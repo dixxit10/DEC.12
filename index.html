@@ -103,8 +103,11 @@
             <button type="button" class="chip" data-cat="健康">健康</button>
             <button type="button" class="chip" data-cat="財運">財運</button>
             <button type="button" class="chip" data-cat="人際">人際</button>
-            <button type="button" class="chip" data-cat="其他／不確定">其他／不確定</button>
           </div>
+        </div>
+        <div class="field">
+          <label>想問的問題（選填）</label>
+          <input type="text" id="divine-question" placeholder="例如：這段感情是否適合我？" maxlength="60">
         </div>
         <div class="field">
           <label>預測有效長度（必填）</label>
@@ -301,37 +304,36 @@
             </div>
           </div>
           <div class="dots" id="detail-dots"></div>
-
-          <!-- 驗證區 -->
-          <div class="detail-card">
-            <div class="detail-field">
-              <div class="field-label"><img src='img/icon-pencil.png' class='glyph' alt=''> 寫下觀察與感受</div>
-              <textarea id="detail-note" placeholder="這段時間的觀察、感受，或是與指引對照的心得…"></textarea>
-              <div class="note-save-row">
-                <span class="note-save-hint" id="note-save-hint">尚未儲存</span>
-                <button class="note-save-btn" id="note-save-btn"><img src='img/act-save.png' class='glyph' alt=''> 儲存</button>
-              </div>
-            </div>
-            <div class="detail-field">
-              <div class="field-label">表情符號</div>
-              <div class="mood-row" id="detail-moods">
-                <button class="mood-btn" data-mood="😌"><img src='img/mood-smile.png' class='glyph' alt=''></button>
-                <button class="mood-btn" data-mood="😊"><img src='img/mood-laugh.png' class='glyph' alt=''></button>
-                <button class="mood-btn" data-mood="🤔"><img src='img/mood-think.png' class='glyph' alt=''></button>
-                <button class="mood-btn" data-mood="😔"><img src='img/mood-sad.png' class='glyph' alt=''></button>
-                <button class="mood-btn" data-mood="✨"><img src='img/icon-sparkle.png' class='glyph' alt=''></button>
-              </div>
-            </div>
-            <div class="detail-field">
-              <div class="field-label"><img src='img/icon-search.png' class='glyph' alt=''> 驗證</div>
-              <div class="verify-row">
-                <button class="verify-btn" id="verify-y">◯ 應驗了</button>
-                <button class="verify-btn" id="verify-x"><img src='img/icon-close.png' class='glyph' alt=''> 未應驗</button>
-              </div>
+        </div>
+        <!-- 共用欄位區（抽卡/卜卦詳情都顯示）：v29.2 修復抽卡記錄欄位遺失 -->
+        <div class="detail-card" id="detail-fields">
+          <div class="detail-field">
+            <div class="field-label"><img src='img/icon-pencil.png' class='glyph' alt=''> 寫下觀察與感受</div>
+            <textarea id="detail-note" placeholder="這段時間的觀察、感受，或是與指引對照的心得…"></textarea>
+            <div class="note-save-row">
+              <span class="note-save-hint" id="note-save-hint">尚未儲存</span>
+              <button class="note-save-btn" id="note-save-btn"><img src='img/act-save.png' class='glyph' alt=''> 儲存</button>
             </div>
           </div>
-          <p class="detail-note">寫下心得與應驗，之後回到這裡對照，看看指引是否成真</p>
+          <div class="detail-field">
+            <div class="field-label">表情符號</div>
+            <div class="mood-row" id="detail-moods">
+              <button class="mood-btn" data-mood="😌"><img src='img/mood-smile.png' class='glyph' alt=''></button>
+              <button class="mood-btn" data-mood="😊"><img src='img/mood-laugh.png' class='glyph' alt=''></button>
+              <button class="mood-btn" data-mood="🤔"><img src='img/mood-think.png' class='glyph' alt=''></button>
+              <button class="mood-btn" data-mood="😔"><img src='img/mood-sad.png' class='glyph' alt=''></button>
+              <button class="mood-btn" data-mood="✨"><img src='img/icon-sparkle.png' class='glyph' alt=''></button>
+            </div>
+          </div>
+          <div class="detail-field">
+            <div class="field-label"><img src='img/icon-search.png' class='glyph' alt=''> 驗證</div>
+            <div class="verify-row">
+              <button class="verify-btn" id="verify-y">○ 應驗了</button>
+              <button class="verify-btn" id="verify-x"><img src='img/icon-close.png' class='glyph' alt=''> 未應驗</button>
+            </div>
+          </div>
         </div>
+        <p class="detail-note">寫下心得與應驗，之後回到這裡對照，看看指引是否成真</p>
       </div>
     </div>
   </section>
@@ -553,11 +555,23 @@
 
 
 </body>
-<!-- Firebase 雲端資料層（未設定 config 時自動 fallback 到 localStorage） -->
-<script src="js/firebase.js?v=29"></script>
-<!-- 卜卦內容資料庫（用戶可自行修改 data/hexagrams.js 更新卦辭） -->
-<script src="data/hexagrams.js?v=29"></script>
-<!-- 應用程式邏輯 -->
-<script src="js/app.js?v=29"></script>
+<!-- ============================================================
+     串接整合說明（v3 已修復版）
+     ------------------------------------------------------------
+     1. js/firebase.js   → 雲端資料層（可選）。未設定 FIREBASE_CONFIG 時
+                          自動 fallback 到 localStorage，不影響任何功能。
+     2. js/app.js        → 完整應用程式邏輯（v2-app-fixed.js 整合版）。
+                          為「自包含」全域腳本：自含 HEXAGRAMS / LINES /
+                          TRI / HEX_TABLE / state / $ / onBoot() 等所有定義，
+                          不依賴 data/hexagrams.js，亦不依賴 firebase.js。
+                          載入後立即執行 onBoot() 完成初始化與 DOM 綁定。
+     ------------------------------------------------------------
+     注意：data/hexagrams.js 為「爻辭資料庫」的舊版資料來源，v2-app-fixed.js
+     已內建完整 HEXAGRAMS 資料，故本頁不再需要載入它（保留檔案僅供參考/擴充）。
+     ============================================================ -->
+<!-- 雲端資料層（可選，未設定 config 時自動 fallback 到 localStorage） -->
+<script src="js/firebase.js?v=30"></script>
+<!-- 應用程式邏輯（v2-app-fixed.js 整合版，自包含，含抽卡/進階卜卦修正） -->
+<script src="js/app.js?v=30"></script>
 </body>
 </html>
