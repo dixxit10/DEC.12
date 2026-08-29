@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>易經卜卦 — 藝術 Gallery v29</title>
+<title>DEC.12</title>
 <link rel="stylesheet" href="css/style.css?v=29">
 </head>
 <body>
 <div class="phone-shell" id="shell">
 
-  <!-- ============ P1 入口（首頁） ============ -->
+  <!--  P1 入口 -->
   <section class="screen active" id="screen-p1" data-screen="p1">
     <header class="topbar">
       <div class="brand">DEC. 12</div>
@@ -19,15 +19,14 @@
       </div>
     </header>
     <div class="main">
-      <!-- v13：移除長 tagline 欄位（頂欄與頁腳不變） -->
-
+      
       <!-- 功能一：每日靈感抽卡 -->
       <div class="p1-section">
         <div class="p1-sec-head">
           <div class="p1-sec-badge"><img src='img/card.png' class='glyph' alt=''></div>
           <div>
-            <div class="p1-sec-title">每日靈感抽卡</div>
-            <div class="p1-sec-sub">每天一張，靜心翻開，給自己一個正念的錨點</div>
+            <div class="p1-sec-title">微光卡</div>
+            <div class="p1-sec-sub">為當下的自己帶來靈感與溫柔指引</div>
           </div>
         </div>
 
@@ -35,7 +34,7 @@
         <div class="draw-card" id="draw-card">
           <div class="draw-inner" id="draw-inner">
             <div class="draw-face draw-front">
-              <div class="draw-seal"><img src='img/jar.png' class='glyph' alt=''></div>
+              <div class="draw-seal"><img src='img/card.png' class='glyph' alt=''></div>
               <div class="draw-front-txt">每日靈感</div>
             </div>
             <div class="draw-face draw-back">
@@ -45,11 +44,10 @@
             </div>
           </div>
         </div>
-        <!-- v13：移除獨立「點擊此處翻開靈感卡」翻面按鈕，改由「每日靈感抽卡」按鈕觸發翻面 -->
 
         <!-- 未抽卡：每日靈感抽卡 -->
         <div class="draw-actions" id="draw-actions">
-          <button class="btn btn-primary btn-lg" id="btn-draw">點擊此處翻開靈感卡</button>
+          <button class="btn btn-primary btn-lg" id="btn-draw">點擊翻開微光卡</button>
         </div>
 
         <!-- 已抽卡：與 P2-C 結果頁相同的按鈕 -->
@@ -64,25 +62,25 @@
       </div>
 
       <!-- 功能區隔 -->
-      <div class="p1-divider">—— 需要更具體的方向？ ——</div>
+      <div class="p1-divider"> 需要更具體的方向？ </div>
 
       <!-- 功能二：進階卜卦罐 -->
       <div class="p1-section">
         <div class="p1-sec-head">
-          <div class="p1-sec-badge"><img src='img/jar.png' class='glyph' alt=''></div>
+          <div class="p1-sec-badge"><img src='img/StarryNight.png' class='glyph' alt=''></div>
           <div>
-            <div class="p1-sec-title">進階卜卦罐</div>
-            <div class="p1-sec-sub">心中默想一件事，選個類別與有效長度，讓結果更聚焦</div>
+            <div class="p1-sec-title">進階星星瓶</div>
+            <div class="p1-sec-sub">透過類別，讓指引更聚焦</div>
           </div>
         </div>
-        <button class="btn btn-secondary btn-lg" id="btn-advance">進入卜卦罐</button>
+        <button class="btn btn-secondary btn-lg" id="btn-advance">進入星星瓶</button>
       </div>
 
-      <p class="footer-link">若這份指引有幫助，歡迎<a href="#" id="milk-link" style="color:var(--accent); text-decoration:underline">請開發者一杯奶茶</a>表示支持</p>
+      <p class="footer-link">若DEC.12真的有鼓勵到您，歡迎<a href="#" id="milk-link" style="color:var(--accent); text-decoration:underline">請開發者一杯奶茶</a>表示支持</p>
     </div>
   </section>
 
-  <!-- ============ P2-A 進階卜卦罐表單（v11：P1 表單移至這裡） ============ -->
+  <!-- P2-A 進階卜卦罐表單 -->
   <section class="screen" id="screen-p2a" data-screen="p2a">
     <header class="topbar">
       <button class="back" id="p2a-back">← 返回</button>
@@ -90,13 +88,13 @@
     </header>
     <div class="main">
       <div class="login-hero" style="padding:14px 0 18px">
-        <div class="seal"><img src='img/jar.png' class='glyph' alt=''></div>
-        <h2>進階卜卦罐</h2>
-        <p>心中默想一件事，選個類別讓結果更聚焦</p>
+        <div class="seal"><img src='img/StarryNight.png' class='glyph' alt=''></div>
+        <h2>星星罐</h2>
+        <p>閉上眼，帶著問題選擇類別，讓思緒在星光中聚焦。</p>
       </div>
       <div class="form-card">
         <div class="field">
-          <label>問題類別（必填）</label>
+          <label>問題類別(必填)</label>
           <div class="chips" id="cat-chips">
             <button type="button" class="chip" data-cat="感情">感情</button>
             <button type="button" class="chip" data-cat="事業">事業</button>
@@ -105,12 +103,12 @@
             <button type="button" class="chip" data-cat="人際">人際</button>
           </div>
         </div>
-        <div class="field">
+        <!-- <div class="field">
           <label>想問的問題（選填）</label>
           <input type="text" id="divine-question" placeholder="例如：這段感情是否適合我？" maxlength="60">
-        </div>
+        </div>-->
         <div class="field">
-          <label>預測有效長度（必填）</label>
+          <label>運勢的顯化期(必填)</label>
           <div class="chips" id="len-chips">
             <button type="button" class="chip" data-len="一週內">一週內</button>
             <button type="button" class="chip" data-len="一個月內">一個月內</button>
@@ -120,7 +118,7 @@
         </div>
         <button class="btn btn-primary btn-lg" id="btn-start">開始卜卦</button>
       </div>
-      <p class="hint" style="text-align:center; margin-top:14px">起卦動畫為 Loading 過場，完成後直接顯示結果</p>
+      <!--<p class="hint" style="text-align:center; margin-top:14px">起卦動畫為 Loading 過場，完成後直接顯示結果</p> -->
     </div>
   </section>
 
@@ -205,19 +203,19 @@
     </header>
     <div class="main">
       <div class="milk-hero">
-        <div class="seal"><img src='img/milk-tea.png' class='glyph' alt=''></div>
+        <div class="seal"><img src='img/jar.png' class='glyph' alt=''></div>
         <h2>奶茶金</h2>
-        <p>每一杯奶茶，都是開發者繼續寫字與修 bug 的燃料</p>
+        <p>每一杯奶茶，都是開發者繼續寫字和維護的燃料</p>
       </div>
       <div class="milk-stats">
-        <div class="milk-stat"><div class="n">128</div><div class="l">累積杯數</div></div>
+        <div class="milk-stat"><div class="n">42</div><div class="l">累積杯數</div></div>
         <div class="milk-stat"><div class="n">NT$ 9,600</div><div class="l">累積金額</div></div>
-        <div class="milk-stat"><div class="n">100%</div><div class="l">流向開發者</div></div>
+        <div class="milk-stat"><div class="n">15%</div><div class="l">流向開發者</div></div>
       </div>
       <div class="milk-list">
-        <div class="milk-row"><span class="d">伺服器與網域</span><span class="a">NT$ 3,200</span></div>
-        <div class="milk-row"><span class="d">開發者奶茶（記錄用）</span><span class="a">NT$ 4,800</span></div>
-        <div class="milk-row"><span class="d">營運雜支</span><span class="a">NT$ 1,600</span></div>
+        <div class="milk-row"><span class="d">伺服器與網域</span><span class="a">NT$ 3,000</span></div>
+        <div class="milk-row"><span class="d">已購買奶茶</span><span class="a">NT$ 1,800</span></div>
+        <div class="milk-row"><span class="d">愛心捐款</span><span class="a">NT$ 4,800</span></div>
       </div>
       <button class="btn btn-primary btn-lg" id="btn-milk-support" disabled style="opacity:.55; cursor:not-allowed">請開發者一杯奶茶（即將開放）</button>
       <p class="hint" style="text-align:center; margin-top:14px">金額與流向公開透明，每月更新一次</p>
@@ -389,7 +387,7 @@
     </header>
     <div class="main">
       <div class="login-hero">
-        <div class="seal"><img src='img/jar.png' class='glyph' alt=''></div>
+        <div class="seal"><img src='img/gear.png' class='glyph' alt=''></div>
         <h2 id="login-title">登入</h2>
         <p id="login-sub">記錄你的卜卦與應驗，歡迎回來對照，看看指引是否成真</p>
       </div>
@@ -555,23 +553,10 @@
 
 
 </body>
-<!-- ============================================================
-     串接整合說明（v3 已修復版）
-     ------------------------------------------------------------
-     1. js/firebase.js   → 雲端資料層（可選）。未設定 FIREBASE_CONFIG 時
-                          自動 fallback 到 localStorage，不影響任何功能。
-     2. js/app.js        → 完整應用程式邏輯（v2-app-fixed.js 整合版）。
-                          為「自包含」全域腳本：自含 HEXAGRAMS / LINES /
-                          TRI / HEX_TABLE / state / $ / onBoot() 等所有定義，
-                          不依賴 data/hexagrams.js，亦不依賴 firebase.js。
-                          載入後立即執行 onBoot() 完成初始化與 DOM 綁定。
-     ------------------------------------------------------------
-     注意：data/hexagrams.js 為「爻辭資料庫」的舊版資料來源，v2-app-fixed.js
-     已內建完整 HEXAGRAMS 資料，故本頁不再需要載入它（保留檔案僅供參考/擴充）。
-     ============================================================ -->
-<!-- 雲端資料層（可選，未設定 config 時自動 fallback 到 localStorage） -->
+
 <script src="js/firebase.js?v=30"></script>
-<!-- 應用程式邏輯（v2-app-fixed.js 整合版，自包含，含抽卡/進階卜卦修正） -->
+<script src="data/hexagrams.js?v=30"></script>
 <script src="js/app.js?v=30"></script>
 </body>
 </html>
+
