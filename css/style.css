@@ -3,3 +3,10 @@
 #detail-fields{display:none!important}
 /* v30: 註冊頁按鈕間距 */
 #btn-later{margin-top:14px}
+
+/* ===== ICON FULL-BLEED FIX (v4) ===== */
+/* 外框 icon 滿版填滿外框：object-fit:cover + 100% 尺寸 + 繼承容器圓角 */
+.icon-btn img,.hero .seal img,.draw-seal img,.coin img,.about-hero .seal img,
+.milk-hero .seal img,.login-hero .seal img,.diary-hero .seal img,.setting-hero .seal img,
+.dash-hero .avatar img,.loading-seal img,.guardian-seal img
+{width:100%!important;height:100%!important;object-fit:cover!important;border-radius:inherit}
