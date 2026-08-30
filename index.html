@@ -14,7 +14,7 @@
     <header class="topbar">
       <div class="brand">DEC. 12</div>
       <div class="right">
-        <button class="navlink" id="nav-login">登入/註冊</button>
+        <button class="navlink" id="nav-login" data-i18n="nav.login">登入/註冊</button>
         <button class="icon-btn" id="btn-menu" aria-label="選單"><img src='img/icon-menu.png' class='glyph icon-menu' alt=''></button>
       </div>
     </header>
@@ -25,8 +25,8 @@
         <div class="p1-sec-head">
           <div class="p1-sec-badge"><img src='img/card.png' class='glyph' alt=''></div>
           <div>
-            <div class="p1-sec-title">微光卡</div>
-            <div class="p1-sec-sub">為當下的自己帶來靈感與溫柔指引</div>
+            <div class="p1-sec-title" data-i18n="p1.micro">微光卡</div>
+            <div class="p1-sec-sub" data-i18n="p1.microSub">為當下的自己帶來靈感與溫柔指引</div>
           </div>
         </div>
 
@@ -34,73 +34,74 @@
         <div class="draw-card" id="draw-card">
           <div class="draw-inner" id="draw-inner">
             <div class="draw-face draw-front">
-              <div class="draw-seal"><img src='img/card.png' class='glyph' alt=''></div>
-              <div class="draw-front-txt">每日靈感</div>
+              <img class="draw-front-art" src="img/card.png" alt="">
+              <!-- <div class="draw-seal"><img src='img/card.png' class='glyph' alt=''></div> -->
+              <!--<div class="draw-front-txt" data-i18n="p1.draw">點擊翻開微光卡</div> -->
             </div>
             <div class="draw-face draw-back">
               <div class="draw-back-k" id="draw-back-k">58 斷捨離中迎來新生</div>
               <div class="draw-back-el" id="draw-back-el"></div>
-              <div class="draw-back-txt" id="draw-back-txt">每日靈感卡，點擊翻開。</div>
+              <div class="draw-back-txt" id="draw-back-txt" data-i18n="draw.hint">每日靈感卡，點擊翻開。</div>
             </div>
           </div>
         </div>
 
         <!-- 未抽卡：每日靈感抽卡 -->
         <div class="draw-actions" id="draw-actions">
-          <button class="btn btn-primary btn-lg" id="btn-draw">點擊翻開微光卡</button>
+          <button class="btn btn-primary btn-lg" id="btn-draw" data-i18n="p1.draw">點擊翻開微光卡</button>
         </div>
 
         <!-- 已抽卡：與 P2-C 結果頁相同的按鈕 -->
         <div class="draw-actions hidden" id="draw-actions-done">
-          <button class="btn btn-primary btn-lg" id="btn-save-draw">儲存至日記</button>
+          <button class="btn btn-primary btn-lg" id="btn-save-draw" data-i18n="p1.save">儲存至日記</button>
           <div style="height:10px"></div>
           <div style="display:flex; gap:8px">
-            <button class="btn btn-secondary" id="btn-redraw">重新抽卡</button>
-            <button class="btn btn-ghost" id="btn-share-draw">分享</button>
+            <button class="btn btn-secondary" id="btn-redraw" data-i18n="p1.redraw">重新抽卡</button>
+            <button class="btn btn-ghost" id="btn-share-draw" data-i18n="p1.share">分享</button>
           </div>
         </div>
       </div>
 
       <!-- 功能區隔 -->
-      <div class="p1-divider"> 需要更具體的方向？ </div>
+      <div class="p1-divider" data-i18n="p1.divider"> 需要更具體的方向？ </div>
 
       <!-- 功能二：進階卜卦罐 -->
       <div class="p1-section">
         <div class="p1-sec-head">
           <div class="p1-sec-badge"><img src='img/StarryNight.png' class='glyph' alt=''></div>
           <div>
-            <div class="p1-sec-title">進階星星瓶</div>
-            <div class="p1-sec-sub">透過類別，讓指引更聚焦</div>
+            <div class="p1-sec-title" data-i18n="p1.advance">進階星星瓶</div>
+            <div class="p1-sec-sub" data-i18n="p1.advanceSub">透過類別，讓指引更聚焦</div>
           </div>
         </div>
-        <button class="btn btn-secondary btn-lg" id="btn-advance">進入星星瓶</button>
+        <button class="btn btn-secondary btn-lg" id="btn-advance" data-i18n="p1.enter">進入星星瓶</button>
       </div>
 
-      <p class="footer-link">若DEC.12真的有鼓勵到您，歡迎<a href="#" id="milk-link" style="color:var(--accent); text-decoration:underline">請開發者一杯奶茶</a>表示支持</p>
+      <p class="footer-link">若DEC.12真的有鼓勵到您，歡迎<a href="#" id="milk-link" style="color:var(--accent); text-decoration:underline" data-i18n="p1.footerLink">請開發者一杯奶茶</a>表示支持</p>
     </div>
   </section>
 
   <!-- P2-A 進階卜卦罐表單 -->
   <section class="screen" id="screen-p2a" data-screen="p2a">
     <header class="topbar">
-      <button class="back" id="p2a-back">← 返回</button>
+      <button class="back" id="p2a-back" data-i18n="p2a.back">← 返回</button>
       <div class="right"></div>
     </header>
     <div class="main">
       <div class="login-hero" style="padding:14px 0 18px">
         <div class="seal"><img src='img/StarryNight.png' class='glyph' alt=''></div>
-        <h2>星星罐</h2>
-        <p>閉上眼，帶著問題選擇類別，讓思緒在星光中聚焦。</p>
+        <h2 data-i18n="p2a.title">星星罐</h2>
+        <p data-i18n="p2a.subtitle">閉上眼，帶著問題選擇類別，讓思緒在星光中聚焦。</p>
       </div>
       <div class="form-card">
         <div class="field">
-          <label>問題類別(必填)</label>
+          <label data-i18n="p2a.cat">問題類別(必填)</label>
           <div class="chips" id="cat-chips">
-            <button type="button" class="chip" data-cat="感情">感情</button>
-            <button type="button" class="chip" data-cat="事業">事業</button>
-            <button type="button" class="chip" data-cat="健康">健康</button>
-            <button type="button" class="chip" data-cat="財運">財運</button>
-            <button type="button" class="chip" data-cat="人際">人際</button>
+            <button type="button" class="chip" data-cat="感情" data-i18n="p2a.cat1">感情</button>
+            <button type="button" class="chip" data-cat="事業" data-i18n="p2a.cat2">事業</button>
+            <button type="button" class="chip" data-cat="健康" data-i18n="p2a.cat3">健康</button>
+            <button type="button" class="chip" data-cat="財運" data-i18n="p2a.cat4">財運</button>
+            <button type="button" class="chip" data-cat="人際" data-i18n="p2a.cat5">人際</button>
           </div>
         </div>
         <!-- <div class="field">
@@ -108,15 +109,15 @@
           <input type="text" id="divine-question" placeholder="例如：這段感情是否適合我？" maxlength="60">
         </div>-->
         <div class="field">
-          <label>運勢的顯化期(必填)</label>
+          <label data-i18n="p2a.len">運勢的顯化期(必填)</label>
           <div class="chips" id="len-chips">
-            <button type="button" class="chip" data-len="一週內">一週內</button>
-            <button type="button" class="chip" data-len="一個月內">一個月內</button>
-            <button type="button" class="chip" data-len="三個月內">三個月內</button>
-            <button type="button" class="chip" data-len="長期（六個月以上）">長期（六個月以上）</button>
+            <button type="button" class="chip" data-len="一週內" data-i18n="p2a.len1">一週內</button>
+            <button type="button" class="chip" data-len="一個月內" data-i18n="p2a.len2">一個月內</button>
+            <button type="button" class="chip" data-len="三個月內" data-i18n="p2a.len3">三個月內</button>
+            <button type="button" class="chip" data-len="長期（六個月以上）" data-i18n="p2a.len4">六個月以上</button>
           </div>
         </div>
-        <button class="btn btn-primary btn-lg" id="btn-start">開始卜卦</button>
+        <button class="btn btn-primary btn-lg" id="btn-start" data-i18n="p2a.start">開始卜卦</button>
       </div>
       <!--<p class="hint" style="text-align:center; margin-top:14px">起卦動畫為 Loading 過場，完成後直接顯示結果</p> -->
     </div>
@@ -127,7 +128,7 @@
     <header class="topbar">
       <div class="brand">DEC. 12</div>
       <div class="right">
-        <button class="navlink" id="nav-login">登入/註冊</button>
+        <button class="navlink" id="nav-login" data-i18n="nav.login">登入/註冊</button>
         <button class="icon-btn" id="btn-menu" aria-label="選單"><img src='img/icon-menu.png' class='glyph icon-menu' alt=''></button>
       </div>
     </header>
@@ -139,7 +140,7 @@
               <circle class="bg" cx="68" cy="68" r="63"></circle>
               <circle class="fg" id="core-ring-fg" cx="68" cy="68" r="63"></circle>
             </svg>
-            <button class="core-btn" id="core-btn">起卦中</button>
+            <button class="core-btn" id="core-btn" data-i18n="p2b.casting">起卦中</button>
           </div>
           <div class="coin" data-i="0"><img src='img/el-sky.png' class='glyph' alt=''></div>
           <div class="coin" data-i="1"><img src='img/el-sky.png' class='glyph' alt=''></div>
@@ -157,7 +158,7 @@
     <header class="topbar">
       <div class="brand">DEC. 12</div>
       <div class="right">
-        <button class="navlink" id="nav-login">登入/註冊</button>
+        <button class="navlink" id="nav-login" data-i18n="nav.login">登入/註冊</button>
         <button class="icon-btn" id="btn-menu" aria-label="選單"><img src='img/icon-menu.png' class='glyph icon-menu' alt=''></button>
       </div>
     </header>
@@ -165,32 +166,32 @@
       <div class="result-meta" id="result-meta"></div>
       <div class="carousel" id="result-carousel"></div>
       <div class="dots" id="result-dots"></div>
-      <button class="btn btn-primary btn-lg" id="btn-save-p2c">儲存到日記</button>
+      <button class="btn btn-primary btn-lg" id="btn-save-p2c" data-i18n="p2c.save">儲存到日記</button>
       <div style="height:10px"></div>
       <div style="display:flex; gap:8px">
-        <button class="btn btn-secondary" id="btn-redo-p2c">重新起卦</button>
-        <button class="btn btn-ghost" id="btn-share-p2c">分享</button>
+        <button class="btn btn-secondary" id="btn-redo-p2c" data-i18n="p2c.redo">重新起卦</button>
+        <button class="btn btn-ghost" id="btn-share-p2c" data-i18n="p1.share">分享</button>
       </div>
-      <p class="disclaimer">今日瀏覽 1,284 人 · 平台推薦指數 4.8／5</p>
+      <p class="disclaimer" data-i18n="p2c.disclaimer">今日瀏覽 1,284 人 · 平台推薦指數 4.8／5</p>
     </div>
   </section>
 
   <!-- ============ 關於 DEC. 12（開發者的話） ============ -->
   <section class="screen" id="screen-about" data-screen="about">
     <header class="topbar">
-      <button class="back" id="about-back">← 返回</button>
+      <button class="back" id="about-back" data-i18n="p2a.back">← 返回</button>
       <div class="right"></div>
     </header>
     <div class="main">
       <div class="about-hero">
         <div class="seal"><img src='img/jar.png' class='glyph' alt=''></div>
-        <h2>關於 DEC. 12</h2>
-        <p>一個陪你靜下心、面對當下的手機卜卦小站</p>
+        <h2 data-i18n="about.title">關於 DEC. 12</h2>
+        <p data-i18n="about.subtitle">一個陪你靜下心、面對當下的卜卦系統</p>
       </div>
       <div class="about-card">
-        <p>當感到迷茫時，內心的聲音被外界的喧囂淹沒時。我們需要的不是宿命論，而是一面溫柔映照內心、指引方向的鏡子。</p>
-        <p>卜卦罐的原型使用《易經》智慧，這是一套動態平衡的古老生命哲學。在這裡，每一次提問都是一次與自己、與宇宙節奏的深刻對話。讓這份智慧為你撥開迷霧，給予當下前行的勇氣。</p>
-        <p style="color:var(--dim); font-size:12px">DEC. 12 · 正式版 v22</p>
+        <p data-i18n="about.p1">當感到迷茫時，內心的聲音被外界的喧囂淹沒時。我們需要的不是宿命論，而是一面溫柔映照內心、指引方向的鏡子。</p>
+        <p data-i18n="about.p2">卜卦罐的原型使用《易經》智慧，這是一套動態平衡的古老生命哲學。在這裡，每一次提問都是一次與自己、與宇宙節奏的深刻對話。讓這份智慧為你撥開迷霧，給予當下前行的勇氣。</p>
+        <p style="color:var(--dim); font-size:12px" data-i18n="about.version">DEC. 12 · 正式版 v22</p>
       </div>
     </div>
   </section>
@@ -198,27 +199,27 @@
   <!-- ============ 奶茶金 ============ -->
   <section class="screen" id="screen-milk" data-screen="milk">
     <header class="topbar">
-      <button class="back" id="milk-back">← 返回</button>
+      <button class="back" id="milk-back" data-i18n="p2a.back">← 返回</button>
       <div class="right"></div>
     </header>
     <div class="main">
       <div class="milk-hero">
         <div class="seal"><img src='img/jar.png' class='glyph' alt=''></div>
-        <h2>奶茶金</h2>
-        <p>每一杯奶茶，都是開發者繼續寫字和維護的燃料</p>
+        <h2 data-i18n="milk.title">奶茶基金</h2>
+        <p data-i18n="milk.subtitle">每一杯奶茶，都是開發者繼續寫字和維護的燃料</p>
       </div>
       <div class="milk-stats">
-        <div class="milk-stat"><div class="n">42</div><div class="l">累積杯數</div></div>
-        <div class="milk-stat"><div class="n">NT$ 9,600</div><div class="l">累積金額</div></div>
-        <div class="milk-stat"><div class="n">15%</div><div class="l">流向開發者</div></div>
+        <div class="milk-stat"><div class="n">42</div><div class="l" data-i18n="milk.cups">累積杯數</div></div>
+        <div class="milk-stat"><div class="n">NT$ 9,600</div><div class="l" data-i18n="milk.total">累積金額</div></div>
+        <div class="milk-stat"><div class="n">15%</div><div class="l" data-i18n="milk.ratio">流向開發者</div></div>
       </div>
       <div class="milk-list">
-        <div class="milk-row"><span class="d">伺服器與網域</span><span class="a">NT$ 3,000</span></div>
-        <div class="milk-row"><span class="d">已購買奶茶</span><span class="a">NT$ 1,800</span></div>
-        <div class="milk-row"><span class="d">愛心捐款</span><span class="a">NT$ 4,800</span></div>
+        <div class="milk-row"><span class="d" data-i18n="milk.r1">伺服器與網域</span><span class="a">NT$ 3,000</span></div>
+        <div class="milk-row"><span class="d" data-i18n="milk.r2">已購買奶茶</span><span class="a">NT$ 1,800</span></div>
+        <div class="milk-row"><span class="d" data-i18n="milk.r3">愛心捐款</span><span class="a">NT$ 4,800</span></div>
       </div>
-      <button class="btn btn-primary btn-lg" id="btn-milk-support" disabled style="opacity:.55; cursor:not-allowed">請開發者一杯奶茶（即將開放）</button>
-      <p class="hint" style="text-align:center; margin-top:14px">金額與流向公開透明，每月更新一次</p>
+      <button class="btn btn-primary btn-lg" id="btn-milk-support" disabled style="opacity:.55; cursor:not-allowed" data-i18n="milk.support">請開發者一杯奶茶（即將開放）</button>
+      <p class="hint" style="text-align:center; margin-top:14px" data-i18n="milk.note">金額與流向公開透明，每月更新一次</p>
     </div>
   </section>
 
@@ -237,17 +238,17 @@
         <div class="dash-name" id="dash-name">你好，旅人</div>
         <div class="dash-badges">
           <span class="badge" id="btn-collect"><img src='img/trophy.png' class='glyph' alt=''> 收藏相簿 <span id="collect-count">3</span></span>
-          <span class="badge" id="btn-guardian"><img src='img/shield.png' class='glyph' alt=''> 本命守護牌</span>
+          <span class="badge" id="btn-guardian"><img src='img/shield.png' class='glyph' alt='' data-i18n="dash.guardian"> 本命守護牌</span>
         </div>
       </div>
 
       <div class="dash-stats">
-        <div class="stat"><div class="n" id="stat-count">0</div><div class="l">卜卦次數</div></div>
-        <div class="stat"><div class="n" id="stat-pending">0</div><div class="l">待回來對照</div></div>
+        <div class="stat"><div class="n" id="stat-count">0</div><div class="l" data-i18n="dash.statCount">卜卦次數</div></div>
+        <div class="stat"><div class="n" id="stat-pending">0</div><div class="l" data-i18n="dash.statPending">待回來對照</div></div>
         <!-- v25：移除第三個統計欄位（原標籤已刪除） -->
       </div>
 
-      <h3 class="dash-sec">每一筆卜卦</h3>
+      <h3 class="dash-sec" data-i18n="dash.sec">每一筆卜卦</h3>
       <!-- v12：日曆呈現（無限滑動＋選日期） -->
       <div class="cal-nav">
         <button class="cal-nav-btn" id="cal-prev">‹</button>
@@ -257,7 +258,7 @@
       <div class="cal-scroll" id="cal-scroll">
         <div id="cal-months"></div>
       </div>
-      <p class="hint" style="text-align:center; margin-top:-4px">點任一格子可查看該卦內容；滑動查看更多月份</p>
+      <p class="hint" style="text-align:center; margin-top:-4px" data-i18n="menu.diaryHint">點任一格子可查看每一筆紀錄；滑動看更多月份</p>
 
     </div>
 
@@ -267,7 +268,7 @@
   <!-- ============ 日記詳情頁（58 斷捨離中迎來新生） ============ -->
   <section class="screen" id="screen-detail" data-screen="detail">
     <header class="topbar" id="detail-topbar">
-      <button class="back" id="detail-back">← 返回</button>
+      <button class="back" id="detail-back" data-i18n="p2a.back">← 返回</button>
       <div class="right"></div>
     </header>
     <div class="main">
@@ -306,15 +307,15 @@
         <!-- 共用欄位區（抽卡/卜卦詳情都顯示）：v29.2 修復抽卡記錄欄位遺失 -->
         <div class="detail-card" id="detail-fields">
           <div class="detail-field">
-            <div class="field-label"><img src='img/icon-pencil.png' class='glyph' alt=''> 寫下觀察與感受</div>
+            <div class="field-label" data-i18n="menu.detailWrite"><img src='img/icon-pencil.png' class='glyph' alt=''> 寫下觀察與感受</div>
             <textarea id="detail-note" placeholder="這段時間的觀察、感受，或是與指引對照的心得…"></textarea>
             <div class="note-save-row">
-              <span class="note-save-hint" id="note-save-hint">尚未儲存</span>
-              <button class="note-save-btn" id="note-save-btn"><img src='img/act-save.png' class='glyph' alt=''> 儲存</button>
+              <span class="note-save-hint" id="note-save-hint" data-i18n="menu.detailNoteSave">尚未儲存</span>
+              <button class="note-save-btn" id="note-save-btn" data-i18n="menu.detailSave"><img src='img/act-save.png' class='glyph' alt=''> 儲存</button>
             </div>
           </div>
           <div class="detail-field">
-            <div class="field-label">表情符號</div>
+            <div class="field-label" data-i18n="menu.detailMood">表情符號</div>
             <div class="mood-row" id="detail-moods">
               <button class="mood-btn" data-mood="😌"><img src='img/mood-smile.png' class='glyph' alt=''></button>
               <button class="mood-btn" data-mood="😊"><img src='img/mood-laugh.png' class='glyph' alt=''></button>
@@ -324,14 +325,14 @@
             </div>
           </div>
           <div class="detail-field">
-            <div class="field-label"><img src='img/icon-search.png' class='glyph' alt=''> 驗證</div>
+            <div class="field-label" data-i18n="menu.detailVerify"><img src='img/icon-search.png' class='glyph' alt=''> 驗證</div>
             <div class="verify-row">
-              <button class="verify-btn" id="verify-y">○ 應驗了</button>
-              <button class="verify-btn" id="verify-x"><img src='img/icon-close.png' class='glyph' alt=''> 未應驗</button>
+              <button class="verify-btn" id="verify-y" data-i18n="menu.verifyY">○ 應驗了</button>
+              <button class="verify-btn" id="verify-x" data-i18n="menu.verifyX"><img src='img/icon-close.png' class='glyph' alt=''> 未應驗</button>
             </div>
           </div>
         </div>
-        <p class="detail-note">寫下心得與應驗，之後回到這裡對照，看看指引是否成真</p>
+        <p class="detail-note" data-i18n="menu.detailNoteHint">寫下心得與應驗，之後回到這裡對照，看看指引是否成真</p>
       </div>
     </div>
   </section>
@@ -339,38 +340,38 @@
   <!-- ============ Setting（M 選單進入） ============ -->
   <section class="screen" id="screen-setting" data-screen="setting">
     <header class="topbar">
-      <button class="back" id="setting-back">← 返回</button>
+      <button class="back" id="setting-back" data-i18n="p2a.back">← 返回</button>
       <div class="right"></div>
     </header>
     <div class="main">
       <div class="setting-hero">
         <div class="seal"><img src='img/gear.png' class='glyph' alt=''></div>
-        <h2>設定</h2>
-        <p>管理你的通知、隱私與帳號</p>
+        <h2 data-i18n="setting.title">設定</h2>
+        <p data-i18n="setting.subtitle">管理你的通知、隱私與帳號</p>
       </div>
       <div class="setting-group">
         <div class="setting-row">
-          <span class="s-label"><img src='img/icon-email.png' class='glyph' alt=''> 寄信提醒</span>
-          <button class="mini-btn on" id="set-remind">已開啟</button>
+          <span class="s-label"><img src='img/icon-email.png' class='glyph' alt='' data-i18n="setting.remind"> 寄信提醒</span>
+          <button class="mini-btn on" id="set-remind" data-i18n="set.on">已開啟</button>
         </div>
         <div class="setting-row">
-          <span class="s-label"><img src='img/icon-bell.png' class='glyph' alt=''> 推播通知</span>
-          <button class="mini-btn" id="set-push">開啟</button>
+          <span class="s-label"><img src='img/icon-bell.png' class='glyph' alt='' data-i18n="setting.push"> 推播通知</span>
+          <button class="mini-btn" id="set-push" data-i18n="set.off">開啟</button>
         </div>
         <div class="setting-row">
-          <span class="s-label"><img src='img/icon-moon.png' class='glyph' alt=''> 深色模式</span>
-          <span class="s-val">跟隨系統</span>
+          <span class="s-label"><img src='img/icon-moon.png' class='glyph' alt='' data-i18n="setting.dark"> 亮色模式</span>
+          <span class="s-val" data-i18n="setting.darkVal">跟隨系統</span>
         </div>
       </div>
       <div class="setting-group">
         <div class="setting-row">
-          <span class="s-label"><img src='img/avatar.png' class='glyph' alt=''> 帳號</span>
-          <span class="s-val" id="setting-account">未登入</span>
+          <span class="s-label" data-i18n="menu.account"><img src='img/avatar.png' class='glyph' alt=''> 帳號</span>
+          <span class="s-val" id="setting-account" data-i18n="menu.accountGuest">未登入</span>
           <!-- v23：登入後可修改暱稱 -->
-          <button class="mini-btn" id="btn-edit-name" style="display:none">修改暱稱</button>
+          <button class="mini-btn" id="btn-edit-name" style="display:none" data-i18n="menu.editName">修改暱稱</button>
         </div>
         <div class="setting-row">
-          <span class="s-label"><img src='img/icon-pencil.png' class='glyph' alt=''> 隱私權政策</span>
+          <span class="s-label" data-i18n="menu.privacy"><img src='img/icon-pencil.png' class='glyph' alt=''> 隱私權政策</span>
           <span class="s-val">v1.0</span>
         </div>
       </div>
@@ -388,38 +389,38 @@
     <div class="main">
       <div class="login-hero">
         <div class="seal"><img src='img/gear.png' class='glyph' alt=''></div>
-        <h2 id="login-title">登入</h2>
-        <p id="login-sub">記錄你的卜卦與應驗，歡迎回來對照，看看指引是否成真</p>
+        <h2 id="login-title" data-i18n="p5.title">登入</h2>
+        <p id="login-sub" data-i18n="p5.sub">記錄你的卜卦與應驗，歡迎回來對照，看看指引是否成真</p>
       </div>
       <!-- v22：帳號 / 密碼欄位 -->
       <div class="auth-tabs">
-        <button class="auth-tab on" id="tab-login">登入</button>
-        <button class="auth-tab" id="tab-register">註冊</button>
+        <button class="auth-tab on" id="tab-login" data-i18n="p5.title">登入</button>
+        <button class="auth-tab" id="tab-register" data-i18n="p5.register">註冊</button>
       </div>
       <div class="form-card">
         <div class="field">
-          <label>帳號（Email）</label>
+          <label data-i18n="menu.authEmail">帳號（Email）</label>
           <input type="email" id="auth-email" placeholder="you@example.com" inputmode="email" autocomplete="email">
         </div>
         <!-- v26：欄位順序調整為 信箱 → 用戶名 → 密碼 → 確認密碼（用戶名移到密碼前） -->
         <div class="field" id="auth-name-field" style="display:none">
-          <label>用戶名（註冊用）</label>
+          <label data-i18n="menu.authName">用戶名（註冊用）</label>
           <input type="text" id="auth-name" placeholder="想被稱呼的名字" maxlength="16">
         </div>
         <div class="field">
-          <label>密碼</label>
+          <label data-i18n="menu.authPass">密碼</label>
           <input type="password" id="auth-pass" placeholder="至少 8 碼，含字母與數字" autocomplete="current-password">
           <!-- v26：密碼即時提示（輸入時動態驗證） -->
           <div class="pass-hint" id="pass-hint" style="display:none"></div>
         </div>
         <div class="field" id="auth-pass2-field" style="display:none">
-          <label>確認密碼</label>
+          <label data-i18n="menu.authPass2">確認密碼</label>
           <input type="password" id="auth-pass2" placeholder="再輸入一次密碼" autocomplete="new-password">
         </div>
         <div class="auth-error" id="auth-error"></div>
         <!-- v25：忘記密碼機制（登入模式顯示） -->
         <div class="auth-forgot" id="auth-forgot" style="display:none">
-          <button type="button" id="btn-forgot">忘記帳號或密碼？</button>
+          <button type="button" id="btn-forgot" data-i18n="menu.forgot">忘記密碼？</button>
         </div>
         <!-- v26：忘記密碼 → 僅限 Email 尋找 -->
         <div class="forgot-box" id="forgot-box" style="display:none">
@@ -427,14 +428,14 @@
             <label>輸入註冊時的信箱尋找密碼</label>
             <input type="email" id="forgot-email" placeholder="you@example.com" inputmode="email">
           </div>
-          <button type="button" class="btn btn-secondary btn-sm" id="btn-forgot-find">尋找密碼</button>
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-forgot-find" data-i18n="menu.forgotFind">尋找密碼</button>
           <div class="forgot-result" id="forgot-result"></div>
-          <button type="button" class="forgot-close" id="btn-forgot-close"><img src='img/icon-close.png' class='glyph' alt=''> 關閉</button>
+          <button type="button" class="forgot-close" id="btn-forgot-close" data-i18n="menu.forgotClose"><img src='img/icon-close.png' class='glyph' alt=''> 關閉</button>
         </div>
       </div>
-      <button class="btn btn-primary btn-lg" id="btn-login">登入</button>
+      <button class="btn btn-primary btn-lg" id="btn-login" data-i18n="p5.title">登入</button>
   <!--    <div style="height:10px"></div> -->
-      <button class="btn btn-secondary" id="btn-later">稍後再說</button>
+      <button class="btn btn-secondary" id="btn-later" data-i18n="p5.later">稍後再說</button>
   <!--   <p class="hint" style="text-align:center; margin-top:12px">會員資料僅存於本機瀏覽器（localStorage），不會上傳</p> -->
     </div>
   </section>
@@ -449,7 +450,7 @@
       <div class="loading-wrap">
         <div class="loading-seal"><img src='img/jar.png' class='glyph' alt=''></div>
         <div class="loading-spinner"></div>
-        <p>載入你的隨記中…</p>
+        <p data-i18n="menu.loading">載入你的隨記中…</p>
       </div>
     </div>
   </section>
@@ -459,20 +460,20 @@
 <!-- 分享面板 -->
 <div class="overlay" id="share-overlay">
   <div class="sheet">
-    <h3>分享</h3>
-    <p class="sub">寄 email 給自己＝備份到信箱；與「儲存日記」不同，不會寫入日記</p>
+    <h3 data-i18n="p1.share">分享</h3>
+    <p class="sub" data-i18n="share.sub">歡迎分享給朋友</p>
     <div class="social-row">
       <button class="social-btn" id="social-line"><span class="ic"><img src='img/icon-speech.png' class='glyph' alt=''></span>LINE</button>
       <button class="social-btn" id="social-fb"><span class="ic"><img src='img/icon-pencil.png' class='glyph' alt=''></span>Facebook</button>
       <button class="social-btn" id="social-ig"><span class="ic"><img src='img/icon-camera.png' class='glyph' alt=''></span>Instagram</button>
       <button class="social-btn" id="social-x"><span class="ic"><img src='img/icon-bird.png' class='glyph' alt=''></span>X</button>
     </div>
-    <div class="share-divider">或寄到 Email</div>
+    <div class="share-divider" data-i18n="share.or">或寄到 Email</div>
     <input type="email" id="share-email" placeholder="輸入 email…" inputmode="email">
-    <button class="btn btn-primary" id="btn-send">寄送</button>
+    <button class="btn btn-primary" id="btn-send" data-i18n="share.send">寄送</button>
     <div class="email-preview" id="email-preview"></div>
-    <p class="note">僅用於寄送這份結果，不會註冊帳號</p>
-    <p class="note">若未收到請檢查垃圾郵件</p>
+    <p class="note" data-i18n="menu.shareNote1">僅用於寄送這份結果，不會註冊帳號</p>
+    <p class="note" data-i18n="menu.shareNote2">若未收到請檢查垃圾郵件</p>
   </div>
 </div>
 
@@ -483,31 +484,30 @@
       <div></div>
       <button class="icon-btn" id="btn-menu-close"><img src='img/icon-close.png' class='glyph' alt=''></button>
     </div>
-    <button class="menu-item" data-act="home">首頁</button>
-    <button class="menu-item" data-act="diary">我的隨記</button>
-    <button class="menu-item" data-act="about">關於 DEC. 12</button>
-    <button class="menu-item" data-act="milk">奶茶金</button>
-    <button class="menu-item" data-act="setting">設定</button>
-    <!-- v12：寄信提醒移至 M 選單 -->
-    <div class="menu-remind">
-      <span><img src='img/icon-bell.png' class='glyph' alt=''></span>
-      <div>
-        <div class="t">寄信提醒</div>
-        <div class="d">每個月 1 日提醒你回來對照</div>
-      </div>
-      <button class="mini-btn" id="btn-remind">關閉</button>
+    <button class="menu-item" data-act="home" data-i18n="menu.home">首頁</button>
+    <button class="menu-item" data-act="diary" data-i18n="menu.diary">我的隨記</button>
+    <button class="menu-item" data-act="about" data-i18n="about.title">關於 DEC. 12</button>
+    <button class="menu-item" data-act="milk" data-i18n="milk.title">奶茶基金</button>
+    <div class="menu-item menu-lang">
+      <span class="ml-label" data-i18n="menu.langToggle"><img src='img/nav-setting.png' class='glyph' alt=''>系統語言切換</span>
+      <label class="lang-switch">
+        <input type="checkbox" id="menu-lang-toggle">
+        <span class="track"><span class="thumb"></span></span>
+        <span class="lang-txt" id="menu-lang-txt">中文</span>
+      </label>
     </div>
-    <button class="menu-item danger" id="menu-logout">⎋ 登出</button>
+    <button class="menu-item" data-act="setting" id="menu-setting-item" data-i18n="setting.title">設定</button>
+    <button class="menu-item danger" id="menu-logout" data-i18n="menu.logout">⎋ 登出</button>
   </div>
 </div>
 
 <!-- 已儲存提示（登入狀態） -->
 <div class="overlay modal-mode" id="saved-overlay">
   <div class="sheet modal-box">
-    <h3>已儲存該筆紀錄</h3>
-    <p class="sub">這筆卜卦已寫入你的隨記</p>
-    <button class="btn btn-primary" id="saved-go">前往查看</button>
-    <button class="btn btn-secondary" id="saved-stay">停留在此頁</button>
+    <h3 data-i18n="saved.title">已儲存該筆紀錄</h3>
+    <p class="sub" data-i18n="saved.sub">這筆卜卦已寫入你的隨記</p>
+    <button class="btn btn-primary" id="saved-go" data-i18n="saved.go">前往查看</button>
+    <button class="btn btn-secondary" id="saved-stay" data-i18n="saved.stay">回到首頁</button>
   </div>
 </div>
 
@@ -515,10 +515,10 @@
 <div class="overlay modal-mode" id="collect-overlay">
   <div class="sheet collect-box">
     <div class="sheet-head">
-      <h3><img src='img/trophy.png' class='glyph' alt=''> 收藏相簿</h3>
+      <h3><img src='img/trophy.png' class='glyph' alt='' data-i18n="dash.collect"> 收藏相簿</h3>
       <button class="icon-btn" id="collect-close"><img src='img/icon-close.png' class='glyph' alt=''></button>
     </div>
-    <p class="sub" style="margin-bottom:14px">完成任務或收集元素，解鎖彩色圖案</p>
+    <p class="sub" style="margin-bottom:14px" data-i18n="menu.collectSub">完成任務或收集元素，解鎖彩色圖案</p>
     <div id="collect-body"></div>
   </div>
 </div>
@@ -527,15 +527,15 @@
 <div class="overlay modal-mode" id="guardian-overlay">
   <div class="sheet guardian-box" style="text-align:center">
     <div class="sheet-head">
-      <h3><img src='img/shield.png' class='glyph' alt=''> 本命守護牌</h3>
+      <h3><img src='img/shield.png' class='glyph' alt='' data-i18n="dash.guardian"> 本命守護牌</h3>
       <button class="icon-btn" id="guardian-close"><img src='img/icon-close.png' class='glyph' alt=''></button>
     </div>
-    <p class="sub">送給你的迎新祝福，一生只有一次翻開機會</p>
+    <p class="sub" data-i18n="menu.guardianSub">送給你的迎新祝福，每個帳號只有一次翻開機會</p>
     <div class="guardian-card" id="guardian-card">
       <div class="guardian-inner" id="guardian-inner">
         <div class="guardian-face guardian-front">
           <div class="guardian-seal"><img src='img/jar.png' class='glyph' alt=''></div>
-          <div class="guardian-front-txt">請靜心翻開旅程起點的第一張卡牌<br>作為送給用戶的迎新祝福</div>
+          <div class="guardian-front-txt" data-i18n="menu.guardianFront1">請靜心翻開旅程起點的第一張卡牌<br>作為送給用戶的迎新祝福</div>
         </div>
         <div class="guardian-face guardian-back" id="guardian-back">
           <div class="guardian-back-k">58 斷捨離中迎來新生</div>
@@ -544,18 +544,16 @@
         </div>
       </div>
     </div>
-    <button class="guardian-flip-btn" id="guardian-flip">翻開本命守護牌</button>
-    <p class="guardian-locked-note" id="guardian-locked-note" style="display:none"><img src='img/icon-lock.png' class='glyph' alt=''> 本命守護牌已固定，無法再次翻開</p>
+    <button class="guardian-flip-btn" id="guardian-flip" data-i18n="menu.guardianFlip">翻開本命守護牌</button>
+    <p class="guardian-locked-note" id="guardian-locked-note" style="display:none" data-i18n="menu.guardianLocked"><img src='img/icon-lock.png' class='glyph' alt=''> 本命守護牌已固定，無法再次翻開</p>
   </div>
 </div>
 
 <div id="toast"></div>
 
-
-</body>
-
 <script src="js/firebase.js?v=30"></script>
 <script src="data/hexagrams.js?v=30"></script>
+<script src="data/hexagrams.en.js?v=30"></script>
 <script src="js/app.js?v=30"></script>
 </body>
 </html>
