@@ -1,313 +1,216 @@
-/* DEC.12 v45 · 儲存結果圖卡（儲存結果 = 把畫面上看到的結果卡片原封不動輸出成 PNG）
-   核心原則：
-     ① 每日抽卡 → 輸出 3:4 微光卡（與畫面 #draw-card 翻開後相同的 .draw-card 造型：
-        米白畫布 + 圓頂狀框 1:1 + 該卦美術圖 + 卦名 + 指引文字）
-     ② 進階卜卦 → 輸出長條 PNG（圓頂狀框 1:1 放卡片1 美術圖+卦名，
-        卡片2/3/4 解釋文字在下方成長條，完整顯示不截斷）
-   本版修正（v44→v45）：
-     問題：儲存結果預覽 Overlay「異常放大超出手機畫面，再縮小到正確位置」
-     根因1：v44 showStage() 把 1080px 圖卡 stage 移到視口正中央且 z-index:9999——
-            html2canvas 渲染期間（等圖載入）大圖在手機畫面中央爆出螢幕，
-            渲染完移走 → 看起來「先放大再縮回」。
-            修正：stage 保持螢幕外（left:-9999px）離線渲染；
-            html2canvas 依元素自身尺寸繪製，與視口位置無關，使用者永遠看不到渲染過程。
-     根因2：#save-preview-img 依賴 max-width 動態縮放，src 設定後可能以 2160px
-            原始尺寸閃一幀再縮小。
-            修正：顯示 overlay 前先計算 contain 縮放比例並鎖定 img width/height，
-            一顯示即為最終大小；並關閉 .modal-mode .sheet 的 pop scale 動畫。
-   注意：全部以「內聯樣式 + 明確 px」重建（不依賴外部 CSS），避免 html2canvas 讀不到 class 樣式。
-   產生後顯示在預覽層：使用者長壓圖片即可儲存，或按「下載圖片」按鈕。 */
+/* DEC.12 v47 · 結果圖卡（html2canvas + QRCode + Overlay 長壓儲存）
+   ------------------------------------------------------------
+   設計原則：
+   1. 抽卡當下即綁定：用 MutationObserver 監看 #draw-back-k / #result-carousel，
+      DOM 一更新就快照 {卦名, 內容, 美術圖} 到模組變數。儲存時只讀快照，
+      永不讀 live DOM → 徹底消除「偶爾存到別張卡」的競態條件。
+   2. 離線重建：圖卡全部用內聯樣式重建（不依賴外部 CSS），html2canvas 100% 渲染。
+   3. 每日抽卡：3:4 畫布（1080×1440）、圓頂框 1:1（960×960）、DEC.12 品牌、QRcode。
+   4. 進階卜卦：長條畫布（1080×H）、卡片1 圓頂框 1:1、卡片2/3/4 白底圓角長條
+      （條列式圓點分行）、DEC.12 品牌、QRcode。
+   5. Overlay 呈現：圖卡以最終尺寸直接顯示（無放大→縮小動畫），長壓即可儲存。 */
 (function () {
   "use strict";
 
-  function isEn() { try { return localStorage.getItem("xingua_lang") === "en"; } catch (e) { return false; } }
-  function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+  /* ---------- 工具 ---------- */
+  function isEn() {
+    try { return localStorage.getItem("xingua_lang") === "en"; } catch (e) { return false; }
+  }
+  function siteUrl() {
+    try { return location.href; } catch (e) { return "https://dec12.app/"; }
+  }
+  function clean(s) {
+    return String(s == null ? "" : s).replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
+  }
   function $(id) { return document.getElementById(id); }
-  function toast(msg) { try { var t = $("toast"); if (t) { t.textContent = msg; t.classList.add("show"); setTimeout(function () { t.classList.remove("show"); }, 2200); } } catch (e) {} }
-
-  /* ============ 讀取目前結果（權威來源 = 畫面當下 DOM） ============ */
-  function findHexByNum(num) {
+  function esc(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+  function hexList() {
+    var en = (typeof window !== "undefined" && window.HEXAGRAMS_EN) || null;
+    var zh = (typeof window !== "undefined" && window.HEXAGRAMS) || [];
+    return (isEn() && en && en.length) ? en : zh;
+  }
+  function findHex(num) {
+    var list = hexList();
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].num === num) return list[i];
+    }
+    return null;
+  }
+  function toast(msg) {
     try {
-      var n = parseInt(num, 10);
-      var list = (typeof window !== "undefined" && window.HEXAGRAMS) || [];
-      for (var i = 0; i < list.length; i++) {
-        if (list[i] && parseInt(list[i].num, 10) === n) return list[i];
+      var t = $("toast");
+      if (t) {
+        t.textContent = msg;
+        t.classList.add("show");
+        clearTimeout(t._timer);
+        t._timer = setTimeout(function () { t.classList.remove("show"); }, 2200);
       }
     } catch (e) {}
+  }
+
+  /* ---------- 抽卡當下綁定（MutationObserver 快照） ---------- */
+  var dailySnapshot = null;      // {num, name, guide, art}
+  var divinationSnapshot = null; // [{kind:'main',name,art}, {kind:'text',title,body} x3]
+
+  function watchDaily() {
+    var k = $("draw-back-k");
+    var t = $("draw-back-txt");
+    if (!k) return;
+    var take = function () {
+      var name = clean(k.textContent);
+      var guide = t ? clean(t.textContent) : "";
+      var num = parseInt(name, 10);
+      var hex = isNaN(num) ? null : findHex(num);
+      dailySnapshot = {
+        num: num,
+        name: name,
+        guide: guide,
+        art: (hex && hex.cardImg) || ""
+      };
+    };
+    var mo = new MutationObserver(take);
+    mo.observe(k, { childList: true, characterData: true, subtree: true });
+    if (t) mo.observe(t, { childList: true, characterData: true, subtree: true });
+  }
+
+  function watchDivination() {
+    var car = $("result-carousel");
+    if (!car) return;
+    var take = function () {
+      var slides = car.querySelectorAll(".slide");
+      if (!slides.length) return;
+      var snap = [];
+      var s1 = slides[0];
+      var nameEl = s1.querySelector(".name");
+      var imgEl = s1.querySelector(".card-main-img");
+      snap.push({
+        kind: "main",
+        name: nameEl ? clean(nameEl.textContent) : "",
+        art: imgEl ? imgEl.getAttribute("src") : ""
+      });
+      for (var i = 1; i < slides.length && i < 4; i++) {
+        var s = slides[i];
+        var kEl = s.querySelector(".slide-k");
+        var coreEl = s.querySelector(".core-txt");
+        var focusEl = s.querySelector(".focus");
+        snap.push({
+          kind: "text",
+          title: kEl ? clean(kEl.textContent) : "",
+          body: coreEl ? clean(coreEl.textContent) : (focusEl ? clean(focusEl.textContent) : "")
+        });
+      }
+      divinationSnapshot = snap;
+    };
+    var mo = new MutationObserver(take);
+    mo.observe(car, { childList: true, subtree: true });
+  }
+
+  /* ---------- 模式判斷 ---------- */
+  function currentMode() {
+    var active = document.querySelector(".screen.active");
+    var name = active ? active.getAttribute("data-screen") : "";
+    if (name === "p2c" && divinationSnapshot && divinationSnapshot.length >= 4) return "divination";
+    if (dailySnapshot && dailySnapshot.name) return "daily";
     return null;
   }
 
-  /* 每日抽卡：先讀抽卡當下綁定的 window.DEC12_DAILY（卦名+內容+美術圖三者同一張卡，
-     永不反查、無競態）；若無綁定（如重新載入後直接分享），再以畫面 DOM 兜底並重建綁定。
-     美術圖：綁定值 = hex.cardImg || HEXAGRAM_IMG[num]（與日記明細頁 card-main-img 同一張）。 */
-  function readDaily() {
-    var b = null;
-    try { if (window.DEC12_DAILY && window.DEC12_DAILY.num) b = window.DEC12_DAILY; } catch (e) {}
-    if (!b) {
-      var out2 = { num: null, name: "", guide: "", art: "" };
-      try {
-        var dk2 = $("draw-back-k");
-        if (dk2 && dk2.textContent) {
-          out2.name = String(dk2.textContent).replace(/\s+/g, " ").trim();
-          var m2 = out2.name.match(/(\d{1,2})/);
-          if (m2) out2.num = parseInt(m2[1], 10);
-        }
-        var dt2 = $("draw-back-txt");
-        if (dt2) out2.guide = String(dt2.textContent).replace(/\s+/g, " ").trim();
-        var h2 = out2.num ? findHexByNum(out2.num) : null;
-        if (h2 && h2.cardImg) out2.art = h2.cardImg;
-        if (!out2.art && h2) { try { if (window.HEXAGRAM_IMG && window.HEXAGRAM_IMG[h2.num]) out2.art = window.HEXAGRAM_IMG[h2.num]; } catch (e) {} }
-        try { window.DEC12_DAILY = out2; } catch (e) {}
-      } catch (e) {}
-      return out2;
-    }
-    return { num: b.num, name: b.name, guide: b.guide, art: b.art };
-  }
-
-  /* 進階卜卦：直接讀畫面 Carousel 的 4 張 .slide（與畫面一致）。
-     卡片1 美術圖取 .card-main-img（即時、權威），卦名取 .name。 */
-  function readDivination() {
-    var out = { slides: [], art: "", name: "" };
-    try {
-      var car = $("result-carousel");
-      if (car) {
-        var slides = car.querySelectorAll(".slide");
-        for (var i = 0; i < slides.length; i++) {
-          var s = slides[i];
-          var k = s.querySelector(".slide-k"), c = s.querySelector(".core-txt"), f = s.querySelector(".focus");
-          out.slides.push({
-            k: k ? String(k.textContent).replace(/\s+/g, " ").trim() : "",
-            txt: c ? String(c.textContent).replace(/\s+/g, " ").trim() : "",
-            focus: f ? String(f.textContent).replace(/\s+/g, " ").trim() : ""
-          });
-          if (i === 0) {
-            var img = s.querySelector("img.card-main-img") || s.querySelector(".el-ic img");
-            if (img && img.getAttribute("src")) out.art = img.getAttribute("src");
-            var nm = s.querySelector(".name");
-            if (nm) out.name = String(nm.textContent).replace(/\s+/g, " ").trim();
-          }
-        }
-      }
-      /* 保險：由卡片1 卦名反查 cardImg（型別統一） */
-      if (!out.art && out.name) {
-        var m = out.name.match(/(\d{1,2})/);
-        if (m) {
-          var h = findHexByNum(parseInt(m[1], 10));
-          if (h && h.cardImg) out.art = h.cardImg;
-        }
-      }
-    } catch (e) {}
-    return out;
-  }
-
-  /* ============ 判斷目前是哪一種結果 ============ */
-  function currentKind() {
-    try {
-      var p2c = $("screen-p2c"), p1 = $("screen-p1");
-      if (p2c && p2c.classList.contains("active")) return "divination";
-      if (p1 && p1.classList.contains("active")) {
-        var dc = $("draw-card");
-        if (dc && dc.classList.contains("flipped")) return "daily";
-      }
-      var car = $("result-carousel");
-      if (car && car.querySelector(".slide")) return "divination";
-      var d2 = $("draw-card");
-      if (d2 && d2.classList.contains("flipped")) return "daily";
-    } catch (e) {}
-    return "daily";
-  }
-
-  /* ============ 每日抽卡：3:4 米白畫布 + 圓頂狀框 1:1（與微光卡同造型） ============ */
-  function buildDailyCard(r) {
-    var art = r.art || "";
-    var box = document.createElement("div");
-    box.id = "save-daily-card";
-    /* 畫布 1080×1440（3:4）：四周留白 64px，最上方 DEC.12 品牌 */
-    box.style.cssText = "width:1080px;height:1440px;box-sizing:border-box;background:#f4f1ea;font-family:'Noto Serif TC','Songti TC','STSong','Georgia',serif;color:#111;position:relative;padding:64px 64px 0;display:flex;flex-direction:column;align-items:center;";
-    /* 品牌名 DEC.12（最上方） */
-    var brand = document.createElement("div");
-    brand.style.cssText = "font-size:34px;font-weight:700;letter-spacing:14px;color:#8a8378;text-align:center;margin-bottom:40px;flex:0 0 auto;";
-    brand.textContent = "DEC. 12";
-    box.appendChild(brand);
-    /* 圓頂狀框（1:1 = 960×960，與微光卡相同拱門造型 border-radius） */
-    var arch = document.createElement("div");
-    arch.style.cssText = "width:960px;height:960px;box-sizing:border-box;background:#fff;border-radius:480px 480px 24px 24px / 380px 380px 24px 24px;position:relative;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.12);border:1px solid #e3ded2;flex:0 0 auto;";
-    box.appendChild(arch);
-    /* 該卦背景美術圖（與畫面同一張） */
-    if (art) {
-      var bg = document.createElement("img");
-      bg.src = art;
-      bg.crossOrigin = "anonymous";
-      bg.alt = "";
-      bg.style.cssText = "position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover;display:block;";
-      arch.appendChild(bg);
-      /* 底部漸層：確保白字清晰可讀 */
-      var grad = document.createElement("div");
-      grad.style.cssText = "position:absolute;left:0;top:0;width:100%;height:100%;background:linear-gradient(180deg,rgba(0,0,0,0) 42%,rgba(0,0,0,.5) 76%,rgba(0,0,0,.66) 100%);";
-      arch.appendChild(grad);
-    }
-    /* 框內文字（微光卡排版：卦名大標 + 分隔線 + 指引；字級調小確保完整顯示） */
-    var txtWrap = document.createElement("div");
-    txtWrap.style.cssText = "position:absolute;left:0;bottom:0;width:100%;box-sizing:border-box;padding:0 84px 88px;text-align:center;color:#fff;";
-    arch.appendChild(txtWrap);
-    var title = document.createElement("div");
-    title.style.cssText = "font-size:56px;font-weight:700;letter-spacing:8px;color:#fff;text-shadow:0 2px 16px rgba(0,0,0,.6);margin-bottom:24px;";
-    title.textContent = r.name || (isEn() ? "Daily Light" : "每日靈感");
-    txtWrap.appendChild(title);
-    var line = document.createElement("div");
-    line.style.cssText = "width:170px;height:3px;background:rgba(255,255,255,.85);margin:0 auto 26px;border-radius:2px;";
-    txtWrap.appendChild(line);
-    var guide = document.createElement("div");
-    guide.style.cssText = "font-size:30px;line-height:1.85;color:rgba(255,255,255,.97);text-shadow:0 1px 12px rgba(0,0,0,.55);font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Microsoft JhengHei','Noto Sans TC',sans-serif;max-height:430px;overflow:hidden;";
-    guide.textContent = r.guide || "";
-    txtWrap.appendChild(guide);
-    /* 底部 QRcode 已移除（v44） */
-    return box;
-  }
-
-  /* ============ 進階卜卦：圓頂狀框 1:1（卡片1）+ 卡片2/3/4 長條（完整內容） ============ */
-  function buildDivinationCard(r) {
-    var slides = r.slides && r.slides.length ? r.slides : [{ k: "", txt: "" }, { k: "", txt: "" }, { k: "", txt: "" }, { k: "", txt: "" }];
-    var wrap = document.createElement("div");
-    wrap.id = "save-slides-wrap";
-    /* 寬 1080、高度動態（長條），四周留白 64px，最上方 DEC.12 品牌 */
-    wrap.style.cssText = "width:1080px;box-sizing:border-box;background:#f4f1ea;font-family:-apple-system,BlinkMacSystemFont,'PingFang TC','Microsoft JhengHei','Noto Sans TC','Noto Serif TC',serif;color:#111;padding:64px 64px 70px;";
-    var brand = document.createElement("div");
-    brand.style.cssText = "font-size:34px;font-weight:700;letter-spacing:14px;color:#8a8378;text-align:center;margin-bottom:40px;font-family:'Noto Serif TC','Songti TC','STSong','Georgia',serif;";
-    brand.textContent = "DEC. 12";
-    wrap.appendChild(brand);
-    /* 卡片1：圓頂狀框 1:1（960×960，與每日抽卡一致）+ 該卦美術圖 + 卦名 */
-    var arch = document.createElement("div");
-    arch.style.cssText = "width:960px;height:960px;box-sizing:border-box;background:#fff;border-radius:480px 480px 24px 24px / 380px 380px 24px 24px;position:relative;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.10);border:1px solid #e3ded2;margin:0 auto 52px;";
-    if (r.art) {
-      var bg = document.createElement("img");
-      bg.src = r.art;
-      bg.crossOrigin = "anonymous";
-      bg.alt = "";
-      bg.style.cssText = "position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover;display:block;";
-      arch.appendChild(bg);
-      var grad = document.createElement("div");
-      grad.style.cssText = "position:absolute;left:0;top:0;width:100%;height:100%;background:linear-gradient(180deg,rgba(0,0,0,0) 45%,rgba(0,0,0,.58) 100%);";
-      arch.appendChild(grad);
-    }
-    var c1txt = document.createElement("div");
-    c1txt.style.cssText = "position:absolute;left:0;bottom:0;width:100%;box-sizing:border-box;padding:0 80px 84px;text-align:center;color:#fff;";
-    arch.appendChild(c1txt);
-    var c1k = document.createElement("div");
-    c1k.style.cssText = "font-size:56px;font-weight:700;letter-spacing:6px;color:#fff;text-shadow:0 2px 16px rgba(0,0,0,.6);margin-bottom:22px;font-family:'Noto Serif TC','Songti TC','STSong','Georgia',serif;";
-    c1k.textContent = r.name || slides[0].k || "";
-    c1txt.appendChild(c1k);
-    var c1line = document.createElement("div");
-    c1line.style.cssText = "width:160px;height:3px;background:rgba(255,255,255,.85);margin:0 auto;border-radius:2px;";
-    c1txt.appendChild(c1line);
-    wrap.appendChild(arch);
-    /* 卡片2/3/4：解釋文字長條（與結果頁 Carousel 相同排版；高度自動、完整顯示不截斷） */
-    var defTitles = ["", (isEn() ? "Reading" : "指引"), (isEn() ? "Context" : "情境解讀"), (isEn() ? "Guidance" : "參考建議")];
-    for (var i = 1; i < 4; i++) {
-      var s = slides[i] || { k: "", txt: "" };
-      var card = document.createElement("div");
-      card.style.cssText = "width:100%;box-sizing:border-box;background:#fff;border:1px solid #e3ded2;border-radius:20px;padding:44px 48px;margin-bottom:36px;text-align:left;";
-      var k = document.createElement("div");
-      k.style.cssText = "font-size:26px;color:#8a8378;margin-bottom:20px;letter-spacing:2px;";
-      k.textContent = s.k || defTitles[i] || "";
-      card.appendChild(k);
-      var body = document.createElement("div");
-      body.style.cssText = "font-size:30px;line-height:1.85;color:#111;white-space:pre-line;";
-      body.textContent = s.txt || s.focus || "";
-      card.appendChild(body);
-      wrap.appendChild(card);
-    }
-    /* 底部 QRcode 已移除（v44） */
-    return wrap;
-  }
-
-  /* ============ 等待圖片載入（含背景美術圖） ============ */
-  function waitImages(root) {
+  /* ---------- QR ---------- */
+  function drawQr() {
     return new Promise(function (resolve) {
-      var imgs = root ? root.querySelectorAll("img") : [];
-      var pending = [];
-      for (var i = 0; i < imgs.length; i++) {
-        var im = imgs[i];
-        if (!im.complete || im.naturalWidth === 0) pending.push(im);
-      }
-      if (!pending.length) { resolve(); return; }
-      var done = false, remain = pending.length;
-      var fin = function () { if (!done) { remain--; if (remain <= 0) { done = true; resolve(); } } };
-      for (var j = 0; j < pending.length; j++) {
-        pending[j].addEventListener("load", fin);
-        pending[j].addEventListener("error", fin);
-      }
-      setTimeout(function () { if (!done) { done = true; resolve(); } }, 5000);
+      if (typeof QRCode === "undefined") { resolve(""); return; }
+      QRCode.toDataURL(siteUrl(), {
+        width: 300, margin: 1, color: { dark: "#111111", light: "#f4f1ea" }
+      }).then(function (url) { resolve(url); }).catch(function () { resolve(""); });
     });
   }
 
-  function showStage(el) {
+  /* ---------- 圖卡 HTML（全部內聯樣式） ---------- */
+  var SERIF = "'Noto Serif TC','Songti TC','STSong','Georgia',serif";
+
+  function brandHtml() {
+    return '<div style="font-size:34px;letter-spacing:14px;color:#a39d90;text-align:center;margin-bottom:36px;font-family:' + SERIF + ';">DEC. 12</div>';
+  }
+  function qrHtml(qr) {
+    return '<div style="margin-top:44px;display:flex;align-items:center;justify-content:center;gap:24px;">' +
+      (qr ? '<img src="' + qr + '" style="width:150px;height:150px;border-radius:10px;flex-shrink:0;">' : "") +
+      '<div style="font-size:22px;color:#a39d90;line-height:1.7;letter-spacing:1px;text-align:left;font-family:' + SERIF + ';">掃碼回到 DEC. 12<br>每一次占卜，都是一次與自己的對話</div>' +
+      "</div>";
+  }
+  function domeFrameHtml(art, name, guide) {
+    return '<div style="width:960px;height:960px;border-radius:50% 50% 18px 18px/38% 38% 18px 18px;overflow:hidden;position:relative;box-shadow:0 18px 44px rgba(0,0,0,.14);flex-shrink:0;background:#101014;">' +
+      (art ? '<img src="' + art + '" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">' : "") +
+      '<div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.18) 0%,rgba(0,0,0,0) 32%,rgba(0,0,0,.55) 100%);"></div>' +
+      '<div style="position:absolute;left:84px;right:84px;top:52px;text-align:center;">' +
+        '<div style="font-size:56px;font-weight:700;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.6);letter-spacing:4px;line-height:1.3;font-family:' + SERIF + ';">' + esc(name) + "</div>" +
+      "</div>" +
+      '<div style="position:absolute;left:84px;right:84px;bottom:44px;text-align:left;">' +
+        '<div style="font-size:30px;line-height:1.75;color:#fff;text-shadow:0 1px 10px rgba(0,0,0,.65);max-height:430px;overflow:hidden;letter-spacing:1px;font-family:' + SERIF + ';">' + esc(guide) + "</div>" +
+      "</div>" +
+      "</div>";
+  }
+  function textCardHtml(title, body) {
+    return '<div style="width:960px;background:#fff;border-radius:24px;padding:40px 48px;margin-top:32px;box-shadow:0 8px 24px rgba(0,0,0,.06);box-sizing:border-box;">' +
+      '<div style="font-size:26px;color:#8a8578;letter-spacing:2px;margin-bottom:16px;font-family:' + SERIF + ';">' + esc(title) + "</div>" +
+      '<div style="font-size:32px;color:#111;line-height:1.8;letter-spacing:1px;white-space:pre-line;font-family:' + SERIF + ';">' + esc(body) + "</div>" +
+      "</div>";
+  }
+
+  function dailyCardHtml(snap, qr) {
+    return '<div style="width:1080px;height:1440px;background:#f4f1ea;position:relative;overflow:hidden;box-sizing:border-box;padding:60px 60px 56px;display:flex;flex-direction:column;align-items:center;">' +
+      brandHtml() +
+      domeFrameHtml(snap.art, snap.name, snap.guide) +
+      qrHtml(qr) +
+      "</div>";
+  }
+
+  function divinationCardHtml(snap, qr) {
+    var html = '<div style="width:1080px;background:#f4f1ea;position:relative;box-sizing:border-box;padding:60px 60px 56px;display:flex;flex-direction:column;align-items:center;">' +
+      brandHtml();
+    var main = snap[0];
+    html += domeFrameHtml(main.art, main.name, "");
+    for (var i = 1; i < snap.length; i++) {
+      html += textCardHtml(snap[i].title, snap[i].body);
+    }
+    html += qrHtml(qr);
+    html += "</div>";
+    return html;
+  }
+
+  /* ---------- 離線渲染（html2canvas） ---------- */
+  function renderToCanvas(html, width, height) {
     var stage = $("share-card-stage");
-    if (!stage) return;
-    stage.innerHTML = "";
-    stage.appendChild(el);
-    /* v45：保持在螢幕外（left:-9999px）離線渲染。
-       html2canvas 是以「元素自身尺寸」（offsetWidth/offsetHeight）繪製，與視口位置無關；
-       放在螢幕外 = 使用者永遠看不到渲染過程，
-       不會再出現 1080px 大圖爆出 390px 手機畫面（放大→縮回的閃動）。 */
-    var w = el.offsetWidth || 1080;
+    if (!stage) return Promise.reject(new Error("no stage"));
+    if (typeof html2canvas === "undefined") return Promise.reject(new Error("html2canvas not loaded"));
     stage.style.left = "-9999px";
     stage.style.top = "0";
-    stage.style.width = w + "px";
-    stage.style.height = "auto";
     stage.style.zIndex = "-1";
     stage.style.opacity = "1";
-    stage.style.position = "fixed";
-    stage.style.background = "#f4f1ea";
-    stage.style.pointerEvents = "none";
-  }
-  function hideStage() {
-    var stage = $("share-card-stage");
-    if (!stage) return;
-    stage.style.left = "-9999px";
-    stage.style.zIndex = "-1";
-    stage.innerHTML = "";
-  }
-
-  /* ============ 生成 canvas（1080 寬輸出，scale 2 → 2160） ============ */
-  function renderCanvas(kind) {
-    var root = null, bg = "#f4f1ea";
-    if (kind === "daily") {
-      root = buildDailyCard(readDaily());
-    } else {
-      root = buildDivinationCard(readDivination());
-    }
-    showStage(root);
-    return waitImages(root)
-      .then(function () {
-        return new Promise(function (resolve, reject) {
-          if (typeof html2canvas === "undefined") { hideStage(); reject(new Error("html2canvas not loaded")); return; }
-          var scale = 2; /* 2160px 寬輸出，品質高 */
-          html2canvas(root, {
-            scale: scale,
-            backgroundColor: bg,
-            useCORS: true,
-            allowTaint: true,
-            logging: false,
-            width: root.offsetWidth,
-            height: root.offsetHeight,
-            windowWidth: 1080,
-            onclone: function (doc) {
-              var imgs = doc.querySelectorAll("img[src]");
-              for (var i = 0; i < imgs.length; i++) {
-                if (!imgs[i].getAttribute("crossorigin")) imgs[i].setAttribute("crossorigin", "anonymous");
-              }
-            }
-          }).then(function (canvas) {
-            hideStage();
-            try { if (window.DEC12_CAPTURE) window.DEC12_CAPTURE(canvas); } catch (e) {}
-            resolve(canvas);
-          }).catch(function (e) { hideStage(); reject(e); });
-        });
-      });
+    stage.style.width = width + "px";
+    stage.style.height = height + "px";
+    stage.innerHTML = html;
+    return html2canvas(stage.firstChild, {
+      scale: 2,
+      backgroundColor: "#f4f1ea",
+      useCORS: true,
+      logging: false,
+      width: width,
+      height: height,
+      windowWidth: width
+    });
   }
 
-  /* ============ 下載 ============ */
+  /* ---------- Overlay 預覽（長壓儲存） ---------- */
+  function showPreview(canvas) {
+    var ov = $("card-preview-overlay");
+    var img = $("card-preview-img");
+    if (!ov || !img) return;
+    img.src = canvas.toDataURL("image/png");
+    ov.classList.add("open");
+  }
+
   function downloadCanvas(canvas) {
     try {
       canvas.toBlob(function (blob) {
@@ -318,7 +221,10 @@
         a.download = "dec12-reading.png";
         document.body.appendChild(a);
         a.click();
-        setTimeout(function () { document.body.removeChild(a); URL.revokeObjectURL(url); }, 800);
+        setTimeout(function () {
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }, 800);
       }, "image/png");
     } catch (e) { fallbackDownload(canvas); }
   }
@@ -333,54 +239,71 @@
     } catch (e) {}
   }
 
-  /* ============ 主流程：生成 → 顯示預覽（長壓可儲存） ============
-     v45：預覽層直接以最終縮放尺寸顯示——
-     1) 先計算並鎖定 img 的 width/height（避免 2160px 原始尺寸先閃一幀再縮小）
-     2) 移除 .modal-mode .sheet 的 pop scale 動畫（overlay 一出現就是正確大小） */
-  var lastCanvas = null;
+  /* ---------- 主流程 ---------- */
   function shareCard() {
-    var kind = currentKind();
-    renderCanvas(kind).then(function (canvas) {
-      lastCanvas = canvas;
-      var ov = $("share-overlay");
-      if (ov) ov.classList.remove("open");
-      var po = $("save-preview-overlay");
-      var img = $("save-preview-img");
-      if (img) {
-        try { img.src = canvas.toDataURL("image/png"); } catch (e) { img.src = ""; }
-        /* 預先鎖定最終顯示尺寸（contain 縮放），img 一顯示即為正確大小 */
-        var box = po ? po.firstElementChild : null;
-        var maxW = (box ? box.clientWidth : (window.innerWidth * 0.92)) - 40;
-        var maxH = (window.innerHeight * 0.88) - 190;
-        if (maxH < 120) maxH = 120;
-        var iw = canvas.width || 1, ih = canvas.height || 1;
-        var ratio = Math.min(maxW / iw, maxH / ih, 1);
-        if (ratio < 1) {
-          img.style.width = Math.round(iw * ratio) + "px";
-          img.style.height = Math.round(ih * ratio) + "px";
-        } else {
-          img.style.width = "auto";
-          img.style.height = "auto";
-        }
+    var mode = currentMode();
+    if (!mode) { toast(isEn() ? "Please finish a reading first." : "請先完成卜卦"); return; }
+    var snap = mode === "daily" ? dailySnapshot : divinationSnapshot;
+    if (!snap) { toast(isEn() ? "Please finish a reading first." : "請先完成卜卦"); return; }
+
+    drawQr().then(function (qr) {
+      var html, w, h;
+      if (mode === "daily") {
+        w = 1080; h = 1440;
+        html = dailyCardHtml(snap, qr);
+      } else {
+        w = 1080; h = 0;
+        html = divinationCardHtml(snap, qr);
       }
-      if (po) po.classList.add("open");
-      else downloadCanvas(canvas);
-    }).catch(function () {
-      toast(isEn() ? "Could not generate the card image." : "圖卡生成失敗，請稍後再試");
+      var stage = $("share-card-stage");
+      if (h === 0) {
+        stage.style.width = w + "px";
+        stage.style.height = "auto";
+        stage.innerHTML = html;
+        h = stage.scrollHeight;
+      }
+      renderToCanvas(html, w, h).then(function (canvas) {
+        showPreview(canvas);
+      }).catch(function () {
+        toast(isEn() ? "Could not generate card." : "圖卡生成失敗，請重試");
+      });
     });
   }
 
-  /* ============ 綁定 ============ */
+  /* ---------- 綁定 ---------- */
   function bind() {
     var btn = $("social-card");
     if (btn) btn.addEventListener("click", shareCard);
-    var dl = $("save-preview-dl");
-    if (dl) dl.addEventListener("click", function () { if (lastCanvas) downloadCanvas(lastCanvas); });
-    var cl = $("save-preview-close");
-    if (cl) cl.addEventListener("click", function () { var po = $("save-preview-overlay"); if (po) po.classList.remove("open"); });
-    var po = $("save-preview-overlay");
-    if (po) po.addEventListener("click", function (e) { if (e.target === this) this.classList.remove("open"); });
+
+    var dl = $("card-preview-download");
+    if (dl) dl.addEventListener("click", function () {
+      var img = $("card-preview-img");
+      if (img && img.src && img.src.indexOf("data:image/png") === 0) {
+        var a = document.createElement("a");
+        a.href = img.src;
+        a.download = "dec12-reading.png";
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function () { document.body.removeChild(a); }, 800);
+      }
+    });
+    var close = $("card-preview-close");
+    if (close) close.addEventListener("click", function () {
+      var ov = $("card-preview-overlay");
+      if (ov) ov.classList.remove("open");
+    });
+    var ov = $("card-preview-overlay");
+    if (ov) ov.addEventListener("click", function (e) {
+      if (e.target === this) this.classList.remove("open");
+    });
+
+    watchDaily();
+    watchDivination();
   }
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", bind);
-  else bind();
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", bind);
+  } else {
+    bind();
+  }
 })();
