@@ -1,13 +1,39 @@
-var FIREBASE_CONFIG = {
-  apiKey: "AIzaSyCEyRLhBF2NSy2jRCdBYd7UzFW5Nwklhk8",
-  authDomain: "dec12-62195.firebaseapp.com",
-  projectId: "dec12-62195",
-  storageBucket: "dec12-62195.firebasestorage.app",
-  messagingSenderId: "981849158907",
-  appId: "1:981849158907:web:9eb4f5f43f207580b3ac5e",
-  measurementId: "G-LX00QPTNB7"
-};
+/* ============================================================
+   DEC.12 卜卦 App v27 — Firebase 雲端資料層 (js/firebase.js)
+   ------------------------------------------------------------
+   功能：
+   1. 若你在 firebase.js 設定 FIREBASE_CONFIG（Firebase 專案設定），
+      會員帳號、日記、收藏、設定會同步到 Firebase Firestore 雲端資料庫，
+      且登入/註冊/重設密碼使用 Firebase Auth。
+   2. 若未設定（null，或 Firebase 連線失敗），自動 fallback 到 localStorage，
+      與原本單機版行為一致。
 
+   如何啟用 Firebase（詳細步驟見 README）：
+   1. 到 https://console.firebase.google.com 建立專案
+   2. 啟用 Authentication → Email/密碼
+   3. 建立 Firestore 資料庫（測試模式）
+   4. 將專案設定中的 config 物件填入下方 FIREBASE_CONFIG
+   5. 重新部署即可。用戶註冊/登入/資料全部雲端同步。
+
+   ※ 若 FIREBASE_CONFIG 留空（null），程式完全以 localStorage 運作，
+      Firebase SDK 不會被載入，不影響任何功能。
+
+   介面（與 localStorage 版本一致）：
+     FB.ready               → Promise<boolean> 是否 Firebase 可用
+     FB.loadUsers()         → Promise<Object>  會員表 {email: {password,name,...}}
+     FB.saveUsers(u)        → Promise<void>    儲存會員表
+     FB.loadDiary(uid)      → Promise<Array>   該會員日記
+     FB.saveDiary(uid,a)    → Promise<void>    儲存該會員日記
+     FB.loadSettings(uid)   → Promise<Object>  該會員設定
+     FB.saveSettings(uid,s) → Promise<void>    儲存該會員設定
+     FB.loadCollect(uid)    → Promise<Object>  該會員收藏
+     FB.saveCollect(uid,c)  → Promise<void>    儲存該會員收藏
+     FB.resetPassword(email)→ Promise<Object>  寄送重設密碼信 {ok, error}
+     FB.signUp(email,pass)  → Promise<Object>  Firebase Auth 註冊 {ok, error}
+     FB.signIn(email,pass)  → Promise<Object>  Firebase Auth 登入 {ok, error}
+   ============================================================ */
+
+var FIREBASE_CONFIG = null; // ← 填入你的 Firebase config 即可啟用雲端
 
 var FB = (function(){
   var db = null, auth = null, enabled = false, initPromise = null;

@@ -3,8 +3,60 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>DEC.12</title>
-<link rel="stylesheet" href="css/style.css?v=29">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-WNF8X236MX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-WNF8X236MX');
+</script>
+<title>DEC.12 ｜ 免費易經占卜・心靈指引與療癒</title>
+<meta name="description" content="DEC.12 為你提供免費的易經占卜與心靈指引。靜心抽一卦，閱讀卦象的溫柔提醒，寫下隨記，回頭見證應驗。免費、療癒、雙語。">
+<meta name="theme-color" content="#ffffff">
+<link rel="canonical" href="https://dec12.app/">
+<link rel="icon" href="img/icon-menu.png" type="image/png">
+<link rel="apple-touch-icon" href="img/icon-menu.png">
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="DEC.12">
+<meta property="og:title" content="DEC.12 ｜ 免費易經占卜・心靈指引與療癒">
+<meta property="og:description" content="免費的易經占卜與心靈指引。靜心抽一卦，閱讀卦象的溫柔提醒，寫下隨記，回頭見證應驗。免費、療癒、雙語。">
+<meta property="og:image" content="https://dec12.app/img/StarryNight.png">
+<meta property="og:url" content="https://dec12.app/">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:locale:alternate" content="en_US">
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="DEC.12 ｜ Free I Ching Reading, Gentle Guidance">
+<meta name="twitter:description" content="Free I Ching readings & gentle guidance. Draw a hexagram, reflect on its message, journal your journey, revisit as life unfolds. Free, bilingual, healing.">
+<meta name="twitter:image" content="https://dec12.app/img/StarryNight.png">
+<!-- JSON-LD 結構化資料：WebSite + Organization -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://dec12.app/#website",
+      "url": "https://dec12.app/",
+      "name": "DEC.12",
+      "alternateName": "DEC.12 免費易經占卜",
+      "description": "免費的易經占卜與心靈指引。靜心抽一卦，閱讀卦象的溫柔提醒，寫下隨記，回頭見證應驗。",
+      "inLanguage": ["zh-Hant", "en"]
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://dec12.app/#organization",
+      "name": "DEC.12",
+      "url": "https://dec12.app/",
+      "logo": "https://dec12.app/img/icon-menu.png",
+      "description": "DEC.12 是一個人經營的免費易經占卜與心靈指引平台。"
+    }
+  ]
+}
+</script>
+<link rel="stylesheet" href="css/style.css?v=37">
 </head>
 <body>
 <div class="phone-shell" id="shell">
@@ -78,6 +130,7 @@
       </div>
 
       <p class="footer-link">若DEC.12真的有鼓勵到您，歡迎<a href="#" id="milk-link" style="color:var(--accent); text-decoration:underline" data-i18n="p1.footerLink">請開發者一杯奶茶</a>表示支持</p>
+      <p class="disclaimer" id="p1-visits"><!-- 動態填入真實瀏覽人次 --></p>
     </div>
   </section>
 
@@ -172,7 +225,6 @@
         <button class="btn btn-secondary" id="btn-redo-p2c" data-i18n="p2c.redo">重新起卦</button>
         <button class="btn btn-ghost" id="btn-share-p2c" data-i18n="p1.share">分享</button>
       </div>
-      <p class="disclaimer" data-i18n="p2c.disclaimer">今日瀏覽 1,284 人 · 平台推薦指數 4.8／5</p>
     </div>
   </section>
 
@@ -209,17 +261,18 @@
         <p data-i18n="milk.subtitle">每一杯奶茶，都是開發者繼續寫字和維護的燃料</p>
       </div>
       <div class="milk-stats">
-        <div class="milk-stat"><div class="n">42</div><div class="l" data-i18n="milk.cups">累積杯數</div></div>
-        <div class="milk-stat"><div class="n">NT$ 9,600</div><div class="l" data-i18n="milk.total">累積金額</div></div>
-        <div class="milk-stat"><div class="n">15%</div><div class="l" data-i18n="milk.ratio">流向開發者</div></div>
+        <div class="milk-stat"><div class="n">50%</div><div class="l" data-i18n="milk.ratio">淨利潤捐出</div></div>
+        <div class="milk-stat"><div class="n" id="milk-cups-n">42</div><div class="l" data-i18n="milk.cups">累積杯數</div></div>
+        <div class="milk-stat"><div class="n" id="milk-total-n">$ 0</div><div class="l" data-i18n="milk.total">累積金額</div></div>
       </div>
       <div class="milk-list">
-        <div class="milk-row"><span class="d" data-i18n="milk.r1">伺服器與網域</span><span class="a">NT$ 3,000</span></div>
-        <div class="milk-row"><span class="d" data-i18n="milk.r2">已購買奶茶</span><span class="a">NT$ 1,800</span></div>
-        <div class="milk-row"><span class="d" data-i18n="milk.r3">愛心捐款</span><span class="a">NT$ 4,800</span></div>
+        <div class="milk-row"><span class="d" data-i18n="milk.r1">伺服器與網域</span><span class="a">$ 3.00</span></div>
+        <div class="milk-row"><span class="d" data-i18n="milk.r2">已購買奶茶</span><span class="a">$ 0</span></div>
+        <div class="milk-row"><span class="d" data-i18n="milk.r3">愛心捐款</span><span class="a">$ 0</span></div>
       </div>
-      <button class="btn btn-primary btn-lg" id="btn-milk-support" disabled style="opacity:.55; cursor:not-allowed" data-i18n="milk.support">請開發者一杯奶茶（即將開放）</button>
+      <button class="btn btn-primary btn-lg" id="btn-milk-support" data-i18n="milk.support">請開發者一杯奶茶</button>
       <p class="hint" style="text-align:center; margin-top:14px" data-i18n="milk.note">金額與流向公開透明，每月更新一次</p>
+      <p class="hint" style="text-align:center; margin-top:10px; color:var(--dim)" data-i18n="milk.charity">DEC.12 是半公益平台：扣除營運成本後的淨利潤，一半將捐給公益團體</p>
     </div>
   </section>
 
@@ -463,6 +516,7 @@
     <h3 data-i18n="p1.share">分享</h3>
     <p class="sub" data-i18n="share.sub">歡迎分享給朋友</p>
     <div class="social-row">
+      <button class="social-btn" id="social-card"><span class="ic">🖼️</span><span data-i18n="share.cardBtn">結果圖卡</span></button>
       <button class="social-btn" id="social-line"><span class="ic"><img src='img/icon-speech.png' class='glyph' alt=''></span>LINE</button>
       <button class="social-btn" id="social-fb"><span class="ic"><img src='img/icon-pencil.png' class='glyph' alt=''></span>Facebook</button>
       <button class="social-btn" id="social-ig"><span class="ic"><img src='img/icon-camera.png' class='glyph' alt=''></span>Instagram</button>
@@ -474,6 +528,23 @@
     <div class="email-preview" id="email-preview"></div>
     <p class="note" data-i18n="menu.shareNote1">僅用於寄送這份結果，不會註冊帳號</p>
     <p class="note" data-i18n="menu.shareNote2">若未收到請檢查垃圾郵件</p>
+  </div>
+</div>
+
+<!-- 結果圖卡產生器（隱藏模板） -->
+<div id="share-card-stage" style="position:fixed; left:-9999px; top:0; width:1080px; height:1080px; z-index:-1; pointer-events:none; opacity:1; background:#f4f1ea;">
+  <div id="share-card" style="width:1080px; height:1080px; background:#f4f1ea; font-family:'Noto Serif TC','Songti TC','STSong','Georgia',serif; color:#111111; position:relative; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:90px 80px; box-sizing:border-box;">
+    <div style="position:absolute; top:52px; left:0; right:0; text-align:center; font-size:26px; letter-spacing:6px; color:#a39d90;">DEC. 12</div>
+    <div style="font-size:120px; line-height:1.1; margin-bottom:34px;" id="card-symbol">☰</div>
+    <div style="font-size:44px; font-weight:600; letter-spacing:3px; margin-bottom:12px;" id="card-hexname">第42卦・益卦</div>
+    <div style="font-size:26px; color:#6b665c; letter-spacing:2px; margin-bottom:40px;" id="card-hexen">Hexagram 42 · Yi</div>
+    <div style="border-top:1px solid #d8d3c8; width:300px; margin-bottom:40px;"></div>
+    <div style="font-size:32px; line-height:1.9; color:#111111; max-width:820px; letter-spacing:1px;" id="card-guide">柔進而上行，利有攸往</div>
+    <div style="font-size:24px; color:#6b665c; margin-top:26px; letter-spacing:2px;" id="card-cat">關於「感情」的指引</div>
+    <div style="position:absolute; bottom:56px; left:0; right:0; display:flex; justify-content:center; align-items:center; gap:24px;">
+      <img id="card-qr" src="" alt="" style="width:150px; height:150px; border-radius:10px;">
+      <div style="text-align:left; font-size:22px; color:#a39d90; line-height:1.7; letter-spacing:1px;">掃碼回到 DEC. 12<br>每一次占卜，都是一次與自己的對話</div>
+    </div>
   </div>
 </div>
 
@@ -551,10 +622,64 @@
 
 <div id="toast"></div>
 
-<script src="js/firebase.js?v=30"></script>
-<script src="data/hexagrams.js?v=30"></script>
-<script src="data/hexagrams.en.js?v=30"></script>
-<script src="js/app.js?v=30"></script>
+<script src="js/firebase.js?v=37"></script>
+<script src="data/hexagrams.js?v=37"></script>
+<script src="data/hexagrams.en.js?v=37"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="js/share-card.js?v=37"></script>
+<script src="js/app.js?v=37"></script>
+<script>
+/* DEC.12 v35 · SEO 語言動態切換（title / meta / lang） */
+(function () {
+  "use strict";
+  function isEn() {
+    try { return localStorage.getItem("xingua_lang") === "en"; } catch (e) { return false; }
+  }
+  var SEO = {
+    zh: {
+      title: "DEC.12 ｜ 免費易經占卜・心靈指引與療癒",
+      desc: "DEC.12 為你提供免費的易經占卜與心靈指引。靜心抽一卦，閱讀卦象的溫柔提醒，寫下隨記，回頭見證應驗。免費、療癒、雙語。",
+      locale: "zh_TW"
+    },
+    en: {
+      title: "DEC.12 ｜ Free I Ching Reading, Gentle Guidance",
+      desc: "Free I Ching readings & gentle guidance. Draw a hexagram, reflect on its message, journal your journey, revisit as life unfolds. Free, bilingual, healing.",
+      locale: "en_US"
+    }
+  };
+  function apply() {
+    var t = isEn() ? SEO.en : SEO.zh;
+    document.title = t.title;
+    var md = document.querySelector('meta[name="description"]');
+    if (md) md.setAttribute("content", t.desc);
+    var ogt = document.querySelector('meta[property="og:title"]');
+    if (ogt) ogt.setAttribute("content", t.title);
+    var ogd = document.querySelector('meta[property="og:description"]');
+    if (ogd) ogd.setAttribute("content", t.desc);
+    var twt = document.querySelector('meta[name="twitter:title"]');
+    if (twt) twt.setAttribute("content", t.title);
+    var twd = document.querySelector('meta[name="twitter:description"]');
+    if (twd) twd.setAttribute("content", t.desc);
+    var ogL = document.querySelector('meta[property="og:locale"]');
+    if (ogL) ogL.setAttribute("content", t.locale);
+    var html = document.documentElement;
+    if (html) html.setAttribute("lang", isEn() ? "en" : "zh-Hant");
+  }
+  apply();
+  var tg = document.getElementById("menu-lang-toggle");
+  if (tg) tg.addEventListener("change", function () { setTimeout(apply, 60); });
+})();
+/* DEC.12 v36 · 奶茶金捐款按鈕 → Ko-fi（dec12studio） */
+(function () {
+  "use strict";
+  var KOFI_URL = "https://ko-fi.com/dec12studio";
+  var btn = document.getElementById("btn-milk-support");
+  if (btn) btn.addEventListener("click", function () {
+    try { window.open(KOFI_URL, "_blank", "noopener"); } catch (e) { window.location.href = KOFI_URL; }
+  });
+})();
+</script>
 </body>
 </html>
 
