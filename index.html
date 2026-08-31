@@ -534,7 +534,13 @@
 <!-- 儲存結果圖卡產生器（隱藏容器：由 share-card.js 動態填入，避免 html2canvas 渲染 3D 翻面） -->
 <div id="share-card-stage" style="position:fixed; left:-9999px; top:0; width:350px; z-index:-1; pointer-events:none; opacity:1; background:#f4f1ea;"></div>
 
-<!-- 儲存結果圖卡預覽層：長壓圖片即可儲存 -->
+<!-- 儲存結果圖卡預覽層：長壓圖片即可儲存
+     v45：移除 .modal-mode .sheet 的 pop scale 動畫（避免放大→縮小的閃動），
+     預覽圖由 share-card.js 預先鎖定最終縮放尺寸後才顯示。 -->
+<style>
+  #save-preview-overlay.modal-mode > div { animation:none !important; }
+  #save-preview-img { transition:none !important; -webkit-touch-callout:default; }
+</style>
 <div class="overlay modal-mode" id="save-preview-overlay" style="align-items:center;">
   <div style="background:#fff; border-radius:20px; padding:20px 16px 16px; max-width:92vw; max-height:88vh; display:flex; flex-direction:column; align-items:center; gap:14px; box-sizing:border-box;">
     <div style="font-size:15px; font-weight:700; color:#111; letter-spacing:1px;" data-i18n="save.previewTitle">你的結果圖卡</div>
@@ -626,8 +632,8 @@
 <script src="data/hexagrams.en.js?v=42"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
-<script src="js/share-card.js?v=44"></script>
-<script src="js/app.js?v=42"></script>
+<script src="js/share-card.js?v=46"></script>
+<script src="js/app.js?v=46"></script>
 <script>
 /* DEC.12 v35 · SEO 語言動態切換（title / meta / lang） */
 (function () {

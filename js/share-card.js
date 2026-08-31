@@ -1,16 +1,20 @@
-/* DEC.12 v44 · 儲存結果圖卡（儲存結果 = 把畫面上看到的結果卡片原封不動輸出成 PNG）
+/* DEC.12 v45 · 儲存結果圖卡（儲存結果 = 把畫面上看到的結果卡片原封不動輸出成 PNG）
    核心原則：
      ① 每日抽卡 → 輸出 3:4 微光卡（與畫面 #draw-card 翻開後相同的 .draw-card 造型：
         米白畫布 + 圓頂狀框 1:1 + 該卦美術圖 + 卦名 + 指引文字）
      ② 進階卜卦 → 輸出長條 PNG（圓頂狀框 1:1 放卡片1 美術圖+卦名，
         卡片2/3/4 解釋文字在下方成長條，完整顯示不截斷）
-   本版修正（v43→v44）：
-     問題1：每日抽卡圖片對應錯誤 → 美術圖/卦名/內容一律以「畫面當下」DOM 為權威來源
-            （#draw-back-el img 或 #draw-back-k 卦名反查），三者保證同一張卡
-     問題2：每日抽卡畫布改 3:4（1080×1440）
-     問題3：文字被圓頂框截斷 → 字級調小 + max-height 適配 + 留白加大
-     問題4：進階卜卦圓頂框改 1:1（960×960，與每日抽卡一致）
-     問題5：最上方加 DEC.12 品牌、底部 QRcode 移除
+   本版修正（v44→v45）：
+     問題：儲存結果預覽 Overlay「異常放大超出手機畫面，再縮小到正確位置」
+     根因1：v44 showStage() 把 1080px 圖卡 stage 移到視口正中央且 z-index:9999——
+            html2canvas 渲染期間（等圖載入）大圖在手機畫面中央爆出螢幕，
+            渲染完移走 → 看起來「先放大再縮回」。
+            修正：stage 保持螢幕外（left:-9999px）離線渲染；
+            html2canvas 依元素自身尺寸繪製，與視口位置無關，使用者永遠看不到渲染過程。
+     根因2：#save-preview-img 依賴 max-width 動態縮放，src 設定後可能以 2160px
+            原始尺寸閃一幀再縮小。
+            修正：顯示 overlay 前先計算 contain 縮放比例並鎖定 img width/height，
+            一顯示即為最終大小；並關閉 .modal-mode .sheet 的 pop scale 動畫。
    注意：全部以「內聯樣式 + 明確 px」重建（不依賴外部 CSS），避免 html2canvas 讀不到 class 樣式。
    產生後顯示在預覽層：使用者長壓圖片即可儲存，或按「下載圖片」按鈕。 */
 (function () {
@@ -33,38 +37,31 @@
     return null;
   }
 
-  /* 每日抽卡：直接讀畫面 #draw-card 翻開後的 DOM。
-     美術圖優先取 #draw-back-el 內的背景圖（與畫面完全同一張）；
-     若該處是元素小圖則改由 #draw-back-k 卦名反查 HEXAGRAMS.cardImg。
-     卦名/內容也全部來自畫面 DOM → 三者保證同一張卡。 */
+  /* 每日抽卡：先讀抽卡當下綁定的 window.DEC12_DAILY（卦名+內容+美術圖三者同一張卡，
+     永不反查、無競態）；若無綁定（如重新載入後直接分享），再以畫面 DOM 兜底並重建綁定。
+     美術圖：綁定值 = hex.cardImg || HEXAGRAM_IMG[num]（與日記明細頁 card-main-img 同一張）。 */
   function readDaily() {
-    var out = { num: null, name: "", guide: "", art: "" };
-    try {
-      var dk = $("draw-back-k");
-      if (dk && dk.textContent) {
-        out.name = String(dk.textContent).replace(/\s+/g, " ").trim();
-        var m = out.name.match(/(\d{1,2})/);
-        if (m) out.num = parseInt(m[1], 10);
-      }
-      var dt = $("draw-back-txt");
-      if (dt) out.guide = String(dt.textContent).replace(/\s+/g, " ").trim();
-
-      /* 1) 畫面 #draw-back-el 的背景圖（即時、權威） */
-      var del = $("draw-back-el");
-      if (del) {
-        var imgs = del.querySelectorAll("img");
-        for (var i = 0; i < imgs.length; i++) {
-          var src = imgs[i].getAttribute("src") || "";
-          if (src && /card|hexagram|art|cover/i.test(src)) { out.art = src; break; }
+    var b = null;
+    try { if (window.DEC12_DAILY && window.DEC12_DAILY.num) b = window.DEC12_DAILY; } catch (e) {}
+    if (!b) {
+      var out2 = { num: null, name: "", guide: "", art: "" };
+      try {
+        var dk2 = $("draw-back-k");
+        if (dk2 && dk2.textContent) {
+          out2.name = String(dk2.textContent).replace(/\s+/g, " ").trim();
+          var m2 = out2.name.match(/(\d{1,2})/);
+          if (m2) out2.num = parseInt(m2[1], 10);
         }
-      }
-      /* 2) 保險：由卦名反查（64 卦全有 cardImg；型別已統一） */
-      if (!out.art && out.num) {
-        var h = findHexByNum(out.num);
-        if (h && h.cardImg) out.art = h.cardImg;
-      }
-    } catch (e) {}
-    return out;
+        var dt2 = $("draw-back-txt");
+        if (dt2) out2.guide = String(dt2.textContent).replace(/\s+/g, " ").trim();
+        var h2 = out2.num ? findHexByNum(out2.num) : null;
+        if (h2 && h2.cardImg) out2.art = h2.cardImg;
+        if (!out2.art && h2) { try { if (window.HEXAGRAM_IMG && window.HEXAGRAM_IMG[h2.num]) out2.art = window.HEXAGRAM_IMG[h2.num]; } catch (e) {} }
+        try { window.DEC12_DAILY = out2; } catch (e) {}
+      } catch (e) {}
+      return out2;
+    }
+    return { num: b.num, name: b.name, guide: b.guide, art: b.art };
   }
 
   /* 進階卜卦：直接讀畫面 Carousel 的 4 張 .slide（與畫面一致）。
@@ -249,13 +246,16 @@
     if (!stage) return;
     stage.innerHTML = "";
     stage.appendChild(el);
-    /* 定位在視口正中央（而非 left:0/top:0），避免 html2canvas 截圖瞬間在左上角閃出 */
+    /* v45：保持在螢幕外（left:-9999px）離線渲染。
+       html2canvas 是以「元素自身尺寸」（offsetWidth/offsetHeight）繪製，與視口位置無關；
+       放在螢幕外 = 使用者永遠看不到渲染過程，
+       不會再出現 1080px 大圖爆出 390px 手機畫面（放大→縮回的閃動）。 */
     var w = el.offsetWidth || 1080;
-    stage.style.left = Math.max(0, Math.round((window.innerWidth - w) / 2)) + "px";
-    stage.style.top = Math.max(0, Math.round((window.innerHeight - 60) / 2)) + "px";
+    stage.style.left = "-9999px";
+    stage.style.top = "0";
     stage.style.width = w + "px";
     stage.style.height = "auto";
-    stage.style.zIndex = "9999";
+    stage.style.zIndex = "-1";
     stage.style.opacity = "1";
     stage.style.position = "fixed";
     stage.style.background = "#f4f1ea";
@@ -333,7 +333,10 @@
     } catch (e) {}
   }
 
-  /* ============ 主流程：生成 → 顯示預覽（長壓可儲存） ============ */
+  /* ============ 主流程：生成 → 顯示預覽（長壓可儲存） ============
+     v45：預覽層直接以最終縮放尺寸顯示——
+     1) 先計算並鎖定 img 的 width/height（避免 2160px 原始尺寸先閃一幀再縮小）
+     2) 移除 .modal-mode .sheet 的 pop scale 動畫（overlay 一出現就是正確大小） */
   var lastCanvas = null;
   function shareCard() {
     var kind = currentKind();
@@ -341,11 +344,25 @@
       lastCanvas = canvas;
       var ov = $("share-overlay");
       if (ov) ov.classList.remove("open");
+      var po = $("save-preview-overlay");
       var img = $("save-preview-img");
       if (img) {
         try { img.src = canvas.toDataURL("image/png"); } catch (e) { img.src = ""; }
+        /* 預先鎖定最終顯示尺寸（contain 縮放），img 一顯示即為正確大小 */
+        var box = po ? po.firstElementChild : null;
+        var maxW = (box ? box.clientWidth : (window.innerWidth * 0.92)) - 40;
+        var maxH = (window.innerHeight * 0.88) - 190;
+        if (maxH < 120) maxH = 120;
+        var iw = canvas.width || 1, ih = canvas.height || 1;
+        var ratio = Math.min(maxW / iw, maxH / ih, 1);
+        if (ratio < 1) {
+          img.style.width = Math.round(iw * ratio) + "px";
+          img.style.height = Math.round(ih * ratio) + "px";
+        } else {
+          img.style.width = "auto";
+          img.style.height = "auto";
+        }
       }
-      var po = $("save-preview-overlay");
       if (po) po.classList.add("open");
       else downloadCanvas(canvas);
     }).catch(function () {
