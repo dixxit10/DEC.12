@@ -33,15 +33,33 @@
      FB.signIn(email,pass)  → Promise<Object>  Firebase Auth 登入 {ok, error}
    ============================================================ */
 
-var FIREBASE_CONFIG = null; // ← 填入你的 Firebase config 即可啟用雲端
+var FIREBASE_CONFIG = {
+  // ★ 必填：到 Firebase Console → 專案設定 → 你的應用程式，複製 apiKey 貼到下方
+  //   （apiKey 是公開的，僅用於識別專案，可安全放在前端）
+  apiKey: "AIzaSyCEyRLhBF2NSy2jRCdBYd7UzFW5Nwklhk8",
+  authDomain: "dec12-62195.firebaseapp.com",
+  projectId: "dec12-62195",
+  storageBucket: "dec12-62195.firebasestorage.app",
+  messagingSenderId: "981849158907",
+  appId: "1:981849158907:web:9eb4f5f43f207580b3ac5e",
+  measurementId: "G-LX00QPTNB7"
+};
 
 var FB = (function(){
   var db = null, auth = null, enabled = false, initPromise = null;
 
+  function configUsable(){
+    if(!FIREBASE_CONFIG) return false;
+    var k = FIREBASE_CONFIG.apiKey || "";
+    // apiKey 仍是佔位符號（未填）→ 視為未設定，安全 fallback 到 localStorage
+    if(!k || k === "YOUR_API_KEY") return false;
+    return true;
+  }
+
   function init(){
     if(initPromise) return initPromise;
     initPromise = new Promise(function(resolve){
-      if(!FIREBASE_CONFIG){
+      if(!configUsable()){
         resolve(false); return;
       }
       try{
@@ -99,6 +117,8 @@ var FB = (function(){
         .then(function(){ return { ok:true }; })
         .catch(function(err){
           var code = err && err.code || "";
+          // 信箱未註冊 → 回傳友善錯誤碼
+          if(code === "auth/user-not-found") return { ok:false, error:"email_not_registered" };
           return { ok:false, error: code };
         });
     });
