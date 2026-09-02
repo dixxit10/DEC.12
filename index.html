@@ -78,7 +78,7 @@
           <div class="p1-sec-badge"><img src='img/card.png' class='glyph' alt=''></div>
           <div>
             <div class="p1-sec-title" data-i18n="p1.micro">微光卡</div>
-            <div class="p1-sec-sub" data-i18n="p1.microSub">為當下的自己帶來靈感與溫柔指引</div>
+            <div class="p1-sec-sub" data-i18n="p1.microSub">為當下帶來靈感與溫柔指引</div>
           </div>
         </div>
 
@@ -87,7 +87,7 @@
           <div class="draw-inner" id="draw-inner">
             <div class="draw-face draw-front">
               <img class="draw-front-art" src="img/card.png" alt="">
-              <div class="draw-front-hint"><span class="swipe">⇄</span><span data-i18n="draw.swipeHint">左右滑動翻開</span></div>
+              <div class="draw-front-hint"><span class="swipe"> </span><span data-i18n="draw.swipeHint"> </span></div>
               <!-- <div class="draw-seal"><img src='img/card.png' class='glyph' alt=''></div> -->
               <!--<div class="draw-front-txt" data-i18n="p1.draw">點擊翻開微光卡</div> -->
             </div>
@@ -101,7 +101,7 @@
 
         <!-- 未抽卡：每日靈感抽卡 -->
         <div class="draw-actions" id="draw-actions">
-          <button class="btn btn-primary btn-lg" id="btn-draw" data-i18n="p1.draw">點擊翻開微光卡</button>
+          <button class="btn btn-primary btn-lg" id="btn-draw" data-i18n="p1.draw">點擊翻開</button>
         </div>
 
         <!-- 已抽卡：與 P2-C 結果頁相同的按鈕 -->
@@ -123,14 +123,14 @@
         <div class="p1-sec-head">
           <div class="p1-sec-badge"><img src='img/StarryNight.png' class='glyph' alt=''></div>
           <div>
-            <div class="p1-sec-title" data-i18n="p1.advance">進階星星瓶</div>
+            <div class="p1-sec-title" data-i18n="p1.advance">進階卜卦</div>
             <div class="p1-sec-sub" data-i18n="p1.advanceSub">透過類別，讓指引更聚焦</div>
           </div>
         </div>
         <button class="btn btn-secondary btn-lg" id="btn-advance" data-i18n="p1.enter">進入星星瓶</button>
       </div>
 
-      <p class="footer-link">若DEC.12真的有鼓勵到您，歡迎<a href="#" id="milk-link" style="color:var(--accent); text-decoration:underline" data-i18n="p1.footerLink">請開發者一杯奶茶</a>表示支持</p>
+      <p class="footer-link">歡迎<a href="#" id="milk-link" style="color:var(--accent); text-decoration:underline" data-i18n="p1.footerLink">請開發者一杯奶茶</a>表示支持</p>
       <p class="disclaimer" id="p1-visits"><!-- 動態填入真實瀏覽人次 --></p>
     </div>
   </section>
@@ -138,8 +138,12 @@
   <!-- P2-A 進階卜卦罐表單 -->
   <section class="screen" id="screen-p2a" data-screen="p2a">
     <header class="topbar">
-      <button class="back" id="p2a-back" data-i18n="p2a.back">← 返回</button>
-      <div class="right"></div>
+      <button class="back" id="p2a-back" style="display:none">← 返回</button>
+      <div class="brand">DEC. 12</div>
+      <div class="right">
+        <button class="navlink" id="nav-login" data-i18n="nav.login">登入/註冊</button>
+        <button class="icon-btn" id="btn-menu" aria-label="選單"><img src='img/icon-menu.png' class='glyph icon-menu' alt=''></button>
+      </div>
     </header>
     <div class="main">
       <div class="login-hero" style="padding:14px 0 18px">
@@ -163,7 +167,7 @@
           <input type="text" id="divine-question" placeholder="例如：這段感情是否適合我？" maxlength="60">
         </div>-->
         <div class="field">
-          <label data-i18n="p2a.len">運勢的顯化期(必填)</label>
+          <label data-i18n="p2a.len">顯化期(必填)</label>
           <div class="chips" id="len-chips">
             <button type="button" class="chip" data-len="一週內" data-i18n="p2a.len1">一週內</button>
             <button type="button" class="chip" data-len="一個月內" data-i18n="p2a.len2">一個月內</button>
@@ -232,8 +236,12 @@
   <!-- ============ 關於 DEC. 12（開發者的話） ============ -->
   <section class="screen" id="screen-about" data-screen="about">
     <header class="topbar">
-      <button class="back" id="about-back" data-i18n="p2a.back">← 返回</button>
-      <div class="right"></div>
+      <button class="back" id="about-back" style="display:none">← 返回</button>
+      <div class="brand">DEC. 12</div>
+      <div class="right">
+        <button class="navlink" id="nav-login" data-i18n="nav.login">登入/註冊</button>
+        <button class="icon-btn" id="btn-menu" aria-label="選單"><img src='img/icon-menu.png' class='glyph icon-menu' alt=''></button>
+      </div>
     </header>
     <div class="main">
       <div class="about-hero">
@@ -242,9 +250,11 @@
         <p data-i18n="about.subtitle">一個陪你靜下心、面對當下的卜卦系統</p>
       </div>
       <div class="about-card">
-        <p data-i18n="about.p1">當感到迷茫時，內心的聲音被外界的喧囂淹沒時。我們需要的不是宿命論，而是一面溫柔映照內心、指引方向的鏡子。</p>
-        <p data-i18n="about.p2">卜卦罐的原型使用《易經》智慧，這是一套動態平衡的古老生命哲學。在這裡，每一次提問都是一次與自己、與宇宙節奏的深刻對話。讓這份智慧為你撥開迷霧，給予當下前行的勇氣。</p>
-        <p style="color:var(--dim); font-size:12px" data-i18n="about.version">DEC. 12 · 正式版 v22</p>
+        <p data-i18n="about.p1">榮格在治療一位病人時，遇到一個他始終記得的時刻。病人正描述夢裡一隻金龜子，話說到一半，窗外真的飛來一隻金龜子，停在窗台上。榮格後來把這類現象稱作「共時性」：外在發生的事，跟你內心正在經歷的，並非因果關係，卻在同一個時刻，指向同一個意義。</p>
+        <p data-i18n="about.p2">《易經》運作的原理，正是這個。它不是預測未來的工具，而是在你提問的當下，把你內在早已知道、卻還沒說出口的答案，用卦象的方式映照出來。</p>
+        <p data-i18n="about.p3">DEC.12 用簡單的文字x日記。讓每一次提問留下紀錄，每一次回頭看，你會發現卦象與現實之間，常常出現讓人愣住的呼應——不是因為卦象真的能預知什麼，而是因為提問本身，讓你更誠實地觀察自己正在經歷的一切。</p>
+        <p data-i18n="about.p4">我自己也在最不確定的日子裡，靠這個方式一次次向內對話。母親的溫柔，如今已化作心底一抹安靜的底蘊，陪我走過那些反覆提問的時刻。如果你也正站在一個看不清方向的路口，那麼別急著相信，問一個你真正在意的問題，看看會發生什麼。</p>
+        <p style="color:var(--dim); font-size:12px" data-i18n="about.version">DEC. 12 · 測試版 v1</p>
       </div>
     </div>
   </section>
@@ -252,8 +262,12 @@
   <!-- ============ 奶茶金 ============ -->
   <section class="screen" id="screen-milk" data-screen="milk">
     <header class="topbar">
-      <button class="back" id="milk-back" data-i18n="p2a.back">← 返回</button>
-      <div class="right"></div>
+      <button class="back" id="milk-back" style="display:none">← 返回</button>
+      <div class="brand">DEC. 12</div>
+      <div class="right">
+        <button class="navlink" id="nav-login" data-i18n="nav.login">登入/註冊</button>
+        <button class="icon-btn" id="btn-menu" aria-label="選單"><img src="img/icon-menu.png" class="glyph icon-menu" alt=""></button>
+      </div>
     </header>
     <div class="main">
       <div class="milk-hero">
@@ -267,13 +281,13 @@
         <div class="milk-stat"><div class="n" id="milk-total-n">$ 0</div><div class="l" data-i18n="milk.total">累積金額</div></div>
       </div>
       <div class="milk-list">
-        <div class="milk-row"><span class="d" data-i18n="milk.r1">伺服器與網域</span><span class="a">$ 3.00</span></div>
-        <div class="milk-row"><span class="d" data-i18n="milk.r2">已購買奶茶</span><span class="a">$ 0</span></div>
-        <div class="milk-row"><span class="d" data-i18n="milk.r3">愛心捐款</span><span class="a">$ 0</span></div>
+        <div class="milk-row"><span class="d" data-i18n="milk.r1">固定費用</span><span class="a">$ 20.00</span></div>
+        <div class="milk-row"><span class="d" data-i18n="milk.r2">創作獎勵</span><span class="a">$ 0</span></div>
+        <div class="milk-row"><span class="d" data-i18n="milk.r3">已捐金額</span><span class="a">$ 0</span></div>
       </div>
-      <button class="btn btn-primary btn-lg" id="btn-milk-support" data-i18n="milk.support">請開發者一杯奶茶</button>
-      <p class="hint" style="text-align:center; margin-top:14px" data-i18n="milk.note">金額與流向公開透明，每月更新一次</p>
-      <p class="hint" style="text-align:center; margin-top:10px; color:var(--dim)" data-i18n="milk.charity">DEC.12 是半公益平台：扣除營運成本後的淨利潤，一半將捐給公益團體</p>
+      <button class="btn btn-primary btn-lg" id="btn-milk-support" data-i18n="milk.support">Ko-fi一杯奶茶</button>
+      <p class="hint" style="text-align:center; margin-top:14px" data-i18n="milk.note">每月月初更新金額</p>
+      <p class="hint" style="text-align:center; margin-top:10px; color:var(--dim)" data-i18n="milk.charity"> DEC.12捐款流向 No Kid Hungry & 家扶基金會</p>
     </div>
   </section>
 
@@ -394,8 +408,12 @@
   <!-- ============ Setting（M 選單進入） ============ -->
   <section class="screen" id="screen-setting" data-screen="setting">
     <header class="topbar">
-      <button class="back" id="setting-back" data-i18n="p2a.back">← 返回</button>
-      <div class="right"></div>
+      <button class="back" id="setting-back" style="display:none">← 返回</button>
+      <div class="brand">DEC. 12</div>
+      <div class="right">
+        <button class="navlink" id="nav-login" data-i18n="nav.login">登入/註冊</button>
+        <button class="icon-btn" id="btn-menu" aria-label="選單"><img src="img/icon-menu.png" class="glyph icon-menu" alt=""></button>
+      </div>
     </header>
     <div class="main">
       <div class="setting-hero">
@@ -437,7 +455,8 @@
     <header class="topbar">
       <div class="brand">DEC. 12</div>
       <div class="right">
-        <button class="icon-btn" id="btn-menu" aria-label="選單"><img src='img/icon-menu.png' class='glyph icon-menu' alt=''></button>
+        <button class="navlink" id="nav-login" data-i18n="nav.login">登入/註冊</button>
+        <button class="icon-btn" id="btn-menu" aria-label="選單"><img src="img/icon-menu.png" class="glyph icon-menu" alt=""></button>
       </div>
     </header>
     <div class="main">
@@ -498,7 +517,10 @@
   <section class="screen" id="screen-loading" data-screen="loading">
     <header class="topbar">
       <div class="brand">DEC. 12</div>
-      <div class="right"></div>
+      <div class="right">
+        <button class="navlink" id="nav-login" data-i18n="nav.login">登入/註冊</button>
+        <button class="icon-btn" id="btn-menu" aria-label="選單"><img src="img/icon-menu.png" class="glyph icon-menu" alt=""></button>
+      </div>
     </header>
     <div class="main">
       <div class="loading-wrap">
@@ -517,17 +539,16 @@
     <h3 data-i18n="p1.share">分享</h3>
     <p class="sub" data-i18n="share.sub">歡迎分享給朋友</p>
     <div class="social-row">
-      <button class="social-btn" id="social-card"><span class="ic">🖼️</span><span data-i18n="share.cardBtn">結果圖卡</span></button>
-      <button class="social-btn" id="social-line"><span class="ic"><img src='img/icon-speech.png' class='glyph' alt=''></span>LINE</button>
-      <button class="social-btn" id="social-fb"><span class="ic"><img src='img/icon-pencil.png' class='glyph' alt=''></span>Facebook</button>
-      <button class="social-btn" id="social-ig"><span class="ic"><img src='img/icon-camera.png' class='glyph' alt=''></span>Instagram</button>
-      <button class="social-btn" id="social-x"><span class="ic"><img src='img/icon-bird.png' class='glyph' alt=''></span>X</button>
+      <button class="social-btn" id="social-card"><span class="ic"> </span><span data-i18n="share.cardBtn">結果圖卡</span></button>
+      <button class="social-btn" id="social-ig"><span class="ic"><img src='img/icon-camera.png' class='glyph' alt=''></span></button>
+      <button class="social-btn" id="social-thread"><span class="ic"><img src='img/icon-speech.png' class='glyph' alt=''></span></button>
+      <button class="social-btn" id="social-x"><span class="ic"><img src='img/icon-bird.png' class='glyph' alt=''></span></button>
     </div>
     <div class="share-divider" data-i18n="share.or">或寄到 Email</div>
     <input type="email" id="share-email" placeholder="輸入 email…" inputmode="email">
     <button class="btn btn-primary" id="btn-send" data-i18n="share.send">寄送</button>
     <div class="email-preview" id="email-preview"></div>
-    <p class="note" data-i18n="menu.shareNote1">僅用於寄送這份結果，不會註冊帳號</p>
+    <p class="note" data-i18n="menu.shareNote1"> </p>
     <p class="note" data-i18n="menu.shareNote2">若未收到請檢查垃圾郵件</p>
   </div>
 </div>
@@ -539,12 +560,12 @@
 <div class="overlay modal-mode" id="card-preview-overlay">
   <div class="sheet card-preview-box">
     <div class="sheet-head">
-      <h3>結果圖卡</h3>
+      <h3>下載圖卡</h3>
       <button class="icon-btn" id="card-preview-close"><img src='img/icon-close.png' class='glyph' alt=''></button>
     </div>
     <p class="sub">長壓圖片即可儲存到手機</p>
     <div class="card-preview-scroll">
-      <img id="card-preview-img" alt="結果圖卡">
+      <img id="card-preview-img" alt="下載圖卡">
     </div>
     <button class="btn btn-primary" id="card-preview-download">下載圖片</button>
   </div>
@@ -562,7 +583,7 @@
     <button class="menu-item" data-act="about" data-i18n="about.title">關於 DEC. 12</button>
     <button class="menu-item" data-act="milk" data-i18n="milk.title">奶茶基金</button>
     <div class="menu-item menu-lang">
-      <span class="ml-label" data-i18n="menu.langToggle"><img src='img/nav-setting.png' class='glyph' alt=''>系統語言切換</span>
+      <span class="ml-label" data-i18n="menu.langToggle">系統語言切換</span>
       <label class="lang-switch">
         <input type="checkbox" id="menu-lang-toggle">
         <span class="track"><span class="thumb"></span></span>
@@ -571,6 +592,11 @@
     </div>
     <button class="menu-item" data-act="setting" id="menu-setting-item" data-i18n="setting.title">設定</button>
     <button class="menu-item danger" id="menu-logout" data-i18n="menu.logout">⎋ 登出</button>
+    <div class="menu-social">
+      <a class="social-icon" href="https://www.instagram.com/" target="_blank" rel="noopener" aria-label="Instagram"><img src='img/icon-camera.png' class='glyph' alt=''></a>
+      <a class="social-icon" href="https://www.threads.net/" target="_blank" rel="noopener" aria-label="Threads"><img src='img/icon-speech.png' class='glyph' alt=''></a>
+      <a class="social-icon" href="https://github.com/" target="_blank" rel="noopener" aria-label="GitHub"><img src='img/icon-bird.png' class='glyph' alt=''></a>
+    </div>
   </div>
 </div>
 
@@ -584,6 +610,16 @@
   </div>
 </div>
 
+<!-- 未儲存離開提示（登入狀態） -->
+<div class="overlay modal-mode" id="guard-overlay">
+  <div class="sheet modal-box">
+    <h3>尚未儲存</h3>
+    <p class="sub">這筆卜卦結果尚未儲存，要儲存到隨記嗎？</p>
+    <button class="btn btn-primary" id="guard-save">儲存至日記</button>
+    <button class="btn btn-secondary" id="guard-discard">放棄儲存</button>
+  </div>
+</div>
+
 <!-- v12：收藏相簿 -->
 <div class="overlay modal-mode" id="collect-overlay">
   <div class="sheet collect-box">
@@ -591,7 +627,7 @@
       <h3><img src='img/trophy.png' class='glyph' alt='' data-i18n="dash.collect"> 收藏相簿</h3>
       <button class="icon-btn" id="collect-close"><img src='img/icon-close.png' class='glyph' alt=''></button>
     </div>
-    <p class="sub" style="margin-bottom:14px" data-i18n="menu.collectSub">完成任務或收集元素，解鎖彩色圖案</p>
+    <p class="sub" style="margin-bottom:14px" data-i18n="menu.collectSub">完成任務或收集元素，解鎖圖卡</p>
     <div id="collect-body"></div>
   </div>
 </div>
@@ -684,4 +720,3 @@
 </script>
 </body>
 </html>
-

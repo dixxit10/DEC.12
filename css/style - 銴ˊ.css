@@ -10,7 +10,7 @@
   --line2: #d8d3c8;
   --accent: #111111;
   --accent-soft: #f4f1ea;
-  --blue: #aac8e4;
+  --blue: #3970a4;
   --blue-soft: rgba(57, 112, 164, 0.12);
   --gold: #dab455;
   --gold-soft: rgba(218, 180, 85, 0.16);
@@ -550,9 +550,9 @@ body {
   border-radius: inherit;
 }
 .draw-back-txt {
-  font-size: 12px;
+  font-size: 13.5px;
   color: #fffffff0;
-  /* line-height: 1.85; */
+  line-height: 1.85;
   text-align: center;
   z-index: 2;
   text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
@@ -791,7 +791,7 @@ body {
 .slide .focus {
   font-size: 14px;
   color: var(--text);
-  /* background: var(--card2); */
+  background: var(--card2);
   border-radius: 10px;
   padding: 12px 14px;
   line-height: 1.7;
@@ -2605,7 +2605,7 @@ body {
   text-align: center;
   font-size: 12px;
   color: var(--dim);
-  /* margin: 20px 0 6px; */
+  margin: 20px 0 6px;
 }
 .footer-link {
   padding: 6px 0 4px;
