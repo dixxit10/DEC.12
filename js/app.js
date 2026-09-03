@@ -287,6 +287,52 @@
         return null
     }
 
+    var CARD2_COMBO_TPL = [
+        "慢慢來，事情最終很可能會走向{A}。中間或許會經歷一段{B}，這都是必經的過程。試著{C}，也記得溫柔地提醒自己，先別{D}。",
+        "其實不用太緊張，最後的結果很可能會是{A}。過程中如果遇到{B}，那也只是暫時的。你可以試著{C}，同時也讓自己留意，別掉進{D}的坑裡。",
+        "放輕鬆，事情的走向大概會是{A}。路上難免會遇到{B}，這很正常。此刻不妨{C}，也提醒自己輕輕避開{D}。",
+        "深呼吸一下，最後大概會迎來{A}。只是這條路上，可能會先經歷{B}，辛苦你了。試著{C}，同時溫柔地提醒自己，先不要{D}。",
+        "一步一步來就好，結果應該會走向{A}。過程中若感受到{B}，請對自己多一點耐心。可以先{C}，也記得留意別{D}。"
+    ];
+    var CARD2_SIMPLE_TPL = [
+        "一個階段正式結束了，新的方向會走向{A}。此刻，你可以試著{C}。",
+        "過去的都過去了，接下來會慢慢走向{A}。給自己一點時間{C}。",
+        "一切都翻開新的一頁，未來大概會是{A}。此刻最溫柔的做法，就是{C}。",
+        "舊的已經放下了，眼前的路會走向{A}。你可以試著{C}，慢慢來。",
+        "這是一個全新的開始，方向會是{A}。此刻，不妨先{C}。"
+    ];
+    var CARD3_COMBO_TPL = [
+        "在『{CAT}』這件事上，我想陪你看看：{MAIN}。同時也想輕輕提醒你：{SUP}。",
+        "關於『{CAT}』，此刻最重要的是：{MAIN}。但也別忘了照顧自己：{SUP}。",
+        "說到『{CAT}』，你現在最需要知道的是：{MAIN}。同時，也想溫柔提醒你：{SUP}。",
+        "在『{CAT}』這條路上，主要的方向是：{MAIN}。而過程中，也請多留意：{SUP}。",
+        "關於『{CAT}』，我看見的是：{MAIN}。也想陪你一起注意：{SUP}。"
+    ];
+    var CARD4_COMBO_TPL = [
+        "你可以試著{MAIN}，慢慢來就好。同時也想提醒你：{SUP}。",
+        "不妨先{MAIN}，一步一步來。也別忘了照顧自己：{SUP}。",
+        "可以從{MAIN}開始，給自己一點時間。同時也要記得：{SUP}。",
+        "試著{MAIN}吧，不用急。也想溫柔提醒你：{SUP}。",
+        "你可以先{MAIN}，慢慢調整步伐。同時也提醒自己：{SUP}。"
+    ];
+
+    function pickTplIdx(res, key, n) {
+        var k = "_tpl_" + key;
+        return typeof res[k] !== "number" && (res[k] = Math.floor(Math.random() * n)), res[k]
+    }
+
+    function fillTpl(tpl, map) {
+        return tpl.replace(/\{(\w+)\}/g, function(_, k) {
+            return map[k] || ""
+        })
+    }
+
+    function guideOf(entry, cat) {
+        if (!entry || !entry.guide) return "";
+        var g = entry.guide;
+        return typeof g === "object" ? g[cat] || g["其他/不確定"] || g.未選 || "" : g
+    }
+
     function resolveInterpretation(res) {
         var h = res.hex,
             _L = getLines(),
@@ -297,22 +343,31 @@
         if (count === 0) return {
             mode: "benGua",
             lineData: null,
-            zhiGua: null
+            zhiGua: null,
+            combo: null
         };
         if (count === 1) {
             var pos1 = changed[0];
             return {
                 mode: "line",
                 lineData: _L[h.key] && _L[h.key][String(pos1)] || null,
-                zhiGua: null
+                zhiGua: null,
+                combo: null
             }
         }
         if (count === 2) {
-            var pos2 = Math.max(changed[0], changed[1]);
+            var posMax = Math.max(changed[0], changed[1]),
+                posMin = Math.min(changed[0], changed[1]),
+                mainLine2 = _L[h.key] && _L[h.key][String(posMax)] || null,
+                supportLine2 = _L[h.key] && _L[h.key][String(posMin)] || null;
             return {
                 mode: "line",
-                lineData: _L[h.key] && _L[h.key][String(pos2)] || null,
-                zhiGua: null
+                lineData: mainLine2,
+                zhiGua: null,
+                combo: {
+                    main: mainLine2,
+                    support: supportLine2
+                }
             }
         }
         if (count === 3) {
@@ -322,7 +377,11 @@
                 lineData: null,
                 zhiGua: zhi3,
                 benGuaText: h.plain || h.core || "",
-                zhiGuaText: zhi3 && (zhi3.plain || zhi3.core) || ""
+                zhiGuaText: zhi3 && (zhi3.plain || zhi3.core) || "",
+                combo: {
+                    main: zhi3,
+                    support: h
+                }
             }
         }
         if (count === 4 || count === 5) {
@@ -330,12 +389,19 @@
                 unchanged = all.filter(function(p) {
                     return changed.indexOf(p) === -1
                 }),
-                pos = Math.min.apply(null, unchanged),
-                zhi = zhiGuaObject(res);
+                posLow = Math.min.apply(null, unchanged),
+                posHigh = Math.max.apply(null, unchanged),
+                zhi = zhiGuaObject(res),
+                mainLine4 = zhi && _L[zhi.key] && _L[zhi.key][String(posLow)] || null,
+                supportLine4 = count === 4 && zhi && _L[zhi.key] && _L[zhi.key][String(posHigh)] || null;
             return {
                 mode: "line",
-                lineData: zhi && _L[zhi.key] && _L[zhi.key][String(pos)] || null,
-                zhiGua: zhi
+                lineData: mainLine4,
+                zhiGua: zhi,
+                combo: count === 4 ? {
+                    main: mainLine4,
+                    support: supportLine4
+                } : null
             }
         }
         var zhi6 = zhiGuaObject(res),
@@ -351,39 +417,141 @@
             lineData: null,
             zhiGua: zhi6,
             zhiGuaText: zhi6 && (zhi6.plain || zhi6.core) || "",
-            special
+            special: special,
+            combo: {
+                main: zhi6,
+                support: null
+            }
         }
     }
 
     function readingLineText(res) {
         var r = resolveInterpretation(res);
-        if (r.mode === "line") return r.lineData ? r.lineData.name + "：" + r.lineData.text : res.hex.plain || res.hex.core || "";
+        if (r.mode === "line") {
+            if (r.combo) {
+                var m = r.combo.main,
+                    s = r.combo.support,
+                    A = m && m.main_state || "",
+                    C = m && m.main_strategy || "";
+                if ((A || C) && s) {
+                    var B = s.support_risk || "",
+                        D = s.support_warning || "",
+                        t = CARD2_COMBO_TPL[pickTplIdx(res, "l2", CARD2_COMBO_TPL.length)];
+                    return fillTpl(t, {
+                        A: A,
+                        B: B,
+                        C: C,
+                        D: D
+                    })
+                }
+            }
+            return r.lineData ? r.lineData.name + "：" + r.lineData.text : res.hex.plain || res.hex.core || ""
+        }
         if (r.mode === "bothGua") {
+            if (r.combo) {
+                var m2 = r.combo.main,
+                    s2 = r.combo.support,
+                    A2 = m2 && m2.main_state || "",
+                    C2 = m2 && m2.main_strategy || "";
+                if ((A2 || C2) && s2) {
+                    var B2 = s2.support_risk || "",
+                        D2 = s2.support_warning || "",
+                        t2 = CARD2_COMBO_TPL[pickTplIdx(res, "l2", CARD2_COMBO_TPL.length)];
+                    return fillTpl(t2, {
+                        A: A2,
+                        B: B2,
+                        C: C2,
+                        D: D2
+                    })
+                }
+            }
             var label = r.zhiGua ? r.zhiGua.num + " " + r.zhiGua.symbolLabel : "";
-            return r.benGuaText + (r.zhiGuaText ? `
-之卦` + (label ? "「" + label + "」" : "") + "：" + r.zhiGuaText : "")
+            return (label ? "之卦「" + label + "」：" : "") + r.zhiGuaText + (r.benGuaText ? `
+本卦：` + r.benGuaText : "")
         }
         if (r.mode === "zhiGua") {
-            var zlabel = r.zhiGua ? r.zhiGua.num + " " + r.zhiGua.symbolLabel + "：" : "",
-                base = zlabel + r.zhiGuaText;
-            return r.special && r.special.text && (base += `
-` + r.special.label + "：" + r.special.text), base
+            if (r.special && r.special.text) return r.special.label + "：" + r.special.text;
+            if (r.combo && r.combo.main) {
+                var m3 = r.combo.main,
+                    A3 = m3.main_state || "",
+                    C3 = m3.main_strategy || "";
+                if (A3 || C3) return fillTpl(CARD2_SIMPLE_TPL[pickTplIdx(res, "l2s", CARD2_SIMPLE_TPL.length)], {
+                    A: A3,
+                    C: C3
+                })
+            }
+            var zlabel = r.zhiGua ? r.zhiGua.num + " " + r.zhiGua.symbolLabel + "：" : "";
+            return zlabel + r.zhiGuaText
         }
         return res.hex.plain || res.hex.core || ""
     }
 
     function readingFocusText(res, cat) {
-        var r = resolveInterpretation(res);
-        if (r.mode === "line" && r.lineData && r.lineData.focus && r.lineData.focus[cat]) return r.lineData.focus[cat];
-        var h = res.hex;
+        var r = resolveInterpretation(res),
+            h = res.hex;
+        if (r.mode === "line") {
+            if (r.combo && r.combo.support) {
+                var mf = r.combo.main && r.combo.main.focus && r.combo.main.focus[cat],
+                    sf = r.combo.support && r.combo.support.focus && r.combo.support.focus[cat];
+                if (mf && sf) return fillTpl(CARD3_COMBO_TPL[pickTplIdx(res, "f" + cat, CARD3_COMBO_TPL.length)], {
+                    CAT: cat,
+                    MAIN: mf,
+                    SUP: sf
+                })
+            }
+            if (r.lineData && r.lineData.focus && r.lineData.focus[cat]) return r.lineData.focus[cat];
+            return h.focus[cat] || h.focus["其他/不確定"] || h.focus.未選 || h.core || ""
+        }
+        if (r.mode === "bothGua") {
+            var zhi = r.zhiGua,
+                mf2 = zhi && zhi.focus && zhi.focus[cat],
+                sf2 = h.focus && h.focus[cat];
+            if (mf2 && sf2) return fillTpl(CARD3_COMBO_TPL[pickTplIdx(res, "f" + cat, CARD3_COMBO_TPL.length)], {
+                CAT: cat,
+                MAIN: mf2,
+                SUP: sf2
+            });
+            return mf2 || sf2 || h.core || ""
+        }
+        if (r.mode === "zhiGua") {
+            var zh = r.zhiGua;
+            return zh && zh.focus && zh.focus[cat] || h.focus[cat] || h.focus["其他/不確定"] || h.focus.未選 || h.core || ""
+        }
         return h.focus[cat] || h.focus["其他/不確定"] || h.focus.未選 || h.core || ""
     }
 
-    function readingGuideText(res) {
-        var r = resolveInterpretation(res);
-        if (r.mode === "line" && r.lineData && r.lineData.guide) return r.lineData.guide;
-        var h = res.hex;
-        return h.focus["其他/不確定"] || h.core || ""
+    function readingGuideText(res, cat) {
+        var r = resolveInterpretation(res),
+            h = res.hex;
+        if (r.mode === "line") {
+            if (r.combo && r.combo.support) {
+                var mg = guideOf(r.combo.main, cat),
+                    sg = guideOf(r.combo.support, cat);
+                if (mg && sg) return fillTpl(CARD4_COMBO_TPL[pickTplIdx(res, "g" + cat, CARD4_COMBO_TPL.length)], {
+                    MAIN: mg,
+                    SUP: sg
+                })
+            }
+            var lg = r.lineData && guideOf(r.lineData, cat);
+            if (lg) return lg;
+            return h.guide && (h.guide[cat] || h.guide["其他/不確定"] || h.guide.未選) || h.focus[cat] || h.core || ""
+        }
+        if (r.mode === "bothGua") {
+            var zhi = r.zhiGua,
+                mg2 = guideOf(zhi, cat),
+                sg2 = guideOf(h, cat);
+            if (mg2 && sg2) return fillTpl(CARD4_COMBO_TPL[pickTplIdx(res, "g" + cat, CARD4_COMBO_TPL.length)], {
+                MAIN: mg2,
+                SUP: sg2
+            });
+            return mg2 || sg2 || h.core || ""
+        }
+        if (r.mode === "zhiGua") {
+            var zh = r.zhiGua,
+                zg = guideOf(zh, cat);
+            return zg || (zh && zh.focus && zh.focus[cat]) || h.core || ""
+        }
+        return h.guide && (h.guide[cat] || h.guide["其他/不確定"] || h.guide.未選) || h.focus[cat] || h.core || ""
     }
     var state = {
         cat: "",
@@ -727,7 +895,7 @@
                 changed = res.changedLines || [];
             $("result-meta").innerHTML = '<div class="meta-row"><span class="k">類別</span><span>' + esc(res.cat) + '</span></div><div class="meta-row"><span class="k">有效長度</span><span>' + esc(res.len) + "</span></div>";
             var slides = "",
-                changedTxt = changed.length === 0 ? "" : "動爻：第 " + changed.join("、") + " 爻",
+                changedTxt = changed.length === 0 ? "沒有變爻" : "動爻：第 " + changed.join("、") + " 爻",
                 title = res.hex.num + " " + res.hex.symbolLabel;
             slides += '<div class="slide symbol-slide"><div class="el-ic">' + cardMainImg(h) + '</div><div class="pair" style="display:flex;flex-direction:row;align-items:center;justify-content:center;gap:16px;">' +
             '<div style="display:flex;flex-direction:column;align-items:center;">' + h.upper + '<br>' + h.lower + '</div>' +
@@ -735,11 +903,14 @@
                 '<div style="margin:0 4px;">→</div>' +
                 '<div style="display:flex;flex-direction:column;align-items:center;">' + chg.sym.split(" ").join("<br>") + '</div>'
             ) +
-            '</div><div class="name">' + esc(title) + "</div>" + (changedTxt ? '<div class="changed-line">' + esc(changedTxt) + "</div>" : "") + "</div>", slides += '<div class="slide"><div class="slide-k">' + esc(title) + '</div><div class="core-txt">' + esc(readingLineText(res)) + "</div></div>", slides += '<div class="slide"><div class="slide-k">關於「' + esc(catTxt) + "×" + esc(lenTxt) + '」</div><div class="focus">' + esc(readingFocusText(res, res.cat)) + "</div></div>", slides += '<div class="slide"><div class="slide-k">參考建議</div><div class="core-txt">' + esc(readingGuideText(res)) + "</div></div>", $("result-carousel").innerHTML = slides;
+            '</div><div class="name">' + esc(title) + "</div>" + (changedTxt ? '<div class="changed-line">' + esc(changedTxt) + "</div>" : "") + "</div>", slides += '<div class="slide"><div class="slide-k">' + esc(title) + '</div><div class="core-txt">' + esc(readingLineText(res)) + "</div></div>", slides += '<div class="slide"><div class="slide-k">關於「' + esc(catTxt) + "×" + esc(lenTxt) + '」</div><div class="focus">' + esc(readingFocusText(res, res.cat)) + "</div></div>", slides += '<div class="slide"><div class="slide-k">參考建議</div><div class="core-txt">' + esc(readingGuideText(res, res.cat)) + "</div></div>", $("result-carousel").innerHTML = slides;
             for (var dotsHtml = "", i = 0; i < 4; i++) dotsHtml += "<i" + (i === 0 ? ' class="on"' : "") + "></i>";
             $("result-dots").innerHTML = dotsHtml, updateDots();
             var _c = $("result-carousel");
-            _c && (_c.scrollLeft = keepPos ? _prev * _c.clientWidth : 0, updateDots())
+            _c && (_c.scrollLeft = keepPos ? _prev * _c.clientWidth : 0, updateDots());
+            if (!keepPos && _c) requestAnimationFrame(function() {
+                _c.scrollLeft = 0, updateDots()
+            })
         }
     }
 
@@ -1409,7 +1580,7 @@
         var bk = document.querySelector("#guardian-back .guardian-back-k"),
             bt = document.querySelector("#guardian-back .guardian-back-txt"),
             be = $("guardian-back-el");
-        return bk && (bk.textContent = h.num + " " + h.symbolLabel), bt && (bt.textContent = h.core || h.plainText || ""), be && (be.innerHTML = mainElIcon(h)), h
+        return bk && (bk.textContent = h.num + " " + h.symbolLabel), bt && (bt.textContent = h.blessingText || h.plainText || h.core || ""), be && (be.innerHTML = mainElIcon(h)), h
     }
 
     function openGuardian() {
@@ -1447,16 +1618,19 @@
                 chg = changedHex(rec),
                 catTxt = rec.cat || "未選",
                 changed = rec.changedLines || [],
-                changedTxt = changed.length ? "動爻：第 " + changed.join("、") + " 爻" : "",
+                changedTxt = changed.length ? "動爻：第 " + changed.join("、") + " 爻" : "沒有變爻",
                 title = h.num + " " + h.symbolLabel,
                 slides = "";
-            if (slides += '<div class="slide symbol-slide"><div class="el-ic">' + cardMainImg(h) + '</div><div class="pair">' + h.upper + " " + h.lower + (chg.none ? "" : "　→　" + chg.sym) + '</div><div class="name">' + esc(title) + "</div>" + (changedTxt ? '<div class="changed-line">' + esc(changedTxt) + "</div>" : "") + "</div>", slides += '<div class="slide"><div class="slide-k">' + esc(title) + '</div><div class="core-txt">' + esc(readingLineText(rec)) + "</div></div>", slides += '<div class="slide"><div class="slide-k">關於「' + esc(catTxt) + "×" + esc(rec.len || "") + '」</div><div class="focus">' + esc(readingFocusText(rec, catTxt)) + "</div></div>", slides += '<div class="slide"><div class="slide-k">參考建議</div><div class="core-txt">' + esc(readingGuideText(rec)) + "</div></div>", c.innerHTML = slides, d) {
+            if (slides += '<div class="slide symbol-slide"><div class="el-ic">' + cardMainImg(h) + '</div><div class="pair">' + h.upper + " " + h.lower + (chg.none ? "" : "　→　" + chg.sym) + '</div><div class="name">' + esc(title) + "</div>" + (changedTxt ? '<div class="changed-line">' + esc(changedTxt) + "</div>" : "") + "</div>", slides += '<div class="slide"><div class="slide-k">' + esc(title) + '</div><div class="core-txt">' + esc(readingLineText(rec)) + "</div></div>", slides += '<div class="slide"><div class="slide-k">關於「' + esc(catTxt) + "×" + esc(rec.len || "") + '」</div><div class="focus">' + esc(readingFocusText(rec, catTxt)) + "</div></div>", slides += '<div class="slide"><div class="slide-k">參考建議</div><div class="core-txt">' + esc(readingGuideText(rec, catTxt)) + "</div></div>", c.innerHTML = slides, d) {
                 for (var dotsHtml = "", i = 0; i < 4; i++) dotsHtml += "<i" + (i === 0 ? ' class="on"' : "") + "></i>";
                 d.innerHTML = dotsHtml;
                 var _dc = $("detail-carousel");
                 _dc && (_dc.scrollLeft = keepPos ? _pidx * _dc.clientWidth : 0), (function() {
                     for (var _dd = d.children, _i = 0; _i < _dd.length; _i++) _dd[_i].className = _i === Math.round(c.scrollLeft / c.clientWidth) ? "on" : ""
-                })()
+                })(), !keepPos && requestAnimationFrame(function() {
+                    _dc.scrollLeft = 0;
+                    for (var _dd2 = d.children, _j = 0; _j < _dd2.length; _j++) _dd2[_j].className = _j === 0 ? "on" : ""
+                })
             }
         }
     }
@@ -1869,9 +2043,8 @@
                 verifyX: "未應驗",
                 detailNoteHint: "寫下心得與應驗，之後回到這裡對照，看看指引是否成真",
                 collectSub: "完成任務或收集元素，解鎖彩色圖案",
-                guardianSub: "送給你的迎新祝福，一生只有一次翻開機會",
-                guardianFront1: `請靜心翻開旅程起點的第一張卡片
-作為送給用戶的迎新祝福`,
+                guardianSub: "每個帳戶只有一次翻開本命卡機會",
+                guardianFront1: `請靜心翻開旅程起點的第一張卡片作為迎新祝福`,
                 guardianFlip: "翻開本命守護牌",
                 guardianLocked: "本命守護牌已固定，無法再次翻開"
             },
