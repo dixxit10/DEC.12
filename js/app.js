@@ -1228,7 +1228,7 @@
     }
 
     function refreshPerUserData() {
-        diaryData = loadDiary(), renderDiaryData(), renderCalendar(), renderCollect()
+        diaryData = loadDiary(), renderDiaryData(), renderCalendar(), renderCollect(), loadGuardianRemote()
     }
 
     function applySettingsUI() {
@@ -1647,6 +1647,19 @@
         }
     }
 
+    function loadGuardianRemote() {
+        typeof FB != "undefined" && FB && FB.loadGuardian && FB.loadGuardian(uid()).then(function(remote) {
+            if(remote && (remote.opened || remote.hexNum)) {
+                try {
+                    remote.opened && localStorage.setItem(guardianKey(), "1"),
+                    remote.hexNum && localStorage.setItem(guardianHexKey(), String(remote.hexNum))
+                } catch (e) {}
+                var ov = guardianOverlay();
+                ov && ov.classList.contains("open") && openGuardian()
+            }
+        })
+    }
+
     function guardianOverlay() {
         return document.getElementById("guardian-overlay")
     }
@@ -1740,7 +1753,11 @@
             try {
                 localStorage.setItem(guardianHexKey(), String(h.num))
             } catch (e) {}
-            card.classList.add("flipped"), markGuardianOpened(), flipBtn.style.display = "none", playGuardianFlare(), setTimeout(function() {
+            typeof FB != "undefined" && FB && FB.saveGuardian && FB.saveGuardian(uid(), {
+                opened: !0,
+                hexNum: h.num,
+                openedAt: Date.now()
+            }), card.classList.add("flipped"), markGuardianOpened(), flipBtn.style.display = "none", playGuardianFlare(), setTimeout(function() {
                 note.style.display = "", toast(t("toast.guardianFixed"))
             }, 1600)
         }
@@ -2103,7 +2120,7 @@
     });
 
     function onBoot() {
-        purgeLegacyPasswords(), clearLegacySession(), updateNav(), updateMenuAuth(), applySettingsUI(), go("p1"), typeof FB != "undefined" && FB && FB.loadUsers && FB.loadUsers().then(function(remote) {
+        purgeLegacyPasswords(), clearLegacySession(), updateNav(), updateMenuAuth(), applySettingsUI(), go("p1"), isLoggedIn() && loadGuardianRemote(), typeof FB != "undefined" && FB && FB.loadUsers && FB.loadUsers().then(function(remote) {
             if(remote) try {
                 localStorage.setItem(FB_USERS_KEY, JSON.stringify(remote))
             } catch (e) {}
@@ -2270,10 +2287,13 @@
             about: {
                 title: "關於 DEC. 12",
                 subtitle: "在圓的軌跡裡，與宇宙共振",
-                p1: "榮格在治療一位病人時，遇到一個他始終記得的時刻。病人正描述夢裡一隻金龜子，話說到一半，窗外真的飛來一隻金龜子，停在窗台上。榮格後來把這類現象稱作「共時性」：外在發生的事，跟你內心正在經歷的，並非因果關係，卻在同一個時刻，指向同一個意義。",
-                p2: "《易經》運作的原理，正是這個。它不是預測未來的工具，而是在你提問的當下，把你內在早已知道、卻還沒說出口的答案，用卦象的方式映照出來。",
-                p3: "DEC.12 用簡單的文字x日記。讓每一次提問留下紀錄，每一次回頭看，你會發現卦象與現實之間，常常出現讓人愣住的呼應。不是因為卦象真的能預知什麼，而是因為提問本身，讓你更誠實地觀察自己正在經歷的一切。",
-                p4: "我自己也在最不確定的日子裡，靠這個方式一次次向內對話。母親的溫柔，如今已化作心底一抹安靜的底蘊，陪我走過那些反覆提問的時刻。如果你也正站在一個看不清方向的路口，那麼別急著相信，問一個你真正在意的問題，看看會發生什麼。",
+                p1: "1949年，卡爾·榮格為《易經》的首個西方主要譯本撰寫了序言。真正讓他信服的並非預言，而是一種他稱為「共時性」的模式。",
+                p2: "他提到一位病人正在描述夢裡的一隻金龜子，話說到一半，窗外真的飛來一隻金龜子，停在窗台上。這並非因果關係，卻在同一個時刻，指向同一個意義。",
+                p3: "這就是《易經》的運作方式。它並非預測未來的工具，而是一面鏡子，映照出你早已知曉卻尚未說出口的事物。",
+                p4: "DEC.12建議將此與一個簡單的習慣結合：寫日記。你提出的每一個問題都要記錄下來。每次回顧時，你都會發現卦象與你生活中實際發生的事情多麼吻合。這並非因為卦象預示了什麼，而是因為提出問題讓你更坦誠地面對自己。",
+                p5: "我在自己迷惘的日子裡，不斷地問自己問題，試著傾聽內在的聲音，於是便創造了這個系統。",
+                p6: "如果你站在人生的十字路口，看不清前方的路，不要急於相信任何事。",
+                p7: "只要問出那個對你來說真正重要的問題。",
                 version: "DEC. 12 · 測試版 v1"
             },
             draw: {
@@ -2572,10 +2592,13 @@
             about: {
                 title: "About DEC. 12",
                 subtitle: "Finding resonance in life's patterns",
-                p1: "While treating a patient, Carl Jung witnessed a moment he never forgot. The patient was describing a golden scarab from a dream when a similar beetle suddenly appeared at the window. Jung later called experiences like this “synchronicity”: an outer event and an inner experience are not causally linked, yet at the same moment they point to the same meaning.",
-                p2: "This is also one way to understand the I Ching. It is not a tool for predicting the future. At the moment you ask a question, it reflects through the hexagrams what you may already sense inside but have not yet put into words.",
-                p3: "DEC.12 combines simple readings with a journal. Each question leaves a record. When you look back, you may notice surprising echoes between the reading and real life—not because the hexagrams predicted anything, but because asking the question helped you observe your experience more honestly.",
-                p4: "I have used this practice myself during uncertain times as a way to turn inward and listen. My mother's gentleness has become a quiet foundation that stays with me through those moments of questioning. If you are standing at a crossroads and cannot see the way ahead, you do not have to believe first. Ask a question that truly matters to you and see what happens.",
+                p1: "In 1949, Carl Jung wrote the foreword to the first major Western translation of the I Ching. What convinced him wasn't prophecy. It was a pattern he called synchronicity.",
+                p2: "He once described a moment with a patient describing a dream about a scarab beetle. Mid-sentence, a real beetle flew in and landed on the windowsill. Not cause and effect. Just two things, arriving at the same meaning, at the same moment.",
+                p3: "That's how the I Ching works. It's not a tool for predicting your future. It's a mirror, surfacing what you already know, but haven't said out loud yet.",
+                p4: "DEC.12 pairs this with something simple: a journal. Every question you ask gets recorded. Every time you look back, you'll notice how often the hexagram echoes what was actually happening in your life. Not because it predicted anything, but because asking the question made you more honest with yourself.",
+                p5: "I built this during my own uncertain days, asking one question after another, trying to hear myself think.",
+                p6: "If you're standing at a crossroad you can't quite see past, don't rush to believe anything. Just ask the one question that actually matters to you.",
+                p7: "Ask your first question.",
                 version: "DEC. 12 · Beta v1"
             },
             draw: {
