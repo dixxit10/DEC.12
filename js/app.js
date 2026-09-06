@@ -5,7 +5,7 @@
         UI_LANG = (function() {
             try {
                 var v = localStorage.getItem("xingua_lang");
-                if (v === "en" || v === "zh") return v
+                if(v === "en" || v === "zh") return v
             } catch (e) {}
             return defaultLangByRegion()
         })(),
@@ -13,13 +13,13 @@
             return l ? (UI_LANG = l === "en" ? "en" : "zh", HEXAGRAMS = getHexagrams(), LINES = getLines(), onBoot()) : UI_LANG
         },
         getHexagrams = function() {
-            if (typeof window == "undefined") return [];
+            if(typeof window == "undefined") return [];
             var zh = window.HEXAGRAMS || [],
                 en = window.HEXAGRAMS_EN || [];
             return UI_LANG === "en" && en.length ? en : zh
         },
         getLines = function() {
-            if (typeof window == "undefined") return {};
+            if(typeof window == "undefined") return {};
             var zh = window.LINES || {},
                 en = window.LINES_EN || {};
             return UI_LANG === "en" && en && Object.keys(en).length ? en : zh
@@ -70,13 +70,13 @@
     }
 
     function elIcons(hex) {
-        if (!hex) return "";
+        if(!hex) return "";
         var names = [];
         return hex.upperName && ELEMENT_IMG[hex.upperName] && names.push(hex.upperName), hex.lowerName && ELEMENT_IMG[hex.lowerName] && names.push(hex.lowerName), names.length === 0 && (hex.upper && SYM_KEY[hex.upper] && ELEMENT_IMG[SYM_KEY[hex.upper]] && names.push(SYM_KEY[hex.upper]), hex.lower && SYM_KEY[hex.lower] && ELEMENT_IMG[SYM_KEY[hex.lower]] && names.push(SYM_KEY[hex.lower])), names.map(elImgTag).join(" ")
     }
 
     function mainElIcon(hex) {
-        if (!hex) return "";
+        if(!hex) return "";
         var n = hex.upperName || hex.upper && SYM_KEY[hex.upper] || "";
         return elImgTag(n)
     }
@@ -84,20 +84,20 @@
     function pad2(n) {
         return n < 10 ? "0" + n : "" + n
     }
-    for (var HEXAGRAM_IMG = {}, _hi = 1; _hi <= 64; _hi++) HEXAGRAM_IMG[_hi] = "img/hexagram-" + pad2(_hi) + ".png";
+    for(var HEXAGRAM_IMG = {}, _hi = 1; _hi <= 64; _hi++) HEXAGRAM_IMG[_hi] = "img/hexagram-" + pad2(_hi) + ".png";
 
     function cardMainImg(hex) {
-        if (!hex) return "";
+        if(!hex) return "";
         var src = hex.cardImg || HEXAGRAM_IMG[hex.num] || "";
         return src ? '<img class="card-main-img" src="' + src + '" alt="' + esc(hex.symbolLabel || "") + '">' : mainElIcon(hex)
     }
 
     function hexFromTitle(title) {
-        if (!title) return null;
+        if(!title) return null;
         var m = String(title).match(/^(\d+)\s*(.*)$/);
-        if (!m) return null;
-        for (var num = parseInt(m[1], 10), _H = getHexagrams(), i = 0; i < _H.length; i++)
-            if (_H[i].num === num) return _H[i];
+        if(!m) return null;
+        for(var num = parseInt(m[1], 10), _H = getHexagrams(), i = 0; i < _H.length; i++)
+            if(_H[i].num === num) return _H[i];
         return null
     }
     var HEX_TABLE = {
@@ -168,8 +168,8 @@
     };
 
     function triKey(t2) {
-        for (var k in TRI)
-            if (TRI[k][0] === t2[0] && TRI[k][1] === t2[1] && TRI[k][2] === t2[2]) return k;
+        for(var k in TRI)
+            if(TRI[k][0] === t2[0] && TRI[k][1] === t2[1] && TRI[k][2] === t2[2]) return k;
         return ""
     }
     var STORAGE_KEY = "xingua_draft_v5",
@@ -181,7 +181,7 @@
     function getUsers() {
         try {
             var v = JSON.parse(localStorage.getItem(FB_USERS_KEY) || "{}");
-            if (v && typeof v == "object" && Object.keys(v).length) return v
+            if(v && typeof v == "object" && Object.keys(v).length) return v
         } catch (e) {}
         try {
             return JSON.parse(localStorage.getItem(USERS_KEY) || "{}")
@@ -223,6 +223,19 @@
         } catch (e) {}
     }
 
+    function purgeLegacyPasswords() {
+        try {
+            [USERS_KEY, FB_USERS_KEY].forEach(function(key) {
+                try {
+                    var map = JSON.parse(localStorage.getItem(key) || "{}"),
+                        dirty = !1;
+                    for(var k in map) map[k] && typeof map[k] == "object" && "pass" in map[k] && (delete map[k].pass, dirty = !0);
+                    dirty && localStorage.setItem(key, JSON.stringify(map))
+                } catch (e) {}
+            })
+        } catch (e) {}
+    }
+
     function memberName() {
         var u = currentUser();
         return u && u.name ? u.name : "會員"
@@ -243,12 +256,12 @@
             up = TRI[SYM_KEY[h.upper]].slice(),
             low = TRI[SYM_KEY[h.lower]].slice(),
             changed = res.changedLines || [];
-        if (changed.length === 0) return {
+        if(changed.length === 0) return {
             sym: h.upper + " " + h.lower,
             label: h.symbolLabel,
             none: !0
         };
-        for (var ci = 0; ci < changed.length; ci++) {
+        for(var ci = 0; ci < changed.length; ci++) {
             var line = changed[ci],
                 target = line <= 3 ? low : up,
                 idx = line <= 3 ? line - 1 : line - 4;
@@ -268,8 +281,8 @@
             up = TRI[SYM_KEY[h.upper]].slice(),
             low = TRI[SYM_KEY[h.lower]].slice(),
             changed = res.changedLines || [];
-        if (changed.length === 0) return null;
-        for (var ci = 0; ci < changed.length; ci++) {
+        if(changed.length === 0) return null;
+        for(var ci = 0; ci < changed.length; ci++) {
             var line = changed[ci],
                 target = line <= 3 ? low : up,
                 idx = line <= 3 ? line - 1 : line - 4;
@@ -278,15 +291,15 @@
         var upK = triKey(up),
             lowK = triKey(low),
             entry = HEX_TABLE[upK + "_" + lowK];
-        if (!entry) return null;
-        for (var hi = 0, _H = getHexagrams(); hi < _H.length; hi++)
-            if (_H[hi].num === entry[1]) return _H[hi];
+        if(!entry) return null;
+        for(var hi = 0, _H = getHexagrams(); hi < _H.length; hi++)
+            if(_H[hi].num === entry[1]) return _H[hi];
         return null
     }
-    var CARD2_COMBO_TPL = ["慢慢來，事情可能會走向{A}。中間或許會經歷一段{B}，這都是必經的過程。試著{C}，也記得提醒自己，先別{D}。", "不用太緊張，最後的結果可能會是{A}。過程中如果遇到{B}，那也只是暫時的。你可以試著{C}，同時也讓自己留意，別掉進{D}的坑裡。", "放輕鬆，事情的走向大概會是{A}。路上難免會遇到{B}，這很正常。此刻不妨{C}，也提醒自己輕輕避開{D}。", "深呼吸一下，最後大概會迎來{A}。只是這條路上，可能會先經歷{B}，辛苦你了。試著{C}，同時溫柔地提醒自己，先不要{D}。", "一步一步來就好，結果應該會走向{A}。過程中若感受到{B}，請對自己多一點耐心。可以先{C}，也記得留意別{D}。"],
+    var CARD2_COMBO_TPL = ["慢慢來，事情會走向{A}。中間會經歷一段{B}，這都是必經的過程。試著{C}，也記得提醒自己，先別{D}。", "不用太緊張，結果可能會是{A}。過程中如果遇到{B}，那也只是暫時的。你可以試著{C}，同時也讓自己留意，別掉進{D}的坑裡。", "放輕鬆，事情會走向{A}。路上會遇到{B}，這很正常。此刻不妨{C}，也提醒自己輕輕避開{D}。", "深呼吸一下，將會迎來{A}。只是這條路上，會先經歷{B}，辛苦你了。試著{C}，同時溫柔地提醒自己，先不要{D}。", "一步步來，結果會走向{A}。過程中若感到{B}，請對自己多一點耐心。先{C}，也記得留意別{D}。"],
         CARD2_SIMPLE_TPL = ["一個階段正式結束了，新的方向會走向{A}。此刻，試著{C}。", "過去的都過去了，接著會走向{A}。給自己一點時間{C}。", "一切都翻開新的一頁，未來{A}。此刻最溫柔的做法，就是{C}。", "舊的已經放下了，眼前的路會{A}。你可以試著{C}，慢慢來。", "這是一個全新的開始，方向會是{A}。此刻，不妨先{C}。"],
-        CARD3_COMBO_TPL = ["{MAIN}。同時也想輕輕提醒你：{SUP}", "此刻最重要的是{MAIN}。當{SUP}", "{MAIN}。同時，也想溫柔提醒你：{SUP}", "{MAIN}。而過程中，也請多留意：{SUP}。", "{MAIN}。也想陪你一起注意：{SUP}"],
-        CARD4_COMBO_TPL = ["{MAIN}，慢慢來就好。同時也想提醒你：{SUP}", "不妨先{MAIN}，一步一步來。{SUP}", "{MAIN}{SUP}", "試著{MAIN}吧，不用急。{SUP}", "{MAIN}，慢慢調整步伐。同時提醒自己{SUP}"];
+        CARD3_COMBO_TPL = ["{MAIN}{SUP}", "{MAIN}{SUP}", "{MAIN}{SUP}", "{MAIN}{SUP}", "{MAIN}{SUP}"],
+        CARD4_COMBO_TPL = ["{MAIN}\n{SUP}", "{MAIN}\n{SUP}", "{MAIN}\n{SUP}", "{MAIN}\n{SUP}", "{MAIN}\n{SUP}"];
 
     function pickTplIdx(res, key, n) {
         var k = "_tpl_" + key;
@@ -348,7 +361,7 @@
     }
 
     function guideOf(entry, cat) {
-        if (cat = normalizeCat(cat), !entry || !entry.guide) return "";
+        if(cat = normalizeCat(cat), !entry || !entry.guide) return "";
         var g = entry.guide;
         return typeof g == "object" ? g[cat] || "" : g
     }
@@ -360,13 +373,13 @@
                 return a - b
             }),
             count = changed.length;
-        if (count === 0) return {
+        if(count === 0) return {
             mode: "benGua",
             lineData: null,
             zhiGua: null,
             combo: null
         };
-        if (count === 1) {
+        if(count === 1) {
             var pos1 = changed[0];
             return {
                 mode: "line",
@@ -375,7 +388,7 @@
                 combo: null
             }
         }
-        if (count === 2) {
+        if(count === 2) {
             var posMax = Math.max(changed[0], changed[1]),
                 posMin = Math.min(changed[0], changed[1]),
                 mainLine2 = _L[h.key] && _L[h.key][String(posMax)] || null,
@@ -390,7 +403,7 @@
                 }
             }
         }
-        if (count === 3) {
+        if(count === 3) {
             var zhi3 = zhiGuaObject(res);
             return {
                 mode: "bothGua",
@@ -404,7 +417,7 @@
                 }
             }
         }
-        if (count === 4 || count === 5) {
+        if(count === 4 || count === 5) {
             var all = [1, 2, 3, 4, 5, 6],
                 unchanged = all.filter(function(p) {
                     return changed.indexOf(p) === -1
@@ -447,13 +460,13 @@
 
     function readingLineText(res) {
         var r = resolveInterpretation(res);
-        if (r.mode === "line") {
-            if (r.combo) {
+        if(r.mode === "line") {
+            if(r.combo) {
                 var m = r.combo.main,
                     s = r.combo.support,
                     A = m && m.main_state || "",
                     C = m && m.main_strategy || "";
-                if ((A || C) && s) {
+                if((A || C) && s) {
                     var B = s.support_risk || "",
                         D = s.support_warning || "",
                         t2 = CARD2_COMBO_TPL[pickTplIdx(res, "l2", CARD2_COMBO_TPL.length)];
@@ -465,15 +478,15 @@
                     })
                 }
             }
-            return r.lineData ? r.lineData.name + "：" + r.lineData.text : res.hex.plain || res.hex.core || ""
+            return r.lineData ? r.lineData.name + "：" + r.lineData.text : res.hex.core || res.hex.plain || ""
         }
-        if (r.mode === "bothGua") {
-            if (r.combo) {
+        if(r.mode === "bothGua") {
+            if(r.combo) {
                 var m2 = r.combo.main,
                     s2 = r.combo.support,
                     A2 = m2 && m2.main_state || "",
                     C2 = m2 && m2.main_strategy || "";
-                if ((A2 || C2) && s2) {
+                if((A2 || C2) && s2) {
                     var B2 = s2.support_risk || "",
                         D2 = s2.support_warning || "",
                         t22 = CARD2_COMBO_TPL[pickTplIdx(res, "l2", CARD2_COMBO_TPL.length)];
@@ -489,13 +502,13 @@
             return (label ? "之卦「" + label + "」：" : "") + r.zhiGuaText + (r.benGuaText ? `
 本卦：` + r.benGuaText : "")
         }
-        if (r.mode === "zhiGua") {
-            if (r.special && r.special.text) return r.special.label + "：" + r.special.text;
-            if (r.combo && r.combo.main) {
+        if(r.mode === "zhiGua") {
+            if(r.special && r.special.text) return r.special.label + "：" + r.special.text;
+            if(r.combo && r.combo.main) {
                 var m3 = r.combo.main,
                     A3 = m3.main_state || "",
                     C3 = m3.main_strategy || "";
-                if (A3 || C3) return fillTpl(CARD2_SIMPLE_TPL[pickTplIdx(res, "l2s", CARD2_SIMPLE_TPL.length)], {
+                if(A3 || C3) return fillTpl(CARD2_SIMPLE_TPL[pickTplIdx(res, "l2s", CARD2_SIMPLE_TPL.length)], {
                     A: A3,
                     C: C3
                 })
@@ -503,18 +516,18 @@
             var zlabel = r.zhiGua ? r.zhiGua.num + " " + r.zhiGua.symbolLabel + "：" : "";
             return zlabel + r.zhiGuaText
         }
-        return res.hex.plain || res.hex.core || ""
+        return res.hex.core || res.hex.plain || ""
     }
 
     function readingFocusText(res, cat) {
         cat = normalizeCat(cat);
         var r = resolveInterpretation(res),
             h = res.hex;
-        if (r.mode === "line") {
-            if (r.combo && r.combo.support) {
+        if(r.mode === "line") {
+            if(r.combo && r.combo.support) {
                 var mf = r.combo.main && r.combo.main.focus && r.combo.main.focus[cat],
                     sf = r.combo.support && r.combo.support.focus && r.combo.support.focus[cat];
-                if (mf && sf) return fillTpl(CARD3_COMBO_TPL[pickTplIdx(res, "f" + cat, CARD3_COMBO_TPL.length)], {
+                if(mf && sf) return fillTpl(CARD3_COMBO_TPL[pickTplIdx(res, "f" + cat, CARD3_COMBO_TPL.length)], {
                     CAT: catLabel(cat),
                     MAIN: mf,
                     SUP: sf
@@ -522,7 +535,7 @@
             }
             return r.lineData && r.lineData.focus && r.lineData.focus[cat] ? r.lineData.focus[cat] : h.focus[cat] || h.core || ""
         }
-        if (r.mode === "bothGua") {
+        if(r.mode === "bothGua") {
             var zhi = r.zhiGua,
                 mf2 = zhi && zhi.focus && zhi.focus[cat],
                 sf2 = h.focus && h.focus[cat];
@@ -532,7 +545,7 @@
                 SUP: sf2
             }) : mf2 || sf2 || h.core || ""
         }
-        if (r.mode === "zhiGua") {
+        if(r.mode === "zhiGua") {
             var zh = r.zhiGua;
             return zh && zh.focus && zh.focus[cat] || h.focus[cat] || h.core || ""
         }
@@ -543,11 +556,11 @@
         cat = normalizeCat(cat);
         var r = resolveInterpretation(res),
             h = res.hex;
-        if (r.mode === "line") {
-            if (r.combo && r.combo.support) {
+        if(r.mode === "line") {
+            if(r.combo && r.combo.support) {
                 var mg = guideOf(r.combo.main, cat),
                     sg = guideOf(r.combo.support, cat);
-                if (mg && sg) return fillTpl(CARD4_COMBO_TPL[pickTplIdx(res, "g" + cat, CARD4_COMBO_TPL.length)], {
+                if(mg && sg) return fillTpl(CARD4_COMBO_TPL[pickTplIdx(res, "g" + cat, CARD4_COMBO_TPL.length)], {
                     MAIN: mg,
                     SUP: sg
                 })
@@ -555,7 +568,7 @@
             var lg = r.lineData && guideOf(r.lineData, cat);
             return lg || h.guide && h.guide[cat] || h.focus[cat] || h.core || ""
         }
-        if (r.mode === "bothGua") {
+        if(r.mode === "bothGua") {
             var zhi = r.zhiGua,
                 mg2 = guideOf(zhi, cat),
                 sg2 = guideOf(h, cat);
@@ -564,7 +577,7 @@
                 SUP: sg2
             }) : mg2 || sg2 || h.core || ""
         }
-        if (r.mode === "zhiGua") {
+        if(r.mode === "zhiGua") {
             var zh = r.zhiGua,
                 zg = guideOf(zh, cat);
             return zg || zh && zh.focus && zh.focus[cat] || h.core || ""
@@ -602,7 +615,7 @@
     function loadDraft() {
         try {
             var raw = localStorage.getItem(STORAGE_KEY);
-            if (!raw) return [];
+            if(!raw) return [];
             var v = JSON.parse(raw);
             return Array.isArray(v) ? v : [v]
         } catch (e) {
@@ -650,7 +663,7 @@
         var box = $(containerId);
         box.addEventListener("click", function(e) {
             var chip = e.target.closest(".chip");
-            if (chip) {
+            if(chip) {
                 var val = chip.getAttribute(field === "cat" ? "data-cat" : "data-len");
                 box.querySelectorAll(".chip").forEach(function(c) {
                     c.classList.remove("on")
@@ -670,7 +683,7 @@
         e.target === this && this.classList.remove("open")
     }), document.querySelectorAll(".menu-item").forEach(function(m) {
         m.addEventListener("click", function() {
-            if (!m.classList.contains("menu-lang")) {
+            if(!m.classList.contains("menu-lang")) {
                 var act = m.getAttribute("data-act");
                 guardLeave(function() {
                     $("menu-overlay").classList.remove("open"), act === "home" ? (resetForm(), go("p1")) : act === "diary" ? isLoggedIn() ? (refreshPerUserData(), go("diary"), setTimeout(scrollCalToCurrent, 120)) : (toast("請先登入"), go("p5")) : act === "about" ? (clearDraft(), state.result = null, state.saved = !1, go("about")) : act === "milk" ? (clearDraft(), state.result = null, state.saved = !1, go("milk")) : act === "setting" && (clearDraft(), state.result = null, state.saved = !1, settingReturnTo = document.querySelector(".screen.active") ? document.querySelector(".screen.active").getAttribute("data-screen") : "diary", go("setting"), updateSettingAccount())
@@ -707,7 +720,7 @@
 
     function navLoginClick() {
         guardLeave(function() {
-            if (isLoggedIn()) {
+            if(isLoggedIn()) {
                 refreshPerUserData(), go("diary"), setTimeout(scrollCalToCurrent, 120);
                 return
             }
@@ -724,7 +737,7 @@
     var drawFlipped = !1;
 
     function flipDailyCard() {
-        if (!drawFlipped) {
+        if(!drawFlipped) {
             drawFlipped = !0;
             var res = dailyDraw();
             res.cat = "每日靈感", res.len = "今日", $("draw-card").classList.add("flipped");
@@ -753,11 +766,11 @@
             resetForm(), go("p1")
         })
     }), $("btn-start").addEventListener("click", function() {
-        if (!state.cat) {
+        if(!state.cat) {
             toast("請先選擇問題類別");
             return
         }
-        if (!state.len) {
+        if(!state.len) {
             toast("請先選擇顯化期長度");
             return
         }
@@ -802,17 +815,17 @@
     }
 
     function tossOneLine() {
-        for (var sum = 0, i = 0; i < 3; i++) sum += Math.random() < .5 ? 3 : 2;
+        for(var sum = 0, i = 0; i < 3; i++) sum += Math.random() < .5 ? 3 : 2;
         return sum
     }
 
     function castSixLines() {
-        for (var lines = [], i = 0; i < 6; i++) lines.push(tossOneLine());
+        for(var lines = [], i = 0; i < 6; i++) lines.push(tossOneLine());
         return lines
     }
 
     function pickResult() {
-        for (var cat = normalizeCat(state.cat || ""), values = castSixLines(), changedLines = [], vals = [], i = 0; i < 6; i++) {
+        for(var cat = normalizeCat(state.cat || ""), values = castSixLines(), changedLines = [], vals = [], i = 0; i < 6; i++) {
             var v = values[i];
             vals.push(v), (v === 6 || v === 9) && changedLines.push(i + 1)
         }
@@ -820,18 +833,18 @@
             up = values.slice(3, 6);
 
         function triToName(three) {
-            for (var key = "", k = 0; k < 3; k++) key += three[k] === 7 || three[k] === 9 ? "1" : "0";
-            for (var t2 in TRI)
-                if (TRI[t2].join("") === key) return t2;
+            for(var key = "", k = 0; k < 3; k++) key += three[k] === 7 || three[k] === 9 ? "1" : "0";
+            for(var t2 in TRI)
+                if(TRI[t2].join("") === key) return t2;
             return ""
         }
         var lowK = triToName(low),
             upK = triToName(up),
             entry = HEX_TABLE[upK + "_" + lowK],
             h = null;
-        if (entry) {
-            for (var hi = 0, _H = getHexagrams(); hi < _H.length; hi++)
-                if (_H[hi].num === entry[1]) {
+        if(entry) {
+            for(var hi = 0, _H = getHexagrams(); hi < _H.length; hi++)
+                if(_H[hi].num === entry[1]) {
                     h = _H[hi];
                     break
                 }
@@ -850,7 +863,7 @@
     }
 
     function shuffle(arr) {
-        for (var i = arr.length - 1; i > 0; i--) {
+        for(var i = arr.length - 1; i > 0; i--) {
             var j = Math.floor(Math.random() * (i + 1)),
                 t2 = arr[i];
             arr[i] = arr[j], arr[j] = t2
@@ -898,7 +911,7 @@
     }
 
     function renderCarousel(keepPos) {
-        if (state.result) {
+        if(state.result) {
             var _rc = $("result-carousel"),
                 _prev = keepPos && _rc && Math.round(_rc.scrollLeft / _rc.clientWidth) || 0,
                 res = state.result,
@@ -912,7 +925,7 @@
                 changedTxt = changedText(changed),
                 title = res.hex.num + " " + res.hex.symbolLabel;
             slides += '<div class="slide symbol-slide"><div class="el-ic">' + cardMainImg(h) + '</div><div class="pair" style="display:flex;flex-direction:row;align-items:center;justify-content:center;gap:16px;"><div style="display:flex;flex-direction:column;align-items:center;">' + h.upper + "<br>" + h.lower + "</div>" + (chg.none ? "" : '<div style="margin:0 4px;">→</div><div style="display:flex;flex-direction:column;align-items:center;">' + chg.sym.split(" ").join("<br>") + "</div>") + '</div><div class="name">' + esc(title) + "</div>" + (changedTxt ? '<div class="changed-line">' + esc(changedTxt) + "</div>" : "") + "</div>", slides += '<div class="slide"><div class="slide-k">' + esc(title) + '</div><div class="core-txt">' + esc(readingLineText(res)) + "</div></div>", slides += '<div class="slide"><div class="slide-k">' + esc(t("result.aboutPrefix")) + "「" + esc(catTxt) + " × " + esc(lenLabel(lenTxt)) + '」</div><div class="focus">' + esc(readingFocusText(res, res.cat)) + "</div></div>", slides += '<div class="slide"><div class="slide-k">' + esc(t("result.advice")) + '</div><div class="core-txt">' + esc(readingGuideText(res, res.cat)) + "</div></div>", $("result-carousel").innerHTML = slides;
-            for (var dotsHtml = "", i = 0; i < 4; i++) dotsHtml += "<i" + (i === 0 ? ' class="on"' : "") + "></i>";
+            for(var dotsHtml = "", i = 0; i < 4; i++) dotsHtml += "<i" + (i === 0 ? ' class="on"' : "") + "></i>";
             $("result-dots").innerHTML = dotsHtml, updateDots();
             var _c = $("result-carousel");
             _c && (_c.scrollLeft = keepPos ? _prev * _c.clientWidth : 0, updateDots()), !keepPos && _c && requestAnimationFrame(function() {
@@ -922,12 +935,12 @@
     }
 
     function updateDots() {
-        for (var c = $("result-carousel"), idx = Math.round(c.scrollLeft / c.clientWidth) || 0, dots = $("result-dots").children, i = 0; i < dots.length; i++) dots[i].className = i === idx ? "on" : ""
+        for(var c = $("result-carousel"), idx = Math.round(c.scrollLeft / c.clientWidth) || 0, dots = $("result-dots").children, i = 0; i < dots.length; i++) dots[i].className = i === idx ? "on" : ""
     }
     $("result-carousel").addEventListener("scroll", updateDots);
 
     function updateSaveBtn() {
-        for (var list = ["btn-save-p2c", "btn-save-draw"], i = 0; i < list.length; i++) {
+        for(var list = ["btn-save-p2c", "btn-save-draw"], i = 0; i < list.length; i++) {
             var btn = $(list[i]);
             btn && (state.saved ? (btn.textContent = t("save.done"), btn.disabled = !0) : (btn.textContent = list[i] === "btn-save-p2c" ? t("p2c.save") : t("p1.save"), btn.disabled = !1))
         }
@@ -949,7 +962,7 @@
     }
 
     function saveFlow() {
-        if (state.result) {
+        if(state.result) {
             var freshEls = state.result.method === "daily" ? unlockElementsFromHex(state.result.hex) : [];
             isLoggedIn() ? ($("saved-overlay").classList.add("open"), commitRecord(state.result), state.saved = !0, updateSaveBtn(), safeRenderDiary()) : (saveDraft(state.result), state.draftDate = state.result.date, state.saved = !0, toast("已幫你暫存這筆結果"), setTimeout(function() {
                 go("p5")
@@ -992,85 +1005,88 @@
         var email = $("auth-email").value.trim().toLowerCase(),
             pass = $("auth-pass").value,
             pass2 = $("auth-pass2").value,
-            users = getUsers(),
-            nameField = $("auth-name").value.trim();
-        if (!email) {
+            nameField = $("auth-name").value.trim(),
+            fbReady = typeof FB != "undefined" && FB && FB.signIn && FB.signUp;
+        if(!email) {
             authFail("請輸入帳號（Email）");
             return
         }
-        if (!isValidEmail(email)) {
-            authFail("Email 格式有誤（例：you@example.com，不可含空白或特殊符號）");
+        if(!isValidEmail(email)) {
+            authFail("Email 格式有誤（例：you@example.com，不可含空白或特殊字元）");
             return
         }
-        if (!pass) {
+        if(!pass) {
             authFail("請輸入密碼");
             return
         }
-        if (authMode === "register") {
-            if (!isStrongPassword(pass)) {
+        if(!fbReady) {
+            authFail("需要連線才能註冊／登入，請確認網路後再試");
+            return
+        }
+        purgeLegacyPasswords();
+        var users = getUsers();
+        if(authMode === "register") {
+            if(!isStrongPassword(pass)) {
                 authFail("密碼強度不足：至少 8 碼，且需包含字母與數字");
                 return
             }
-            if (!pass2 || pass !== pass2) {
+            if(!pass2 || pass !== pass2) {
                 authFail("密碼與確認密碼不符合");
                 return
             }
-            if (users[email]) {
+            if(users[email]) {
                 authFail("這個帳號已註冊，請直接登入");
                 return
             }
-            if (!nameField) {
+            if(!nameField) {
                 authFail("請輸入暱稱");
                 return
             }
             var dupName = null;
-            for (var k in users)
-                if (users[k] && users[k].name && String(users[k].name).toLowerCase() === nameField.toLowerCase()) {
+            for(var k in users)
+                if(users[k] && users[k].name && String(users[k].name).toLowerCase() === nameField.toLowerCase()) {
                     dupName = users[k].name;
                     break
-                } if (dupName) {
+                } if(dupName) {
                 authFail("這個暱稱已被使用，請換一個");
                 return
             }
             var nm = nameField;
-            users[email] = {
-                pass,
-                name: nm,
-                createdAt: Date.now()
-            }, saveUsers(users), setSession({
-                email,
-                name: nm
-            }), toast("註冊成功，歡迎 " + nm), mergeDraftsOnLogin(), migrateGuestCollection(), refreshPerUserData(), updateNav(), updateMenuAuth(), showLoading(), typeof FB != "undefined" && FB && FB.signUp && FB.signUp(email, pass).then(function(r) {
-                r && r.error === "auth/email-already-in-use" && toast("訳號已存在，請直接登入")
-            })
-        } else {
-            var rec = users[email];
-            if (typeof FB != "undefined" && FB && FB.signIn) {
-                FB.signIn(email, pass).then(function(r) {
-                    if (!r || !r.ok) {
-                        authFail("帳號或密碼不正確");
-                        return
-                    }
-                    rec = users[email] || rec, rec || (rec = {
-                        pass,
-                        name: email.split("@")[0] || "會員"
-                    }), setSession({
-                        email,
-                        name: rec.name
-                    }), toast("登入成功，歡迎回來 " + rec.name), mergeDraftsOnLogin(), migrateGuestCollection(), refreshPerUserData(), updateNav(), updateMenuAuth(), showLoading(), typeof FB != "undefined" && FB && FB.loadEntitlements && FB.loadEntitlements(email)
-                });
+            FB.signUp(email, pass).then(function(r) {
+                if(!r || !r.ok) {
+                    var ec = r && r.error || "";
+                    ec === "auth/email-already-in-use" ? authFail("這個帳號已註冊，請直接登入") : ec === "auth/weak-password" ? authFail("密碼強度不足：至少 8 碼，且需包含字母與數字") : ec === "auth/invalid-email" ? authFail("Email 格式有誤") : ec && ec.indexOf("network") >= 0 ? authFail("需要連線才能註冊，請確認網路後再試") : authFail("註冊失敗，請稍後再試");
+                    return
+                }
+                users = getUsers(), users[email] = {
+                    name: nm,
+                    createdAt: Date.now()
+                }, saveUsers(users), setSession({
+                    email,
+                    name: nm
+                }), toast("註冊成功，歡迎 " + nm), mergeDraftsOnLogin(), migrateGuestCollection(), refreshPerUserData(), updateNav(), updateMenuAuth(), showLoading(), typeof FB != "undefined" && FB && FB.loadEntitlements && FB.loadEntitlements(email)
+            });
+            return
+        }
+        FB.signIn(email, pass).then(function(r) {
+            if(!r || !r.ok) {
+                var e2 = r && r.error || "";
+                e2 && e2.indexOf("network") >= 0 ? authFail("需要連線才能登入，請確認網路後再試") : authFail("帳號或密碼不正確");
                 return
             }
-            if (!rec || rec.pass !== pass) {
-                authFail("帳號或密碼不正確");
-                return
-            }
+            var rec = getUsers()[email] || null,
+                sname = rec && rec.name || email.split("@")[0] || "會員";
             setSession({
                 email,
-                name: rec.name
-            }), toast("登入成功，歡迎回來 " + rec.name)
-        }
-        mergeDraftsOnLogin(), migrateGuestCollection(), refreshPerUserData(), updateNav(), updateMenuAuth(), showLoading(), typeof FB != "undefined" && FB && FB.loadEntitlements && FB.loadEntitlements(email)
+                name: sname
+            }), toast("登入成功，歡迎回來 " + sname), mergeDraftsOnLogin(), migrateGuestCollection(), refreshPerUserData(), updateNav(), updateMenuAuth(), showLoading(), typeof FB != "undefined" && FB && FB.loadUsers && FB.loadUsers().then(function(map) {
+                var rr = map && map[email] || null;
+                rr && rr.name && (setSession({
+                    email,
+                    name: rr.name
+                }), updateNav(), updateMenuAuth())
+            }), typeof FB != "undefined" && FB && FB.loadEntitlements && FB.loadEntitlements(email)
+        })
     }
     $("btn-login").addEventListener("click", function() {
         doLogin()
@@ -1079,9 +1095,9 @@
     });
     var passHint = $("pass-hint");
     $("auth-pass").addEventListener("input", function() {
-        if (passHint) {
+        if(passHint) {
             var p = this.value;
-            if (!p) {
+            if(!p) {
                 passHint.style.display = "none", passHint.className = "pass-hint";
                 return
             }
@@ -1111,32 +1127,32 @@
     }), $("btn-forgot-find").addEventListener("click", function() {
         var em = $("forgot-email").value.trim().toLowerCase(),
             res = $("forgot-result");
-        if (res) {
-            if (!em) {
+        if(res) {
+            if(!em) {
                 res.innerHTML = '<span class="fr-err">請輸入註冊時的信箱</span>';
                 return
             }
-            if (!isValidEmail(em)) {
+            if(!isValidEmail(em)) {
                 res.innerHTML = '<span class="fr-err">Email 格式有誤（例：you@example.com）</span>';
                 return
             }
             var users = getUsers(),
                 rec = users[em];
-            if (!rec) {
+            if(!rec) {
                 res.innerHTML = '<span class="fr-err">此信箱未註冊，請確認是否曾以該信箱註冊（僅能以信箱查詢，無法用用戶名）</span>';
                 return
             }
-            if (typeof FB != "undefined" && FB && FB.resetPassword) {
+            if(typeof FB != "undefined" && FB && FB.resetPassword) {
                 FB.resetPassword(em).then(function(r) {
-                    if (r && r.ok) res.innerHTML = '<span class="fr-ok">重設密碼信件已寄出至 ' + esc(em) + "，請到信箱點擊連結設定新密碼。</span>", toast("重設密碼信件已寄出");
+                    if(r && r.ok) res.innerHTML = '<span class="fr-ok">重設密碼信件已寄出至 ' + esc(em) + "，請到信箱點擊連結設定新密碼。</span>", toast("重設密碼信件已寄出");
                     else {
                         var code = r && r.error || "";
-                        if (code === "email_not_registered") {
+                        if(code === "email_not_registered") {
                             res.innerHTML = '<span class="fr-err">此信箱未註冊</span>';
                             return
                         }
-                        if (code === "firebase_off") {
-                            res.innerHTML = '<span class="fr-ok">找到你的帳號：</span><div class="fr-pw">密碼：' + esc(rec.pass) + '</div><span class="fr-ok">（雲端重設未啟用，已顯示本機密碼）請記下密碼後登入</span>', toast("已透過信箱找到密碼");
+                        if(code === "firebase_off") {
+                            res.innerHTML = '<span class="fr-err">需要連線才能重設密碼，請確認網路後再試。</span>', toast("需要連線才能重設密碼");
                             return
                         }
                         res.innerHTML = '<span class="fr-err">寄送失敗：' + esc(code) + "</span>"
@@ -1144,7 +1160,7 @@
                 });
                 return
             }
-            res.innerHTML = '<span class="fr-ok">找到你的帳號：</span><div class="fr-pw">密碼：' + esc(rec.pass) + '</div><span class="fr-ok">請記下密碼後登入，或關閉此面板</span>', toast("已透過信箱找到密碼")
+            res.innerHTML = '<span class="fr-err">需要連線才能重設密碼，請確認網路後再試。</span>', toast("需要連線才能重設密碼")
         }
     }), $("forgot-email").addEventListener("keydown", function(e) {
         e.key === "Enter" && $("btn-forgot-find").click()
@@ -1188,12 +1204,12 @@
     function applySettingsUI() {
         var s = getSettings(),
             r = $("set-remind");
-        if (r) {
+        if(r) {
             var on = s.remind !== !1;
             r.textContent = on ? "已開啟" : "已關閉", r.classList.toggle("on", on)
         }
         var p = $("set-push");
-        if (p) {
+        if(p) {
             var pon = !!s.push;
             p.textContent = pon ? "已開啟" : "開啟", p.classList.toggle("on", pon)
         }
@@ -1213,21 +1229,21 @@
     }
     $("btn-edit-name").addEventListener("click", function() {
         var u = currentUser();
-        if (u) {
+        if(u) {
             var cur = (u.name || "").trim(),
                 nm = prompt("輸入新的暱稱（最多 16 字）", cur);
-            if (nm !== null) {
-                if (nm = nm.trim(), !nm) {
+            if(nm !== null) {
+                if(nm = nm.trim(), !nm) {
                     toast("暱稱不能空白");
                     return
                 }
-                if (nm.length > 16) {
+                if(nm.length > 16) {
                     toast("暱稱最多 16 字");
                     return
                 }
                 var users = getUsers();
-                for (var k in users)
-                    if (k !== u.email && users[k] && users[k].name && String(users[k].name).toLowerCase() === nm.toLowerCase()) {
+                for(var k in users)
+                    if(k !== u.email && users[k] && users[k].name && String(users[k].name).toLowerCase() === nm.toLowerCase()) {
                         toast("這個暱稱已被使用，請換一個");
                         return
                     } users[u.email] && (users[u.email].name = nm, saveUsers(users)), setSession({
@@ -1253,16 +1269,16 @@
     function loadDiary() {
         try {
             var raw = localStorage.getItem(diaryKey());
-            if (raw) return JSON.parse(raw)
+            if(raw) return JSON.parse(raw)
         } catch (e) {}
         var seed = seedDiary();
         try {
             localStorage.setItem(diaryKey(), JSON.stringify(seed))
         } catch (e) {}
-        if (typeof FB != "undefined" && FB && FB.loadDiary) {
+        if(typeof FB != "undefined" && FB && FB.loadDiary) {
             var remoteUid = uid();
             FB.loadDiary(remoteUid).then(function(remote) {
-                if (remote && remote.length) {
+                if(remote && remote.length) {
                     try {
                         localStorage.setItem(diaryKey(), JSON.stringify(remote))
                     } catch (e) {}
@@ -1276,10 +1292,10 @@
     function saveDiary(arr) {
         diaryData = arr;
         try {
-            for (var clean = [], si = 0; si < arr.length; si++) {
+            for(var clean = [], si = 0; si < arr.length; si++) {
                 var r = arr[si],
                     c = {};
-                for (var k in r) k === "siblings" || k === "fromDiary" || (c[k] = r[k]);
+                for(var k in r) k === "siblings" || k === "fromDiary" || (c[k] = r[k]);
                 clean.push(c)
             }
             localStorage.setItem(diaryKey(), JSON.stringify(clean))
@@ -1318,8 +1334,8 @@
     function mergeDraftsOnLogin() {
         try {
             var drafts = loadDraft();
-            if (drafts && drafts.length) {
-                for (var diary = loadDiary(), i = drafts.length - 1; i >= 0; i--) {
+            if(drafts && drafts.length) {
+                for(var diary = loadDiary(), i = drafts.length - 1; i >= 0; i--) {
                     var d = drafts[i];
                     !d || !d.hex || (diary.unshift(recordFromResult(d)), d.method === "daily" && unlockElementsFromHex(d.hex))
                 }
@@ -1331,7 +1347,7 @@
     var diaryData = loadDiary();
 
     function diaryByDate(y, m, d) {
-        for (var out = [], i = 0; i < diaryData.length; i++) diaryData[i].y === y && diaryData[i].m === m && diaryData[i].d === d && out.push(diaryData[i]);
+        for(var out = [], i = 0; i < diaryData.length; i++) diaryData[i].y === y && diaryData[i].m === m && diaryData[i].d === d && out.push(diaryData[i]);
         return out.sort(function(a, b) {
             return (b.ts || 0) - (a.ts || 0)
         }), out
@@ -1339,18 +1355,18 @@
 
     function renderCalendar() {
         var box = $("cal-months");
-        if (box) {
-            for (var html = "", mi = 0; mi < 14; mi++) {
+        if(box) {
+            for(var html = "", mi = 0; mi < 14; mi++) {
                 var ym = addMonths(new Date, mi - 4),
                     y = ym.getFullYear(),
                     m = ym.getMonth() + 1;
                 html += '<div class="cal-month" data-ym="' + y + "-" + m + '">', html += '<div class="cal-month-title">' + y + " 年 " + m + " 月</div>", html += '<div class="cal-week">';
-                for (var w = 0; w < 7; w++) html += "<span>" + CAL_WEEK[w] + "</span>";
+                for(var w = 0; w < 7; w++) html += "<span>" + CAL_WEEK[w] + "</span>";
                 html += "</div>", html += '<div class="cal-grid">';
-                for (var first = new Date(y, m - 1, 1).getDay(), days = new Date(y, m, 0).getDate(), today = new Date, pad = 0; pad < first; pad++) html += '<div class="cal-cell empty"></div>';
-                for (var day = 1; day <= days; day++) {
-                    for (var recs = diaryByDate(y, m, day), rec = recs.length ? recs[0] : null, dailyRec = null, dr = 0; dr < recs.length; dr++)
-                        if (recs[dr].type === "card") {
+                for(var first = new Date(y, m - 1, 1).getDay(), days = new Date(y, m, 0).getDate(), today = new Date, pad = 0; pad < first; pad++) html += '<div class="cal-cell empty"></div>';
+                for(var day = 1; day <= days; day++) {
+                    for(var recs = diaryByDate(y, m, day), rec = recs.length ? recs[0] : null, dailyRec = null, dr = 0; dr < recs.length; dr++)
+                        if(recs[dr].type === "card") {
                             dailyRec = recs[dr];
                             break
                         } var recHex = dailyRec ? dailyRec.hex || hexFromTitle(dailyRec.title || "") : null,
@@ -1366,7 +1382,7 @@
 
     function scrollCalToCurrent() {
         var box = document.getElementById("cal-scroll");
-        if (box) {
+        if(box) {
             var now = new Date,
                 cur = box.querySelector('.cal-month[data-ym="' + now.getFullYear() + "-" + (now.getMonth() + 1) + '"]');
             cur && (box.scrollTop = cur.offsetTop - 6, updateCalTitle(cur))
@@ -1380,7 +1396,7 @@
 
     function updateCalTitle(monthEl) {
         var t2 = $("cal-title");
-        if (t2 && monthEl) {
+        if(t2 && monthEl) {
             var parts = monthEl.getAttribute("data-ym").split("-");
             t2.textContent = parts[0] + " 年 " + parseInt(parts[1], 10) + " 月"
         }
@@ -1398,12 +1414,12 @@
             behavior: "smooth"
         })
     }), $("cal-scroll").addEventListener("scroll", function() {
-        for (var box = $("cal-scroll"), months = box.querySelectorAll(".cal-month"), i = 0; i < months.length; i++) months[i].offsetTop <= box.scrollTop + 30 && updateCalTitle(months[i])
+        for(var box = $("cal-scroll"), months = box.querySelectorAll(".cal-month"), i = 0; i < months.length; i++) months[i].offsetTop <= box.scrollTop + 30 && updateCalTitle(months[i])
     }), $("cal-months").addEventListener("click", function(e) {
         var cell = e.target.closest(".cal-cell");
-        if (!(!cell || cell.classList.contains("empty"))) {
+        if(!(!cell || cell.classList.contains("empty"))) {
             var recs = diaryByDate(parseInt(cell.getAttribute("data-y"), 10), parseInt(cell.getAttribute("data-m"), 10), parseInt(cell.getAttribute("data-d"), 10));
-            if (recs && recs.length) {
+            if(recs && recs.length) {
                 var rec = recs[0];
                 rec.fromDiary = !0, rec.siblings = recs, openDetail(rec)
             } else toast("這天沒有卜卦紀錄")
@@ -1484,8 +1500,8 @@
     }
 
     function unlockElementsFromHex(hex) {
-        if (!hex) return [];
-        for (var names = [hex.upperName, hex.lowerName], cur = getCollectedElements(), fresh = [], i = 0; i < names.length; i++) {
+        if(!hex) return [];
+        for(var names = [hex.upperName, hex.lowerName], cur = getCollectedElements(), fresh = [], i = 0; i < names.length; i++) {
             var n = names[i];
             n && cur.indexOf(n) === -1 && (cur.push(n), fresh.push(n))
         }
@@ -1496,26 +1512,26 @@
         try {
             var GUEST_KEY = COLLECT_KEY + "_guest",
                 curKey = collectKey();
-            if (GUEST_KEY === curKey) return;
+            if(GUEST_KEY === curKey) return;
             var guest = JSON.parse(localStorage.getItem(GUEST_KEY) || "[]");
-            if (!guest.length) return;
-            for (var cur = getCollectedElements(), i = 0; i < guest.length; i++) cur.indexOf(guest[i]) === -1 && cur.push(guest[i]);
+            if(!guest.length) return;
+            for(var cur = getCollectedElements(), i = 0; i < guest.length; i++) cur.indexOf(guest[i]) === -1 && cur.push(guest[i]);
             saveCollectedElements(cur), localStorage.removeItem(GUEST_KEY), state.result && state.result.hex && unlockElementsFromHex(state.result.hex)
         } catch (e) {}
     }
 
     function renderCollect() {
         var body = $("collect-body");
-        if (body) {
-            for (var arr = loadDiary(), divCount = 0, feedbackCount = 0, di = 0; di < arr.length; di++) arr[di].type === "divination" && divCount++, (arr[di].note || arr[di].mood || arr[di].verify) && feedbackCount++;
+        if(body) {
+            for(var arr = loadDiary(), divCount = 0, feedbackCount = 0, di = 0; di < arr.length; di++) arr[di].type === "divination" && divCount++, (arr[di].note || arr[di].mood || arr[di].verify) && feedbackCount++;
             var mission0 = divCount >= 1,
                 mission1 = divCount >= 10,
                 mission2 = feedbackCount >= 3;
             COLLECT_BOOKS[0].items[0].locked = !mission0, COLLECT_BOOKS[0].items[1].locked = !mission1, COLLECT_BOOKS[0].items[2].locked = !mission2;
-            for (var html = "", unlockedCount = 0, collected = getCollectedElements(), b = 0; b < COLLECT_BOOKS.length; b++) {
+            for(var html = "", unlockedCount = 0, collected = getCollectedElements(), b = 0; b < COLLECT_BOOKS.length; b++) {
                 var book = COLLECT_BOOKS[b];
                 html += '<div class="collect-book"><div class="book-title">' + book.title + "</div>", html += '<div class="collect-grid ' + (book.grid === "three" ? "three" : "") + '">';
-                for (var i = 0; i < book.items.length; i++) {
+                for(var i = 0; i < book.items.length; i++) {
                     var it = book.items[i],
                         isLocked = it.locked;
                     b === 1 && (isLocked = collected.indexOf(it.label) === -1), isLocked || unlockedCount++, html += '<div class="collect-item' + (isLocked ? " locked" : "") + '" data-idx="' + b + "-" + i + '">', html += '<div class="ci-emoji">' + it.e + "</div>", html += '<div class="ci-label">' + it.label + "</div></div>"
@@ -1569,10 +1585,10 @@
         try {
             s.claimed = localStorage.getItem(guardianClaimKey()) === "1"
         } catch (e) {}
-        if (typeof FB != "undefined" && FB && FB.getConfig && FB.getConfig("betaProgramActive")) {
+        if(typeof FB != "undefined" && FB && FB.getConfig && FB.getConfig("betaProgramActive")) {
             var c = FB.getConfig("betaProgramActive"),
                 a = c && c.active === !0;
-            if (!a) return s.reason = "off", s
+            if(!a) return s.reason = "off", s
         } else return s.reason = "off", s;
         var u = currentUser() || {};
         return u.email ? (s.beta = u.betaTester === !0 || u.betaTester === "true" || u.betaTester === 1 || u.betaTester === "1", s.beta ? (s.can = !s.claimed, s) : (s.reason = "notBeta", s)) : (s.reason = "guest", s)
@@ -1622,10 +1638,10 @@
     function refreshGuardianBanner() {
         var ov = guardianOverlay(),
             wrap = ov && ov.querySelector(".guardian-beta-wrap");
-        if (wrap) {
+        if(wrap) {
             var s = guardianState(),
                 oldB = document.getElementById("guardian-beta-banner");
-            if (oldB && oldB.parentNode === wrap && wrap.removeChild(oldB), !(!s.beta || !s.active)) {
+            if(oldB && oldB.parentNode === wrap && wrap.removeChild(oldB), !(!s.beta || !s.active)) {
                 var langEn = (function() {
                     try {
                         return localStorage.getItem("xingua_lang") === "en"
@@ -1636,9 +1652,9 @@
                 wrap.insertAdjacentHTML("beforeend", langEn ? guardianBannerEN(s) : guardianBannerHTML(s));
                 var btn = document.getElementById("guardian-beta-btn");
                 btn && btn.addEventListener("click", function() {
-                    if (!guardianState().claimed) {
+                    if(!guardianState().claimed) {
                         var st = guardianState();
-                        if (!st.beta || !st.active) {
+                        if(!st.beta || !st.active) {
                             toast(t("toast.guardianBetaOff"));
                             return
                         }
@@ -1656,9 +1672,9 @@
         var n = guardianStoredNum(),
             h = null,
             _H = getHexagrams();
-        if (n) {
-            for (var i = 0; i < _H.length; i++)
-                if (_H[i].num === n) {
+        if(n) {
+            for(var i = 0; i < _H.length; i++)
+                if(_H[i].num === n) {
                     h = _H[i];
                     break
                 }
@@ -1686,7 +1702,7 @@
     }), $("guardian-overlay").addEventListener("click", function(e) {
         e.target === this && this.classList.remove("open")
     }), $("guardian-flip").addEventListener("click", function() {
-        if (!guardianOpened()) {
+        if(!guardianOpened()) {
             var card = $("guardian-card"),
                 flipBtn = $("guardian-flip"),
                 note = $("guardian-locked-note"),
@@ -1703,7 +1719,7 @@
     function renderDetailCarousel(rec, keepPos) {
         var c = $("detail-carousel"),
             d = $("detail-dots");
-        if (c) {
+        if(c) {
             var _pidx = keepPos && c && Math.round(c.scrollLeft / c.clientWidth) || 0,
                 h = rec.hex,
                 chg = changedHex(rec),
@@ -1712,15 +1728,15 @@
                 changedTxt = changedText(changed),
                 title = h.num + " " + h.symbolLabel,
                 slides = "";
-            if (slides += '<div class="slide symbol-slide"><div class="el-ic">' + cardMainImg(h) + '</div><div class="pair">' + h.upper + " " + h.lower + (chg.none ? "" : "　→　" + chg.sym) + '</div><div class="name">' + esc(title) + "</div>" + (changedTxt ? '<div class="changed-line">' + esc(changedTxt) + "</div>" : "") + "</div>", slides += '<div class="slide"><div class="slide-k">' + esc(title) + '</div><div class="core-txt">' + esc(readingLineText(rec)) + "</div></div>", slides += '<div class="slide"><div class="slide-k">' + esc(t("result.aboutPrefix")) + "「" + esc(catTxt) + " × " + esc(lenLabel(rec.len || "")) + '」</div><div class="focus">' + esc(readingFocusText(rec, rec.cat)) + "</div></div>", slides += '<div class="slide"><div class="slide-k">' + esc(t("result.advice")) + '</div><div class="core-txt">' + esc(readingGuideText(rec, rec.cat)) + "</div></div>", c.innerHTML = slides, d) {
-                for (var dotsHtml = "", i = 0; i < 4; i++) dotsHtml += "<i" + (i === 0 ? ' class="on"' : "") + "></i>";
+            if(slides += '<div class="slide symbol-slide"><div class="el-ic">' + cardMainImg(h) + '</div><div class="pair">' + h.upper + " " + h.lower + (chg.none ? "" : "　→　" + chg.sym) + '</div><div class="name">' + esc(title) + "</div>" + (changedTxt ? '<div class="changed-line">' + esc(changedTxt) + "</div>" : "") + "</div>", slides += '<div class="slide"><div class="slide-k">' + esc(title) + '</div><div class="core-txt">' + esc(readingLineText(rec)) + "</div></div>", slides += '<div class="slide"><div class="slide-k">' + esc(t("result.aboutPrefix")) + "「" + esc(catTxt) + " × " + esc(lenLabel(rec.len || "")) + '」</div><div class="focus">' + esc(readingFocusText(rec, rec.cat)) + "</div></div>", slides += '<div class="slide"><div class="slide-k">' + esc(t("result.advice")) + '</div><div class="core-txt">' + esc(readingGuideText(rec, rec.cat)) + "</div></div>", c.innerHTML = slides, d) {
+                for(var dotsHtml = "", i = 0; i < 4; i++) dotsHtml += "<i" + (i === 0 ? ' class="on"' : "") + "></i>";
                 d.innerHTML = dotsHtml;
                 var _dc = $("detail-carousel");
                 _dc && (_dc.scrollLeft = keepPos ? _pidx * _dc.clientWidth : 0), (function() {
-                    for (var _dd = d.children, _i = 0; _i < _dd.length; _i++) _dd[_i].className = _i === Math.round(c.scrollLeft / c.clientWidth) ? "on" : ""
+                    for(var _dd = d.children, _i = 0; _i < _dd.length; _i++) _dd[_i].className = _i === Math.round(c.scrollLeft / c.clientWidth) ? "on" : ""
                 })(), !keepPos && requestAnimationFrame(function() {
                     _dc.scrollLeft = 0;
-                    for (var _dd2 = d.children, _j = 0; _j < _dd2.length; _j++) _dd2[_j].className = _j === 0 ? "on" : ""
+                    for(var _dd2 = d.children, _j = 0; _j < _dd2.length; _j++) _dd2[_j].className = _j === 0 ? "on" : ""
                 })
             }
         }
@@ -1740,19 +1756,19 @@
         }));
         var tabsBox = $("detail-tabs"),
             siblings = rec.siblings && rec.siblings.length ? rec.siblings : [rec];
-        if (rec.fromDiary)
-            for (var sif = 0; sif < siblings.length; sif++) siblings[sif].fromDiary = !0, siblings[sif].siblings = siblings;
-        if (tabsBox)
-            if (siblings.length > 1) {
+        if(rec.fromDiary)
+            for(var sif = 0; sif < siblings.length; sif++) siblings[sif].fromDiary = !0, siblings[sif].siblings = siblings;
+        if(tabsBox)
+            if(siblings.length > 1) {
                 tabsBox.classList.remove("hidden");
-                for (var html = "", si = 0; si < siblings.length; si++) {
+                for(var html = "", si = 0; si < siblings.length; si++) {
                     var s = siblings[si],
                         label = s.type === "card" ? "🎴 抽卡" : "🔮 卜卦",
                         active = s === rec ? " on" : "";
                     html += '<button class="detail-tab' + active + '" data-idx="' + si + '">' + label + (si === 0 ? "（最近）" : "") + "</button>"
                 }
                 tabsBox.innerHTML = html;
-                for (var tabs = tabsBox.querySelectorAll(".detail-tab"), ti = 0; ti < tabs.length; ti++)(function(idx) {
+                for(var tabs = tabsBox.querySelectorAll(".detail-tab"), ti = 0; ti < tabs.length; ti++)(function(idx) {
                     tabs[ti].addEventListener("click", function() {
                         openDetail(siblings[idx])
                     })
@@ -1760,8 +1776,8 @@
             } else tabsBox.classList.add("hidden"), tabsBox.innerHTML = "";
         var viewCard = $("detail-view-card"),
             viewDiv = $("detail-view-divination");
-        if (rec.type === "card") {
-            if (viewCard && viewCard.classList.add("on"), viewDiv && viewDiv.classList.remove("on"), viewCard) {
+        if(rec.type === "card") {
+            if(viewCard && viewCard.classList.add("on"), viewDiv && viewDiv.classList.remove("on"), viewCard) {
                 var hCard = rec.hex || hexFromTitle(rec.title || ""),
                     coreCard = hCard && hCard.core ? hCard.core : rec.note || rec.title || "",
                     elCard = hCard ? cardMainImg(hCard) : "";
@@ -1769,10 +1785,10 @@
             }
         } else viewCard && viewCard.classList.remove("on"), viewDiv && viewDiv.classList.add("on");
         var dd = document.querySelector(".detail-date");
-        if (dd && (dd.textContent = rec.date + " · " + catLabel(rec.cat) + " · " + lenLabel(rec.len || "")), detailNoteDraft && detailNoteDraft.ts === rec.ts && detailNoteDraft.title === rec.title ? ($("detail-note").value = detailNoteDraft.text, setNoteSaveUI(!0, !1), setNoteBtnMode(!1)) : ($("detail-note").value = rec.note || "", setNoteSaveUI(!1, !!rec.note), setNoteBtnMode(!!rec.note)), detailMood = null, document.querySelectorAll("#detail-moods .mood-btn").forEach(function(b) {
+        if(dd && (dd.textContent = rec.date + " · " + catLabel(rec.cat) + " · " + lenLabel(rec.len || "")), detailNoteDraft && detailNoteDraft.ts === rec.ts && detailNoteDraft.title === rec.title ? ($("detail-note").value = detailNoteDraft.text, setNoteSaveUI(!0, !1), setNoteBtnMode(!1)) : ($("detail-note").value = rec.note || "", setNoteSaveUI(!1, !!rec.note), setNoteBtnMode(!!rec.note)), detailMood = null, document.querySelectorAll("#detail-moods .mood-btn").forEach(function(b) {
                 b.classList.remove("on"), rec.mood && b.getAttribute("data-mood") === rec.mood && (b.classList.add("on"), detailMood = rec.mood)
             }), verify = null, $("verify-y").classList.remove("on-y"), $("verify-x").classList.remove("on-x"), rec.verify === "y" && (verify = "y", $("verify-y").classList.add("on-y")), rec.verify === "x" && (verify = "x", $("verify-x").classList.add("on-x")), rec.hex) renderDetailCarousel(rec, !1);
-        else if (rec.title) {
+        else if(rec.title) {
             var c = $("detail-carousel");
             c && (c.innerHTML = '<div class="slide"><div class="slide-k">' + esc(rec.title) + '</div><div class="core-txt">' + esc(rec.note || rec.title) + "</div></div>");
             var d = $("detail-dots");
@@ -1786,7 +1802,7 @@
     }
 
     function renderDiaryData() {
-        for (var i = 0, dc = 0, n = 0; i < diaryData.length; i++) {
+        for(var i = 0, dc = 0, n = 0; i < diaryData.length; i++) {
             var _r = diaryData[i];
             recIsDivination(_r) && (dc++, !_r.verify && n++)
         }
@@ -1800,7 +1816,7 @@
     }), $("milk-back").addEventListener("click", function() {
         resetForm(), go("p1")
     }), $("saved-go").addEventListener("click", function() {
-        if ($("saved-overlay").classList.remove("open"), !isLoggedIn()) {
+        if($("saved-overlay").classList.remove("open"), !isLoggedIn()) {
             toast("請先登入"), go("p5");
             return
         }
@@ -1823,13 +1839,13 @@
         })
     })(), (function() {
         var d = $("detail-dots");
-        if (!d) return;
-        for (var html = "", i = 0; i < 4; i++) html += "<i" + (i === 0 ? ' class="on"' : "") + "></i>";
+        if(!d) return;
+        for(var html = "", i = 0; i < 4; i++) html += "<i" + (i === 0 ? ' class="on"' : "") + "></i>";
         d.innerHTML = html;
         var c = $("detail-carousel");
 
         function update() {
-            for (var idx = Math.round(c.scrollLeft / c.clientWidth) || 0, dots = d.children, j = 0; j < dots.length; j++) dots[j].className = j === idx ? "on" : ""
+            for(var idx = Math.round(c.scrollLeft / c.clientWidth) || 0, dots = d.children, j = 0; j < dots.length; j++) dots[j].className = j === idx ? "on" : ""
         }
         c.addEventListener("scroll", update)
     })();
@@ -1857,13 +1873,13 @@
     });
 
     function saveDetailField(field, val) {
-        if (detailRec) {
-            if (detailRec[field] = val, diaryData.indexOf(detailRec) >= 0) {
+        if(detailRec) {
+            if(detailRec[field] = val, diaryData.indexOf(detailRec) >= 0) {
                 saveDiary(diaryData);
                 return
             }
-            for (var arr = loadDiary(), i = 0; i < arr.length; i++)
-                if (arr[i].ts === detailRec.ts && arr[i].title === detailRec.title) {
+            for(var arr = loadDiary(), i = 0; i < arr.length; i++)
+                if(arr[i].ts === detailRec.ts && arr[i].title === detailRec.title) {
                     arr[i][field] = val, saveDiary(arr);
                     return
                 } diaryData.indexOf(detailRec) < 0 && diaryData.unshift(detailRec), saveDiary(diaryData)
@@ -1882,9 +1898,9 @@
             text: this.value
         }, setNoteSaveUI(!0, !1), setNoteBtnMode(!1))
     }), $("note-save-btn").addEventListener("click", function() {
-        if (detailRec) {
+        if(detailRec) {
             var text = $("detail-note").value;
-            if (noteSaved) {
+            if(noteSaved) {
                 noteSaved = !1, setNoteBtnMode(!1), setNoteSaveUI(!1, !1), $("note-save-hint").textContent = "", $("detail-note").focus(), toast("已切換為編輯模式");
                 return
             }
@@ -1893,14 +1909,14 @@
     });
 
     function guardLeave(after) {
-        if (state.result && !state.saved) {
+        if(state.result && !state.saved) {
             window.__guardAfter = after || function() {}, $("guard-overlay").classList.add("open");
             return
         }
         after && after()
     }
     $("guard-save").addEventListener("click", function() {
-        if ($("guard-overlay").classList.remove("open"), !isLoggedIn()) {
+        if($("guard-overlay").classList.remove("open"), !isLoggedIn()) {
             state.saved = !0, saveDraft(state.result), setTimeout(function() {
                 go("p5")
             }, 300);
@@ -1934,7 +1950,7 @@
 
     function shareText() {
         var res = state.result;
-        if (!res) return "DEC. 12 星星罐";
+        if(!res) return "DEC. 12 星星罐";
         var h = res.hex,
             chg = changedHex(res),
             changed = res.changedLines || [],
@@ -1956,7 +1972,7 @@
 
 `, txt += `一事不宜多問
 `, txt += `這是指引，不是預言。
-`, txt += "—— 來自 DEC. 12 星星罐", txt
+`, txt += "。 來自 DEC. 12 星星罐", txt
     }
 
     function shareUrl() {
@@ -1968,7 +1984,7 @@
     }
 
     function openShare() {
-        if (!state.result) {
+        if(!state.result) {
             toast("請先完成卜卦");
             return
         }
@@ -1980,19 +1996,19 @@
     });
 
     function shareViaApp(kind) {
-        if (!state.result) {
+        if(!state.result) {
             toast("請先完成卜卦");
             return
         }
         var txt = shareText(),
             url = "";
-        if (kind === "ig") {
+        if(kind === "ig") {
             url = "https://www.instagram.com/";
             try {
                 navigator.clipboard && navigator.clipboard.writeText(txt)
             } catch (e) {}
         } else kind === "thread" ? url = "https://www.threads.net/intent/post?text=" + encodeURIComponent(txt) : kind === "x" && (url = "https://twitter.com/intent/tweet?text=" + encodeURIComponent(txt));
-        if (url) try {
+        if(url) try {
             var opened = window.open(url, "_blank");
             toast(opened ? "已開啟分享" : "已複製分享內容，請貼到聊天室")
         } catch (e) {
@@ -2009,11 +2025,11 @@
     }), $("btn-send").addEventListener("click", function() {
         var email = $("share-email").value.trim(),
             emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!email) {
+        if(!email) {
             toast("請輸入 email");
             return
         }
-        if (!emailRe.test(email)) {
+        if(!emailRe.test(email)) {
             toast("email 格式似乎有誤");
             return
         }
@@ -2042,7 +2058,7 @@
 `, body += `一事不宜多問
 `, body += `這是指引，不是預言
 
-`, body += `————
+`, body += `。。
 `, body += `本信件由「DEC. 12」寄出，僅用於備份這份結果。
 `, body += "若不想再收到提醒，可隨時回覆「退訂」停止寄送。", $("email-preview").textContent = "寄送給 " + email + `：
 
@@ -2057,8 +2073,8 @@
     });
 
     function onBoot() {
-        clearLegacySession(), updateNav(), updateMenuAuth(), applySettingsUI(), go("p1"), typeof FB != "undefined" && FB && FB.loadUsers && FB.loadUsers().then(function(remote) {
-            if (remote) try {
+        purgeLegacyPasswords(), clearLegacySession(), updateNav(), updateMenuAuth(), applySettingsUI(), go("p1"), typeof FB != "undefined" && FB && FB.loadUsers && FB.loadUsers().then(function(remote) {
+            if(remote) try {
                 localStorage.setItem(FB_USERS_KEY, JSON.stringify(remote))
             } catch (e) {}
         })
@@ -2083,7 +2099,7 @@
 
     function renderVisits() {
         var el = document.getElementById("p1-visits");
-        if (el) {
+        if(el) {
             var n = window.__visitCount || 1,
                 txt = t("p1.visits");
             try {
@@ -2226,7 +2242,7 @@
                 subtitle: "在圓的軌跡裡，與宇宙共振",
                 p1: "榮格在治療一位病人時，遇到一個他始終記得的時刻。病人正描述夢裡一隻金龜子，話說到一半，窗外真的飛來一隻金龜子，停在窗台上。榮格後來把這類現象稱作「共時性」：外在發生的事，跟你內心正在經歷的，並非因果關係，卻在同一個時刻，指向同一個意義。",
                 p2: "《易經》運作的原理，正是這個。它不是預測未來的工具，而是在你提問的當下，把你內在早已知道、卻還沒說出口的答案，用卦象的方式映照出來。",
-                p3: "DEC.12 用簡單的文字x日記。讓每一次提問留下紀錄，每一次回頭看，你會發現卦象與現實之間，常常出現讓人愣住的呼應——不是因為卦象真的能預知什麼，而是因為提問本身，讓你更誠實地觀察自己正在經歷的一切。",
+                p3: "DEC.12 用簡單的文字x日記。讓每一次提問留下紀錄，每一次回頭看，你會發現卦象與現實之間，常常出現讓人愣住的呼應。不是因為卦象真的能預知什麼，而是因為提問本身，讓你更誠實地觀察自己正在經歷的一切。",
                 p4: "我自己也在最不確定的日子裡，靠這個方式一次次向內對話。母親的溫柔，如今已化作心底一抹安靜的底蘊，陪我走過那些反覆提問的時刻。如果你也正站在一個看不清方向的路口，那麼別急著相信，問一個你真正在意的問題，看看會發生什麼。",
                 version: "DEC. 12 · 測試版 v1"
             },
@@ -2390,7 +2406,7 @@
                 detailSave: "Save",
                 detailMood: "Mood",
                 detailVerify: "Feeling",
-                verifyY: "◯ It hels",
+                verifyY: "◯ It helps",
                 verifyX: "Doesn't help",
                 detailNoteHint: "Write what happened and how you felt, then come back later to compare",
                 collectSub: "Complete missions or collect elements to unlock artwork",
@@ -2630,8 +2646,8 @@
     function asiaLangPref() {
         try {
             var nl = (navigator.language || "").toLowerCase() || "";
-            if (nl.indexOf("zh") === 0 || nl.indexOf("ja") === 0 || nl.indexOf("ko") === 0 || nl.indexOf("th") === 0 || nl.indexOf("vi") === 0 || nl.indexOf("id") === 0 || nl.indexOf("ms") === 0 || nl.indexOf("fil") === 0 || nl.indexOf("tl") === 0) return "zh";
-            if (nl.indexOf("en") === 0) return "en";
+            if(nl.indexOf("zh") === 0 || nl.indexOf("ja") === 0 || nl.indexOf("ko") === 0 || nl.indexOf("th") === 0 || nl.indexOf("vi") === 0 || nl.indexOf("id") === 0 || nl.indexOf("ms") === 0 || nl.indexOf("fil") === 0 || nl.indexOf("tl") === 0) return "zh";
+            if(nl.indexOf("en") === 0) return "en";
             var tz = (Intl.DateTimeFormat().resolvedOptions().timeZone || "").toLowerCase();
             return tz.indexOf("asia/") === 0 ? "zh" : "en"
         } catch (e) {
@@ -2641,11 +2657,11 @@
 
     function defaultLangByRegion() {
         try {
-            if (navigator && navigator.languages && navigator.languages.length)
-                for (var i = 0; i < navigator.languages.length; i++) {
+            if(navigator && navigator.languages && navigator.languages.length)
+                for(var i = 0; i < navigator.languages.length; i++) {
                     var code = String(navigator.languages[i] || "").toLowerCase();
-                    if (code.indexOf("zh") === 0 || code.indexOf("ja") === 0 || code.indexOf("ko") === 0 || code.indexOf("th") === 0 || code.indexOf("vi") === 0 || code.indexOf("id") === 0 || code.indexOf("ms") === 0 || code.indexOf("fil") === 0 || code.indexOf("tl") === 0) return "zh";
-                    if (code.indexOf("en") === 0) return "en"
+                    if(code.indexOf("zh") === 0 || code.indexOf("ja") === 0 || code.indexOf("ko") === 0 || code.indexOf("th") === 0 || code.indexOf("vi") === 0 || code.indexOf("id") === 0 || code.indexOf("ms") === 0 || code.indexOf("fil") === 0 || code.indexOf("tl") === 0) return "zh";
+                    if(code.indexOf("en") === 0) return "en"
                 }
             return asiaLangPref()
         } catch (e) {
@@ -2656,7 +2672,7 @@
     function detectLang() {
         try {
             var saved = localStorage.getItem("xingua_lang");
-            if (saved === "zh" || saved === "en") return saved
+            if(saved === "zh" || saved === "en") return saved
         } catch (e) {}
         return defaultLangByRegion()
     }
@@ -2684,16 +2700,16 @@
                 txt = t(key),
                 hasEl = !1,
                 i;
-            if (txt !== key) {
-                for (i = 0; i < el.childNodes.length; i++)
-                    if (el.childNodes[i].nodeType === 1) {
+            if(txt !== key) {
+                for(i = 0; i < el.childNodes.length; i++)
+                    if(el.childNodes[i].nodeType === 1) {
                         hasEl = !0;
                         break
-                    } if (!hasEl) {
+                    } if(!hasEl) {
                     el.textContent = txt;
                     return
                 }
-                for (i = 0; i < el.childNodes.length; i++) {
+                for(i = 0; i < el.childNodes.length; i++) {
                     var c = el.childNodes[i];
                     c.nodeType === 3 && c.textContent.trim() !== "" && (c.textContent = txt)
                 }
@@ -2705,24 +2721,15 @@
         }), updateSettingAccount()
     }
 
-    function i18nSanityCheck() {
-        try {
-            for (var keys = ["guard.title", "guard.sub", "guard.save", "guard.discard"], i = 0; i < keys.length; i++) {
-                var v = t(keys[i]);
-                v === keys[i] && typeof console != "undefined" && console.warn && console.warn("[i18n] Missing translation:", keys[i], "lang=", lang())
-            }
-        } catch (e) {}
-    }
-
     function initLang() {
         try {
             var saved = localStorage.getItem("xingua_lang");
-            if (saved !== "zh" && saved !== "en") {
+            if(saved !== "zh" && saved !== "en") {
                 var d = detectLang();
                 localStorage.setItem("xingua_lang", d)
             }
         } catch (e) {}
-        applyLangTexts(), syncLangBtns(), i18nSanityCheck()
+        applyLangTexts(), syncLangBtns()
     }
 
     function syncLangUI() {

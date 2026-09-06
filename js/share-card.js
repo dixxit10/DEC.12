@@ -1,191 +1,6 @@
-(function () {
-    "use strict";
+(function(){"use strict";function isEn(){try{return localStorage.getItem("xingua_lang")==="en"}catch(e){return!1}}function siteUrl(){try{return location.href}catch(e){return"https://dec12.app/"}}function clean(s){return String(s==null?"":s).replace(/<[^>]*>/g,"").replace(/\s+/g," ").trim()}function cleanKeepNL(s){return String(s==null?"":s).replace(/<[^>]*>/g,"").replace(/[ \t]+/g," ").replace(/\n{3,}/g,`
 
-    // ---------- 基本工具 ----------
-
-    function isEn() {
-        try {
-            return localStorage.getItem("xingua_lang") === "en";
-        } catch (e) {
-            return false;
-        }
-    }
-
-    function siteUrl() {
-        try {
-            return location.href;
-        } catch (e) {
-            return "https://dec12.app/";
-        }
-    }
-
-    function clean(s) {
-        return String(s == null ? "" : s)
-            .replace(/<[^>]*>/g, "")
-            .replace(/\s+/g, " ")
-            .trim();
-    }
-
-    function cleanKeepNL(s) {
-        return String(s == null ? "" : s)
-            .replace(/<[^>]*>/g, "")
-            .replace(/[ \t]+/g, " ")
-            .replace(/\n{3,}/g, "\n\n")
-            .trim();
-    }
-
-    function $(id) {
-        return document.getElementById(id);
-    }
-
-    function esc(s) {
-        return String(s == null ? "" : s)
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;");
-    }
-
-    function hexList() {
-        var en = (typeof window != "undefined" && window.HEXAGRAMS_EN) || null;
-        var zh = (typeof window != "undefined" && window.HEXAGRAMS) || [];
-        return isEn() && en && en.length ? en : zh;
-    }
-
-    function findHex(num) {
-        var list = hexList();
-        for (var i = 0; i < list.length; i++) {
-            if (list[i].num === num) return list[i];
-        }
-        return null;
-    }
-
-    function toast(msg) {
-        try {
-            var t = $("toast");
-            if (t) {
-                t.textContent = msg;
-                t.classList.add("show");
-                clearTimeout(t._timer);
-                t._timer = setTimeout(function () {
-                    t.classList.remove("show");
-                }, 2200);
-            }
-        } catch (e) {}
-    }
-
-    // ---------- 狀態快照 ----------
-
-    var dailySnapshot = null;
-    var divinationSnapshot = null;
-
-    function watchDaily() {
-        var k = $("draw-back-k");
-        var t = $("draw-back-txt");
-        if (!k) return;
-
-        var take = function () {
-            var name = clean(k.textContent);
-            var guide = t ? clean(t.textContent) : "";
-            var hex = null;
-
-            try {
-                if (window.__lastHex && window.__lastHex.num) hex = window.__lastHex;
-            } catch (e) {}
-
-            if (!hex) {
-                var num = parseInt(name, 10);
-                hex = isNaN(num) ? null : findHex(num);
-            }
-
-            dailySnapshot = {
-                num: hex ? hex.num : NaN,
-                name: name,
-                guide: (hex && (hex.core || hex.plainText || hex.plain || "")) || guide,
-                art: (hex && hex.cardImg) || "",
-            };
-        };
-
-        var mo = new MutationObserver(take);
-        mo.observe(k, { childList: true, characterData: true, subtree: true });
-        if (t) mo.observe(t, { childList: true, characterData: true, subtree: true });
-    }
-
-    function watchDivination() {
-        var car = $("result-carousel");
-        if (!car) return;
-
-        var take = function () {
-            var slides = car.querySelectorAll(".slide");
-            if (!slides.length) return;
-
-            var snap = [];
-            var s1 = slides[0];
-            var nameEl = s1.querySelector(".name");
-            var imgEl = s1.querySelector(".card-main-img");
-
-            snap.push({
-                kind: "main",
-                name: nameEl ? clean(nameEl.textContent) : "",
-                art: imgEl ? imgEl.getAttribute("src") : "",
-            });
-
-            for (var i = 1; i < slides.length && i < 4; i++) {
-                var s = slides[i];
-                var kEl = s.querySelector(".slide-k");
-                var coreEl = s.querySelector(".core-txt");
-                var focusEl = s.querySelector(".focus");
-
-                snap.push({
-                    kind: "text",
-                    title: kEl ? clean(kEl.textContent) : "",
-                    body: coreEl ? cleanKeepNL(coreEl.textContent) : focusEl ? cleanKeepNL(focusEl.textContent) : "",
-                });
-            }
-
-            divinationSnapshot = snap;
-        };
-
-        var mo = new MutationObserver(take);
-        mo.observe(car, { childList: true, subtree: true });
-    }
-
-    function currentMode() {
-        var active = document.querySelector(".screen.active");
-        var name = active ? active.getAttribute("data-screen") : "";
-
-        if (name === "p2c" && divinationSnapshot && divinationSnapshot.length >= 4) return "divination";
-        if (dailySnapshot && dailySnapshot.name) return "daily";
-        return null;
-    }
-
-    function drawQr() {
-        return new Promise(function (resolve) {
-            if (typeof QRCode == "undefined") {
-                resolve("");
-                return;
-            }
-            QRCode.toDataURL(siteUrl(), {
-                width: 300,
-                margin: 1,
-                color: { dark: "#111111", light: "#f4f1ea" },
-            })
-                .then(function (url) {
-                    resolve(url);
-                })
-                .catch(function () {
-                    resolve("");
-                });
-        });
-    }
-
-    // ---------- 卡片樣式（HTML 字串） ----------
-
-    var SANS = "'Noto Sans TC','Songti TC','STSong','Georgia',sans-serif";
-    var SERIF = "'Noto Serif TC','Songti TC','STSong','Georgia',serif";
-
-    function brandHtml() {
-        return `
+`).trim()}function $(id){return document.getElementById(id)}function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}function hexList(){var en=typeof window!="undefined"&&window.HEXAGRAMS_EN||null,zh=typeof window!="undefined"&&window.HEXAGRAMS||[];return isEn()&&en&&en.length?en:zh}function findHex(num){for(var list=hexList(),i=0;i<list.length;i++)if(list[i].num===num)return list[i];return null}function toast(msg){try{var t=$("toast");t&&(t.textContent=msg,t.classList.add("show"),clearTimeout(t._timer),t._timer=setTimeout(function(){t.classList.remove("show")},2200))}catch(e){}}var dailySnapshot=null,divinationSnapshot=null;function watchDaily(){var k=$("draw-back-k"),t=$("draw-back-txt");if(k){var take=function(){var name=clean(k.textContent),guide=t?clean(t.textContent):"",hex=null;try{window.__lastHex&&window.__lastHex.num&&(hex=window.__lastHex)}catch(e){}if(!hex){var num=parseInt(name,10);hex=isNaN(num)?null:findHex(num)}dailySnapshot={num:hex?hex.num:NaN,name,guide:hex&&(hex.core||hex.plainText||hex.plain||"")||guide,art:hex&&hex.cardImg||""}},mo=new MutationObserver(take);mo.observe(k,{childList:!0,characterData:!0,subtree:!0}),t&&mo.observe(t,{childList:!0,characterData:!0,subtree:!0})}}function watchDivination(){var car=$("result-carousel");if(car){var take=function(){var slides=car.querySelectorAll(".slide");if(slides.length){var snap=[],s1=slides[0],nameEl=s1.querySelector(".name"),imgEl=s1.querySelector(".card-main-img");snap.push({kind:"main",name:nameEl?clean(nameEl.textContent):"",art:imgEl?imgEl.getAttribute("src"):""});for(var i=1;i<slides.length&&i<4;i++){var s=slides[i],kEl=s.querySelector(".slide-k"),coreEl=s.querySelector(".core-txt"),focusEl=s.querySelector(".focus");snap.push({kind:"text",title:kEl?clean(kEl.textContent):"",body:coreEl?cleanKeepNL(coreEl.textContent):focusEl?cleanKeepNL(focusEl.textContent):""})}divinationSnapshot=snap}},mo=new MutationObserver(take);mo.observe(car,{childList:!0,subtree:!0})}}function currentMode(){var active=document.querySelector(".screen.active"),name=active?active.getAttribute("data-screen"):"";return name==="p2c"&&divinationSnapshot&&divinationSnapshot.length>=4?"divination":dailySnapshot&&dailySnapshot.name?"daily":null}function drawQr(){return new Promise(function(resolve){if(typeof QRCode=="undefined"){resolve("");return}QRCode.toDataURL(siteUrl(),{width:300,margin:1,color:{dark:"#111111",light:"#f4f1ea"}}).then(function(url){resolve(url)}).catch(function(){resolve("")})})}var SANS="'Noto Sans TC','Songti TC','STSong','Georgia',sans-serif",SERIF="'Noto Serif TC','Songti TC','STSong','Georgia',serif";function brandHtml(){return`
             <div style="
                 font-size: 40px;
                 letter-spacing: 14px;
@@ -194,12 +9,7 @@
                 margin-bottom: 36px;
                 font-family: ${SERIF};
             ">DEC. 12</div>
-        `;
-    }
-
-    function qrHtml(qr) {
-        var qrImg = qr
-            ? `<div style="
+        `}function qrHtml(qr){var qrImg=qr?`<div style="
             padding: 50px;
             background: #f4f1ea;
             display: inline-block;
@@ -212,10 +22,7 @@
                 border-radius: 10px;
                 display: inline-block;
                 vertical-align: middle;
-              ">`
-            : "";
-
-        return `
+              ">`:"";return`
             <div style="margin-top: 44px; text-align: center;">
                 ${qrImg}
                 <div style="
@@ -230,21 +37,13 @@
                     font-family: ${SANS};
                 ">掃碼回到 DEC. 12<br>每一次提問，都是一次與自己的對話</div>
             </div>
-        `;
-    }
-
-    function domeFrameHtml(art, name, guide) {
-        var artImg = art
-            ? `<img src="${art}" style="
+        `}function domeFrameHtml(art,name,guide){var artImg=art?`<img src="${art}" style="
                 position: absolute;
                 inset: 0;
                 width: 100%;
                 height: 100%;
                 object-fit: cover;
-              ">`
-            : "";
-
-        return `
+              ">`:"";return`
             <div style="
                 width: 960px;
                 height: 960px;
@@ -291,15 +90,8 @@
                     ">${esc(guide)}</div>
                 </div>
             </div>
-        `;
-    }
-
-    function textCardHtml(title, body) {
-        var b = String(body == null ? "" : body)
-            .replace(/[ \t]*•[ \t]*/g, "\n•")
-            .replace(/^\n+/, "");
-
-        return `
+        `}function textCardHtml(title,body){var b=String(body==null?"":body).replace(/[ \t]*•[ \t]*/g,`
+•`).replace(/^\n+/,"");return`
             <div style="
                 width: 960px;
                 background: #fff;
@@ -324,13 +116,9 @@
                     letter-spacing: 1px;
                     white-space: normal;
                     font-family: ${SANS};
-                ">${esc(b).replace(/\n/g, "<br>")}</div>
+                ">${esc(b).replace(/\n/g,"<br>")}</div>
             </div>
-        `;
-    }
-
-    function dailyCardHtml(snap, q) {
-        return `
+        `}function dailyCardHtml(snap,q){return`
             <div style="
                 width: 1080px;
                 height: 1440px;
@@ -346,16 +134,11 @@
             ">
                 <div style="width: 100%; text-align: center;">
                     ${brandHtml()}
-                    ${domeFrameHtml(snap.art, snap.name, snap.guide)}
+                    ${domeFrameHtml(snap.art,snap.name,snap.guide)}
                     ${qrHtml(q)}
                 </div>
             </div>
-        `;
-    }
-
-    function divinationCardHtml(snap, qr) {
-        var main = snap[0];
-        var html = `
+        `}function divinationCardHtml(snap,qr){for(var main=snap[0],html=`
             <div style="
                 width: 1080px;
                 background: #f4f1ea;
@@ -367,178 +150,5 @@
                 align-items: center;
             ">
                 ${brandHtml()}
-                ${domeFrameHtml(main.art, main.name, "")}
-        `;
-
-        for (var i = 1; i < snap.length; i++) {
-            html += textCardHtml(snap[i].title, snap[i].body);
-        }
-
-        html += qrHtml(qr);
-        html += "</div>";
-        return html;
-    }
-
-    // ---------- 渲染與輸出 ----------
-
-    function renderToCanvas(html, width, height) {
-        var stage = $("share-card-stage");
-        if (!stage) return Promise.reject(new Error("no stage"));
-        if (typeof html2canvas == "undefined") return Promise.reject(new Error("html2canvas not loaded"));
-
-        stage.style.left = "-9999px";
-        stage.style.top = "0";
-        stage.style.zIndex = "-1";
-        stage.style.opacity = "1";
-        stage.style.width = width + "px";
-        stage.style.height = height + "px";
-        stage.innerHTML = html.trim();
-
-        return html2canvas(stage.firstElementChild, {
-            scale: 2,
-            backgroundColor: "#f4f1ea",
-            useCORS: true,
-            logging: false,
-            width: width,
-            height: height,
-            windowWidth: width,
-        });
-    }
-
-    function showPreview(canvas) {
-        var ov = $("card-preview-overlay");
-        var img = $("card-preview-img");
-        if (!ov || !img) return;
-        img.src = canvas.toDataURL("image/png");
-        ov.classList.add("open");
-    }
-
-    function downloadCanvas(canvas) {
-        try {
-            canvas.toBlob(function (blob) {
-                if (!blob) {
-                    fallbackDownload(canvas);
-                    return;
-                }
-                var url = URL.createObjectURL(blob);
-                var a = document.createElement("a");
-                a.href = url;
-                a.download = "dec12-reading.png";
-                document.body.appendChild(a);
-                a.click();
-                setTimeout(function () {
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                }, 800);
-            }, "image/png");
-        } catch (e) {
-            fallbackDownload(canvas);
-        }
-    }
-
-    function fallbackDownload(canvas) {
-        try {
-            var a = document.createElement("a");
-            a.href = canvas.toDataURL("image/png");
-            a.download = "dec12-reading.png";
-            document.body.appendChild(a);
-            a.click();
-            setTimeout(function () {
-                document.body.removeChild(a);
-            }, 800);
-        } catch (e) {}
-    }
-
-    function shareCard() {
-        var mode = currentMode();
-        if (!mode) {
-            toast(isEn() ? "Please finish a reading first." : "請先完成卜卦");
-            return;
-        }
-
-        var snap = mode === "daily" ? dailySnapshot : divinationSnapshot;
-        if (!snap) {
-            toast(isEn() ? "Please finish a reading first." : "請先完成卜卦");
-            return;
-        }
-
-        drawQr().then(function (qr) {
-            var html, w, h;
-
-            if (mode === "daily") {
-                w = 1080;
-                h = 1440;
-                html = dailyCardHtml(snap, qr);
-            } else {
-                w = 1080;
-                h = 0;
-                html = divinationCardHtml(snap, qr);
-            }
-
-            var stage = $("share-card-stage");
-
-            if (h === 0) {
-                stage.style.width = w + "px";
-                stage.style.height = "auto";
-                stage.innerHTML = html.trim();
-                h = stage.scrollHeight;
-            }
-
-            renderToCanvas(html, w, h)
-                .then(function (canvas) {
-                    showPreview(canvas);
-                })
-                .catch(function () {
-                    toast(isEn() ? "Could not generate card." : "圖卡生成失敗，請重試");
-                });
-        });
-    }
-
-    // ---------- 事件綁定 ----------
-
-    function bind() {
-        var btn = $("social-card");
-        if (btn) btn.addEventListener("click", shareCard);
-
-        var dl = $("card-preview-download");
-        if (dl) {
-            dl.addEventListener("click", function () {
-                var img = $("card-preview-img");
-                if (img && img.src && img.src.indexOf("data:image/png") === 0) {
-                    var a = document.createElement("a");
-                    a.href = img.src;
-                    a.download = "dec12-reading.png";
-                    document.body.appendChild(a);
-                    a.click();
-                    setTimeout(function () {
-                        document.body.removeChild(a);
-                    }, 800);
-                }
-            });
-        }
-
-        var close = $("card-preview-close");
-        if (close) {
-            close.addEventListener("click", function () {
-                var ov2 = $("card-preview-overlay");
-                if (ov2) ov2.classList.remove("open");
-            });
-        }
-
-        var ov = $("card-preview-overlay");
-        if (ov) {
-            ov.addEventListener("click", function (e) {
-                if (e.target === this) this.classList.remove("open");
-            });
-        }
-
-        watchDaily();
-        watchDivination();
-    }
-
-    if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", bind);
-    } else {
-        bind();
-    }
-})();
+                ${domeFrameHtml(main.art,main.name,"")}
+        `,i=1;i<snap.length;i++)html+=textCardHtml(snap[i].title,snap[i].body);return html+=qrHtml(qr),html+="</div>",html}function renderToCanvas(html,width,height){var stage=$("share-card-stage");return stage?typeof html2canvas=="undefined"?Promise.reject(new Error("html2canvas not loaded")):(stage.style.left="-9999px",stage.style.top="0",stage.style.zIndex="-1",stage.style.opacity="1",stage.style.width=width+"px",stage.style.height=height+"px",stage.innerHTML=html.trim(),html2canvas(stage.firstElementChild,{scale:2,backgroundColor:"#f4f1ea",useCORS:!0,logging:!1,width,height,windowWidth:width})):Promise.reject(new Error("no stage"))}function showPreview(canvas){var ov=$("card-preview-overlay"),img=$("card-preview-img");!ov||!img||(img.src=canvas.toDataURL("image/png"),ov.classList.add("open"))}function downloadCanvas(canvas){try{canvas.toBlob(function(blob){if(!blob){fallbackDownload(canvas);return}var url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url,a.download="dec12-reading.png",document.body.appendChild(a),a.click(),setTimeout(function(){document.body.removeChild(a),URL.revokeObjectURL(url)},800)},"image/png")}catch(e){fallbackDownload(canvas)}}function fallbackDownload(canvas){try{var a=document.createElement("a");a.href=canvas.toDataURL("image/png"),a.download="dec12-reading.png",document.body.appendChild(a),a.click(),setTimeout(function(){document.body.removeChild(a)},800)}catch(e){}}function shareCard(){var mode=currentMode();if(!mode){toast(isEn()?"Please finish a reading first.":"請先完成卜卦");return}var snap=mode==="daily"?dailySnapshot:divinationSnapshot;if(!snap){toast(isEn()?"Please finish a reading first.":"請先完成卜卦");return}drawQr().then(function(qr){var html,w,h;mode==="daily"?(w=1080,h=1440,html=dailyCardHtml(snap,qr)):(w=1080,h=0,html=divinationCardHtml(snap,qr));var stage=$("share-card-stage");h===0&&(stage.style.width=w+"px",stage.style.height="auto",stage.innerHTML=html.trim(),h=stage.scrollHeight),renderToCanvas(html,w,h).then(function(canvas){showPreview(canvas)}).catch(function(){toast(isEn()?"Could not generate card.":"圖卡生成失敗，請重試")})})}function bind(){var btn=$("social-card");btn&&btn.addEventListener("click",shareCard);var dl=$("card-preview-download");dl&&dl.addEventListener("click",function(){var img=$("card-preview-img");if(img&&img.src&&img.src.indexOf("data:image/png")===0){var a=document.createElement("a");a.href=img.src,a.download="dec12-reading.png",document.body.appendChild(a),a.click(),setTimeout(function(){document.body.removeChild(a)},800)}});var close=$("card-preview-close");close&&close.addEventListener("click",function(){var ov2=$("card-preview-overlay");ov2&&ov2.classList.remove("open")});var ov=$("card-preview-overlay");ov&&ov.addEventListener("click",function(e){e.target===this&&this.classList.remove("open")}),watchDaily(),watchDivination()}document.readyState==="loading"?document.addEventListener("DOMContentLoaded",bind):bind()})();
