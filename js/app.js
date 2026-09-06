@@ -1,5 +1,14 @@
 (function() {
     "use strict";
+    var ASSET_ROOT = (function() {
+        try {
+            var s = document.currentScript && document.currentScript.src || "";
+            var m = s.match(/^(.*?)js\/app\.js(?:\?.*)?$/);
+            return m ? m[1] : ""
+        } catch (e) {
+            return ""
+        }
+    })();
     var HEXAGRAMS = typeof window != "undefined" && window.HEXAGRAMS || [],
         LINES = typeof window != "undefined" && window.LINES || {},
         UI_LANG = (function() {
@@ -55,14 +64,14 @@
             "☷": "地"
         },
         ELEMENT_IMG = typeof window != "undefined" && window.ELEMENT_IMG || {
-            天: "img/el-tian.png",
-            地: "img/el-di.png",
-            水: "img/el-shui.png",
-            火: "img/el-huo.png",
-            雷: "img/el-lei.png",
-            風: "img/el-feng.png",
-            山: "img/el-shan.png",
-            澤: "img/el-ze.png"
+            天: ASSET_ROOT + "img/el-tian.png",
+            地: ASSET_ROOT + "img/el-di.png",
+            水: ASSET_ROOT + "img/el-shui.png",
+            火: ASSET_ROOT + "img/el-huo.png",
+            雷: ASSET_ROOT + "img/el-lei.png",
+            風: ASSET_ROOT + "img/el-feng.png",
+            山: ASSET_ROOT + "img/el-shan.png",
+            澤: ASSET_ROOT + "img/el-ze.png"
         };
 
     function elImgTag(name) {
@@ -84,7 +93,7 @@
     function pad2(n) {
         return n < 10 ? "0" + n : "" + n
     }
-    for(var HEXAGRAM_IMG = {}, _hi = 1; _hi <= 64; _hi++) HEXAGRAM_IMG[_hi] = "img/hexagram-" + pad2(_hi) + ".png";
+    for(var HEXAGRAM_IMG = {}, _hi = 1; _hi <= 64; _hi++) HEXAGRAM_IMG[_hi] = ASSET_ROOT + "img/hexagram-" + pad2(_hi) + ".png";
 
     function cardMainImg(hex) {
         if(!hex) return "";
@@ -1707,7 +1716,7 @@
             be = $("guardian-back-el"),
             elN = "",
             elN = h.upper && SYM_KEY[h.upper] || h.upperName || "",
-            bgSrc = ELEMENT_IMG && elN && ELEMENT_IMG[elN] || h.cardImg || "img/card-" + (h.num < 10 ? "0" + h.num : h.num) + "-" + h.key + ".png";
+            bgSrc = ELEMENT_IMG && elN && ELEMENT_IMG[elN] || h.cardImg || ASSET_ROOT + "img/card-" + (h.num < 10 ? "0" + h.num : h.num) + "-" + h.key + ".png";
         return back && (back.style.setProperty("--guardian-bg", "url('" + bgSrc + "')"), back.style.setProperty("background-image", "url('" + bgSrc + "')", "important"), back.style.setProperty("background-size", "cover", "important"), back.style.setProperty("background-position", "center", "important"), back.style.setProperty("background-repeat", "no-repeat", "important"), back.style.setProperty("background-color", "transparent", "important")), bk && (bk.textContent = h.num + " " + h.symbolLabel), bt && (bt.textContent = h.blessingText || h.plainText || h.core || ""), be && (be.innerHTML = ""), h
     }
 
