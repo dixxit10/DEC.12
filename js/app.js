@@ -5,21 +5,24 @@
         UI_LANG = (function() {
             try {
                 var v = localStorage.getItem("xingua_lang");
-                return v === "en" ? "en" : "zh"
-            } catch (e) {
-                return "zh"
-            }
+                if (v === "en" || v === "zh") return v
+            } catch (e) {}
+            return defaultLangByRegion()
         })(),
         uiLang = function(l) {
             return l ? (UI_LANG = l === "en" ? "en" : "zh", HEXAGRAMS = getHexagrams(), LINES = getLines(), onBoot()) : UI_LANG
         },
         getHexagrams = function() {
-            var en = typeof window != "undefined" && window.HEXAGRAMS_EN;
-            return UI_LANG === "en" && en && en.length ? en : typeof window != "undefined" && window.HEXAGRAMS || []
+            if (typeof window == "undefined") return [];
+            var zh = window.HEXAGRAMS || [],
+                en = window.HEXAGRAMS_EN || [];
+            return UI_LANG === "en" && en.length ? en : zh
         },
         getLines = function() {
-            var en = typeof window != "undefined" && window.LINES_EN;
-            return UI_LANG === "en" && en ? en : typeof window != "undefined" && window.LINES || {}
+            if (typeof window == "undefined") return {};
+            var zh = window.LINES || {},
+                en = window.LINES_EN || {};
+            return UI_LANG === "en" && en && Object.keys(en).length ? en : zh
         },
         TRI = {
             天: [1, 1, 1],
@@ -236,34 +239,28 @@
     }
 
     function changedHex(res) {
-        var h = res.hex;
-        var up = TRI[SYM_KEY[h.upper]].slice();
-        var low = TRI[SYM_KEY[h.lower]].slice();
-        var changed = res.changedLines || [];
-
-        if (changed.length === 0) {
-            return {
-                sym: h.upper + " " + h.lower,
-                label: h.symbolLabel,
-                none: true,
-            };
-        }
-
+        var h = res.hex,
+            up = TRI[SYM_KEY[h.upper]].slice(),
+            low = TRI[SYM_KEY[h.lower]].slice(),
+            changed = res.changedLines || [];
+        if (changed.length === 0) return {
+            sym: h.upper + " " + h.lower,
+            label: h.symbolLabel,
+            none: !0
+        };
         for (var ci = 0; ci < changed.length; ci++) {
-            var line = changed[ci];
-            var target = line <= 3 ? low : up;
-            var idx = line <= 3 ? line - 1 : line - 4;
-            target[idx] = target[idx] === 1 ? 0 : 1;
+            var line = changed[ci],
+                target = line <= 3 ? low : up,
+                idx = line <= 3 ? line - 1 : line - 4;
+            target[idx] = target[idx] === 1 ? 0 : 1
         }
-
-        var upK = triKey(up);
-        var lowK = triKey(low);
-        var entry = HEX_TABLE[upK + "_" + lowK];
-
+        var upK = triKey(up),
+            lowK = triKey(low),
+            entry = HEX_TABLE[upK + "_" + lowK];
         return {
             sym: SYM_OF[upK] + " " + SYM_OF[lowK],
-            label: entry ? entry[0] : "（變）",
-        };
+            label: entry ? entry[0] : "（變）"
+        }
     }
 
     function zhiGuaObject(res) {
@@ -286,39 +283,14 @@
             if (_H[hi].num === entry[1]) return _H[hi];
         return null
     }
-
-    var CARD2_COMBO_TPL = [
-        "慢慢來，事情最終很可能會走向{A}。中間或許會經歷一段{B}，這都是必經的過程。試著{C}，也記得溫柔地提醒自己，先別{D}。",
-        "其實不用太緊張，最後的結果很可能會是{A}。過程中如果遇到{B}，那也只是暫時的。你可以試著{C}，同時也讓自己留意，別掉進{D}的坑裡。",
-        "放輕鬆，事情的走向大概會是{A}。路上難免會遇到{B}，這很正常。此刻不妨{C}，也提醒自己輕輕避開{D}。",
-        "深呼吸一下，最後大概會迎來{A}。只是這條路上，可能會先經歷{B}，辛苦你了。試著{C}，同時溫柔地提醒自己，先不要{D}。",
-        "一步一步來就好，結果應該會走向{A}。過程中若感受到{B}，請對自己多一點耐心。可以先{C}，也記得留意別{D}。"
-    ];
-    var CARD2_SIMPLE_TPL = [
-        "一個階段正式結束了，新的方向會走向{A}。此刻，你可以試著{C}。",
-        "過去的都過去了，接下來會慢慢走向{A}。給自己一點時間{C}。",
-        "一切都翻開新的一頁，未來大概會是{A}。此刻最溫柔的做法，就是{C}。",
-        "舊的已經放下了，眼前的路會走向{A}。你可以試著{C}，慢慢來。",
-        "這是一個全新的開始，方向會是{A}。此刻，不妨先{C}。"
-    ];
-    var CARD3_COMBO_TPL = [
-        "在『{CAT}』這件事上，我想陪你看看：{MAIN}。同時也想輕輕提醒你：{SUP}。",
-        "關於『{CAT}』，此刻最重要的是：{MAIN}。但也別忘了照顧自己：{SUP}。",
-        "說到『{CAT}』，你現在最需要知道的是：{MAIN}。同時，也想溫柔提醒你：{SUP}。",
-        "在『{CAT}』這條路上，主要的方向是：{MAIN}。而過程中，也請多留意：{SUP}。",
-        "關於『{CAT}』，我看見的是：{MAIN}。也想陪你一起注意：{SUP}。"
-    ];
-    var CARD4_COMBO_TPL = [
-        "你可以試著{MAIN}，慢慢來就好。同時也想提醒你：{SUP}。",
-        "不妨先{MAIN}，一步一步來。也別忘了照顧自己：{SUP}。",
-        "可以從{MAIN}開始，給自己一點時間。同時也要記得：{SUP}。",
-        "試著{MAIN}吧，不用急。也想溫柔提醒你：{SUP}。",
-        "你可以先{MAIN}，慢慢調整步伐。同時也提醒自己：{SUP}。"
-    ];
+    var CARD2_COMBO_TPL = ["慢慢來，事情可能會走向{A}。中間或許會經歷一段{B}，這都是必經的過程。試著{C}，也記得提醒自己，先別{D}。", "不用太緊張，最後的結果可能會是{A}。過程中如果遇到{B}，那也只是暫時的。你可以試著{C}，同時也讓自己留意，別掉進{D}的坑裡。", "放輕鬆，事情的走向大概會是{A}。路上難免會遇到{B}，這很正常。此刻不妨{C}，也提醒自己輕輕避開{D}。", "深呼吸一下，最後大概會迎來{A}。只是這條路上，可能會先經歷{B}，辛苦你了。試著{C}，同時溫柔地提醒自己，先不要{D}。", "一步一步來就好，結果應該會走向{A}。過程中若感受到{B}，請對自己多一點耐心。可以先{C}，也記得留意別{D}。"],
+        CARD2_SIMPLE_TPL = ["一個階段正式結束了，新的方向會走向{A}。此刻，試著{C}。", "過去的都過去了，接著會走向{A}。給自己一點時間{C}。", "一切都翻開新的一頁，未來{A}。此刻最溫柔的做法，就是{C}。", "舊的已經放下了，眼前的路會{A}。你可以試著{C}，慢慢來。", "這是一個全新的開始，方向會是{A}。此刻，不妨先{C}。"],
+        CARD3_COMBO_TPL = ["{MAIN}。同時也想輕輕提醒你：{SUP}", "此刻最重要的是{MAIN}。當{SUP}", "{MAIN}。同時，也想溫柔提醒你：{SUP}", "{MAIN}。而過程中，也請多留意：{SUP}。", "{MAIN}。也想陪你一起注意：{SUP}"],
+        CARD4_COMBO_TPL = ["{MAIN}，慢慢來就好。同時也想提醒你：{SUP}", "不妨先{MAIN}，一步一步來。{SUP}", "{MAIN}{SUP}", "試著{MAIN}吧，不用急。{SUP}", "{MAIN}，慢慢調整步伐。同時提醒自己{SUP}"];
 
     function pickTplIdx(res, key, n) {
         var k = "_tpl_" + key;
-        return typeof res[k] !== "number" && (res[k] = Math.floor(Math.random() * n)), res[k]
+        return typeof res[k] != "number" && (res[k] = Math.floor(Math.random() * n)), res[k]
     }
 
     function fillTpl(tpl, map) {
@@ -326,11 +298,59 @@
             return map[k] || ""
         })
     }
+    var CAT_KEY_MAP = {
+            感情: "love",
+            事業: "career",
+            健康: "health",
+            財運: "finances",
+            人際: "relationships",
+            love: "love",
+            career: "career",
+            health: "health",
+            finances: "finances",
+            relationships: "relationships"
+        },
+        CAT_I18N = {
+            love: "p2a.cat1",
+            career: "p2a.cat2",
+            health: "p2a.cat3",
+            finances: "p2a.cat4",
+            relationships: "p2a.cat5"
+        };
+
+    function normalizeCat(cat) {
+        return CAT_KEY_MAP[cat] || cat || ""
+    }
+
+    function catLabel(cat) {
+        var k = normalizeCat(cat),
+            ik = CAT_I18N[k];
+        return ik ? t(ik) : cat || (lang() === "en" ? "This matter" : "這件事")
+    }
+    var LEN_KEY_MAP = {
+        一週內: "p2a.len1",
+        一個月內: "p2a.len2",
+        三個月內: "p2a.len3",
+        "長期（六個月以上）": "p2a.len4",
+        "6 months": "p2a.len4",
+        "Within 1 week": "p2a.len1",
+        "Within 1 month": "p2a.len2",
+        "Within 3 months": "p2a.len3"
+    };
+
+    function lenLabel(v) {
+        var k = LEN_KEY_MAP[v];
+        return k ? t(k) : v || ""
+    }
+
+    function changedText(changed) {
+        return !changed || changed.length === 0 ? t("result.noChanging") : t("result.changingPrefix") + " " + changed.join(lang() === "en" ? ", " : "、") + t("result.changingSuffix")
+    }
 
     function guideOf(entry, cat) {
-        if (!entry || !entry.guide) return "";
+        if (cat = normalizeCat(cat), !entry || !entry.guide) return "";
         var g = entry.guide;
-        return typeof g === "object" ? g[cat] || g["其他/不確定"] || g.未選 || "" : g
+        return typeof g == "object" ? g[cat] || "" : g
     }
 
     function resolveInterpretation(res) {
@@ -417,7 +437,7 @@
             lineData: null,
             zhiGua: zhi6,
             zhiGuaText: zhi6 && (zhi6.plain || zhi6.core) || "",
-            special: special,
+            special,
             combo: {
                 main: zhi6,
                 support: null
@@ -436,12 +456,12 @@
                 if ((A || C) && s) {
                     var B = s.support_risk || "",
                         D = s.support_warning || "",
-                        t = CARD2_COMBO_TPL[pickTplIdx(res, "l2", CARD2_COMBO_TPL.length)];
-                    return fillTpl(t, {
-                        A: A,
-                        B: B,
-                        C: C,
-                        D: D
+                        t2 = CARD2_COMBO_TPL[pickTplIdx(res, "l2", CARD2_COMBO_TPL.length)];
+                    return fillTpl(t2, {
+                        A,
+                        B,
+                        C,
+                        D
                     })
                 }
             }
@@ -456,8 +476,8 @@
                 if ((A2 || C2) && s2) {
                     var B2 = s2.support_risk || "",
                         D2 = s2.support_warning || "",
-                        t2 = CARD2_COMBO_TPL[pickTplIdx(res, "l2", CARD2_COMBO_TPL.length)];
-                    return fillTpl(t2, {
+                        t22 = CARD2_COMBO_TPL[pickTplIdx(res, "l2", CARD2_COMBO_TPL.length)];
+                    return fillTpl(t22, {
                         A: A2,
                         B: B2,
                         C: C2,
@@ -487,6 +507,7 @@
     }
 
     function readingFocusText(res, cat) {
+        cat = normalizeCat(cat);
         var r = resolveInterpretation(res),
             h = res.hex;
         if (r.mode === "line") {
@@ -494,33 +515,32 @@
                 var mf = r.combo.main && r.combo.main.focus && r.combo.main.focus[cat],
                     sf = r.combo.support && r.combo.support.focus && r.combo.support.focus[cat];
                 if (mf && sf) return fillTpl(CARD3_COMBO_TPL[pickTplIdx(res, "f" + cat, CARD3_COMBO_TPL.length)], {
-                    CAT: cat,
+                    CAT: catLabel(cat),
                     MAIN: mf,
                     SUP: sf
                 })
             }
-            if (r.lineData && r.lineData.focus && r.lineData.focus[cat]) return r.lineData.focus[cat];
-            return h.focus[cat] || h.focus["其他/不確定"] || h.focus.未選 || h.core || ""
+            return r.lineData && r.lineData.focus && r.lineData.focus[cat] ? r.lineData.focus[cat] : h.focus[cat] || h.core || ""
         }
         if (r.mode === "bothGua") {
             var zhi = r.zhiGua,
                 mf2 = zhi && zhi.focus && zhi.focus[cat],
                 sf2 = h.focus && h.focus[cat];
-            if (mf2 && sf2) return fillTpl(CARD3_COMBO_TPL[pickTplIdx(res, "f" + cat, CARD3_COMBO_TPL.length)], {
-                CAT: cat,
+            return mf2 && sf2 ? fillTpl(CARD3_COMBO_TPL[pickTplIdx(res, "f" + cat, CARD3_COMBO_TPL.length)], {
+                CAT: catLabel(cat),
                 MAIN: mf2,
                 SUP: sf2
-            });
-            return mf2 || sf2 || h.core || ""
+            }) : mf2 || sf2 || h.core || ""
         }
         if (r.mode === "zhiGua") {
             var zh = r.zhiGua;
-            return zh && zh.focus && zh.focus[cat] || h.focus[cat] || h.focus["其他/不確定"] || h.focus.未選 || h.core || ""
+            return zh && zh.focus && zh.focus[cat] || h.focus[cat] || h.core || ""
         }
-        return h.focus[cat] || h.focus["其他/不確定"] || h.focus.未選 || h.core || ""
+        return h.focus[cat] || h.core || ""
     }
 
     function readingGuideText(res, cat) {
+        cat = normalizeCat(cat);
         var r = resolveInterpretation(res),
             h = res.hex;
         if (r.mode === "line") {
@@ -533,25 +553,23 @@
                 })
             }
             var lg = r.lineData && guideOf(r.lineData, cat);
-            if (lg) return lg;
-            return h.guide && (h.guide[cat] || h.guide["其他/不確定"] || h.guide.未選) || h.focus[cat] || h.core || ""
+            return lg || h.guide && h.guide[cat] || h.focus[cat] || h.core || ""
         }
         if (r.mode === "bothGua") {
             var zhi = r.zhiGua,
                 mg2 = guideOf(zhi, cat),
                 sg2 = guideOf(h, cat);
-            if (mg2 && sg2) return fillTpl(CARD4_COMBO_TPL[pickTplIdx(res, "g" + cat, CARD4_COMBO_TPL.length)], {
+            return mg2 && sg2 ? fillTpl(CARD4_COMBO_TPL[pickTplIdx(res, "g" + cat, CARD4_COMBO_TPL.length)], {
                 MAIN: mg2,
                 SUP: sg2
-            });
-            return mg2 || sg2 || h.core || ""
+            }) : mg2 || sg2 || h.core || ""
         }
         if (r.mode === "zhiGua") {
             var zh = r.zhiGua,
                 zg = guideOf(zh, cat);
-            return zg || (zh && zh.focus && zh.focus[cat]) || h.core || ""
+            return zg || zh && zh.focus && zh.focus[cat] || h.core || ""
         }
-        return h.guide && (h.guide[cat] || h.guide["其他/不確定"] || h.guide.未選) || h.focus[cat] || h.core || ""
+        return h.guide && h.guide[cat] || h.focus[cat] || h.core || ""
     }
     var state = {
         cat: "",
@@ -636,7 +654,7 @@
                 var val = chip.getAttribute(field === "cat" ? "data-cat" : "data-len");
                 box.querySelectorAll(".chip").forEach(function(c) {
                     c.classList.remove("on")
-                }), chip.classList.add("on"), state[field] = val
+                }), chip.classList.add("on"), state[field] = field === "cat" ? normalizeCat(val) : val
             }
         })
     }
@@ -654,10 +672,8 @@
         m.addEventListener("click", function() {
             if (!m.classList.contains("menu-lang")) {
                 var act = m.getAttribute("data-act");
-                // 修改：規則 3/4 — 選單任何導向（回首頁/隨記/關於/奶茶/設定）都先經 guardLeave，未儲存先跳 Overlay
                 guardLeave(function() {
-                    $("menu-overlay").classList.remove("open");
-                    act === "home" ? (resetForm(), go("p1")) : act === "diary" ? isLoggedIn() ? (renderDiaryData(), renderCalendar(), renderCollect(), go("diary"), setTimeout(scrollCalToCurrent, 120)) : (toast("請先登入"), go("p5")) : act === "about" ? (clearDraft(), state.result = null, state.saved = !1, go("about")) : act === "milk" ? (clearDraft(), state.result = null, state.saved = !1, go("milk")) : act === "setting" && (clearDraft(), state.result = null, state.saved = !1, settingReturnTo = document.querySelector(".screen.active") ? document.querySelector(".screen.active").getAttribute("data-screen") : "diary", go("setting"), updateSettingAccount())
+                    $("menu-overlay").classList.remove("open"), act === "home" ? (resetForm(), go("p1")) : act === "diary" ? isLoggedIn() ? (refreshPerUserData(), go("diary"), setTimeout(scrollCalToCurrent, 120)) : (toast("請先登入"), go("p5")) : act === "about" ? (clearDraft(), state.result = null, state.saved = !1, go("about")) : act === "milk" ? (clearDraft(), state.result = null, state.saved = !1, go("milk")) : act === "setting" && (clearDraft(), state.result = null, state.saved = !1, settingReturnTo = document.querySelector(".screen.active") ? document.querySelector(".screen.active").getAttribute("data-screen") : "diary", go("setting"), updateSettingAccount())
                 })
             }
         })
@@ -681,15 +697,18 @@
     }
 
     function doLogout() {
-        setSession(null), localStorage.removeItem(LOGIN_KEY), clearDraft(), state.result = null, state.saved = !1, state.draftDate = null, resetForm(), refreshPerUserData(), $("menu-overlay").classList.remove("open"), $("saved-overlay").classList.remove("open"), updateNav(), updateMenuAuth(), go("p1"), toast("已登出")
+        setSession(null), localStorage.removeItem(LOGIN_KEY), clearDraft(), state.result = null, state.saved = !1, state.draftDate = null, resetForm(), refreshPerUserData(), $("menu-overlay").classList.remove("open"), $("saved-overlay").classList.remove("open"), updateNav(), updateMenuAuth(), go("p1"), (function() {
+            try {
+                localStorage.removeItem(guardianRedrawKey()), localStorage.removeItem(guardianClaimKey())
+            } catch (e) {}
+        })(), toast("已登出")
     }
     $("menu-logout").addEventListener("click", doLogout);
 
     function navLoginClick() {
-        // 修改：規則 7 — 未登入有未儲存結果時點「登入/註冊」也先跳 Overlay
         guardLeave(function() {
             if (isLoggedIn()) {
-                renderDiaryData(), renderCalendar(), renderCollect(), go("diary"), setTimeout(scrollCalToCurrent, 120);
+                refreshPerUserData(), go("diary"), setTimeout(scrollCalToCurrent, 120);
                 return
             }
             go("p5")
@@ -730,7 +749,6 @@
             go("p2a")
         })
     }), $("p2a-back").addEventListener("click", function() {
-        // 修改：規則 4 — 進階卜卦頁返回每日抽卡（p1）前，若有未儲存結果先跳 Overlay
         guardLeave(function() {
             resetForm(), go("p1")
         })
@@ -794,7 +812,7 @@
     }
 
     function pickResult() {
-        for (var cat = state.cat || "未選", values = castSixLines(), changedLines = [], vals = [], i = 0; i < 6; i++) {
+        for (var cat = normalizeCat(state.cat || ""), values = castSixLines(), changedLines = [], vals = [], i = 0; i < 6; i++) {
             var v = values[i];
             vals.push(v), (v === 6 || v === 9) && changedLines.push(i + 1)
         }
@@ -848,7 +866,7 @@
             ring = $("core-ring-fg"),
             R = 63,
             CIRC = 2 * Math.PI * R;
-        ring.style.strokeDasharray = CIRC, ring.style.strokeDashoffset = CIRC, core.textContent = "起卦中", core.classList.remove("done");
+        ring.style.strokeDasharray = CIRC, ring.style.strokeDashoffset = CIRC, core.textContent = t("p2b.casting"), core.classList.remove("done");
         var slots = shuffle(COIN_SLOTS.slice());
         coins.forEach(function(c, i) {
             c.style.left = slots[i].x + "px", c.style.top = slots[i].y + "px"
@@ -862,7 +880,7 @@
                 c.style.left = s2[i].x + "px", c.style.top = s2[i].y + "px"
             });
             var remain = Math.max(0, total - elapsed);
-            ring.style.strokeDashoffset = CIRC * (remain / total), elapsed >= total && (clearInterval(divTimer), divTimer = null, ring.style.strokeDashoffset = 0, core.textContent = "起卦中", core.classList.add("done"), setTimeout(function() {
+            ring.style.strokeDashoffset = CIRC * (remain / total), elapsed >= total && (clearInterval(divTimer), divTimer = null, ring.style.strokeDashoffset = 0, core.textContent = t("p2b.casting"), core.classList.add("done"), setTimeout(function() {
                 stopDivination()
             }, 350))
         }, 300)
@@ -874,10 +892,6 @@
         state.result = res, state.saved = !1, renderCarousel(), updateSaveBtn(), go("p2c")
     }
     $("core-btn").addEventListener("click", function() {});
-
-    function catLabel(cat) {
-        return !cat || cat === "未選" ? "這件事" : cat
-    }
 
     function esc(s) {
         return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;")
@@ -893,22 +907,15 @@
                 lenTxt = res.len || "未選擇",
                 chg = changedHex(res),
                 changed = res.changedLines || [];
-            $("result-meta").innerHTML = '<div class="meta-row"><span class="k">類別</span><span>' + esc(res.cat) + '</span></div><div class="meta-row"><span class="k">有效長度</span><span>' + esc(res.len) + "</span></div>";
+            $("result-meta").innerHTML = '<div class="meta-row"><span class="k">' + esc(t("result.category")) + "</span><span>" + esc(catLabel(res.cat)) + '</span></div><div class="meta-row"><span class="k">' + esc(t("result.duration")) + "</span><span>" + esc(lenLabel(res.len)) + "</span></div>";
             var slides = "",
-                changedTxt = changed.length === 0 ? "沒有變爻" : "動爻：第 " + changed.join("、") + " 爻",
+                changedTxt = changedText(changed),
                 title = res.hex.num + " " + res.hex.symbolLabel;
-            slides += '<div class="slide symbol-slide"><div class="el-ic">' + cardMainImg(h) + '</div><div class="pair" style="display:flex;flex-direction:row;align-items:center;justify-content:center;gap:16px;">' +
-            '<div style="display:flex;flex-direction:column;align-items:center;">' + h.upper + '<br>' + h.lower + '</div>' +
-            (chg.none ? "" :
-                '<div style="margin:0 4px;">→</div>' +
-                '<div style="display:flex;flex-direction:column;align-items:center;">' + chg.sym.split(" ").join("<br>") + '</div>'
-            ) +
-            '</div><div class="name">' + esc(title) + "</div>" + (changedTxt ? '<div class="changed-line">' + esc(changedTxt) + "</div>" : "") + "</div>", slides += '<div class="slide"><div class="slide-k">' + esc(title) + '</div><div class="core-txt">' + esc(readingLineText(res)) + "</div></div>", slides += '<div class="slide"><div class="slide-k">關於「' + esc(catTxt) + "×" + esc(lenTxt) + '」</div><div class="focus">' + esc(readingFocusText(res, res.cat)) + "</div></div>", slides += '<div class="slide"><div class="slide-k">參考建議</div><div class="core-txt">' + esc(readingGuideText(res, res.cat)) + "</div></div>", $("result-carousel").innerHTML = slides;
+            slides += '<div class="slide symbol-slide"><div class="el-ic">' + cardMainImg(h) + '</div><div class="pair" style="display:flex;flex-direction:row;align-items:center;justify-content:center;gap:16px;"><div style="display:flex;flex-direction:column;align-items:center;">' + h.upper + "<br>" + h.lower + "</div>" + (chg.none ? "" : '<div style="margin:0 4px;">→</div><div style="display:flex;flex-direction:column;align-items:center;">' + chg.sym.split(" ").join("<br>") + "</div>") + '</div><div class="name">' + esc(title) + "</div>" + (changedTxt ? '<div class="changed-line">' + esc(changedTxt) + "</div>" : "") + "</div>", slides += '<div class="slide"><div class="slide-k">' + esc(title) + '</div><div class="core-txt">' + esc(readingLineText(res)) + "</div></div>", slides += '<div class="slide"><div class="slide-k">' + esc(t("result.aboutPrefix")) + "「" + esc(catTxt) + " × " + esc(lenLabel(lenTxt)) + '」</div><div class="focus">' + esc(readingFocusText(res, res.cat)) + "</div></div>", slides += '<div class="slide"><div class="slide-k">' + esc(t("result.advice")) + '</div><div class="core-txt">' + esc(readingGuideText(res, res.cat)) + "</div></div>", $("result-carousel").innerHTML = slides;
             for (var dotsHtml = "", i = 0; i < 4; i++) dotsHtml += "<i" + (i === 0 ? ' class="on"' : "") + "></i>";
             $("result-dots").innerHTML = dotsHtml, updateDots();
             var _c = $("result-carousel");
-            _c && (_c.scrollLeft = keepPos ? _prev * _c.clientWidth : 0, updateDots());
-            if (!keepPos && _c) requestAnimationFrame(function() {
+            _c && (_c.scrollLeft = keepPos ? _prev * _c.clientWidth : 0, updateDots()), !keepPos && _c && requestAnimationFrame(function() {
                 _c.scrollLeft = 0, updateDots()
             })
         }
@@ -922,13 +929,12 @@
     function updateSaveBtn() {
         for (var list = ["btn-save-p2c", "btn-save-draw"], i = 0; i < list.length; i++) {
             var btn = $(list[i]);
-            btn && (state.saved ? (btn.textContent = "已儲存", btn.disabled = !0) : (btn.textContent = list[i] === "btn-save-p2c" ? "儲存到日記" : "儲存至日記", btn.disabled = !1))
+            btn && (state.saved ? (btn.textContent = t("save.done"), btn.disabled = !0) : (btn.textContent = list[i] === "btn-save-p2c" ? t("p2c.save") : t("p1.save"), btn.disabled = !1))
         }
     }
     $("btn-save-p2c").addEventListener("click", function() {
         saveFlow()
     }), $("btn-redo-p2c").addEventListener("click", function() {
-        // 修改：規則 3/4 — 結果頁「重新起卦」進入表單前，若有未儲存結果先跳 Overlay
         guardLeave(function() {
             state.cat = null, state.len = "", document.querySelectorAll("#cat-chips .chip, #len-chips .chip").forEach(function(c) {
                 c.classList.remove("on")
@@ -1051,7 +1057,7 @@
                     }), setSession({
                         email,
                         name: rec.name
-                    }), toast("登入成功，歡迎回來 " + rec.name), mergeDraftsOnLogin(), migrateGuestCollection(), refreshPerUserData(), updateNav(), updateMenuAuth(), showLoading()
+                    }), toast("登入成功，歡迎回來 " + rec.name), mergeDraftsOnLogin(), migrateGuestCollection(), refreshPerUserData(), updateNav(), updateMenuAuth(), showLoading(), typeof FB != "undefined" && FB && FB.loadEntitlements && FB.loadEntitlements(email)
                 });
                 return
             }
@@ -1064,7 +1070,7 @@
                 name: rec.name
             }), toast("登入成功，歡迎回來 " + rec.name)
         }
-        mergeDraftsOnLogin(), migrateGuestCollection(), refreshPerUserData(), updateNav(), updateMenuAuth(), showLoading()
+        mergeDraftsOnLogin(), migrateGuestCollection(), refreshPerUserData(), updateNav(), updateMenuAuth(), showLoading(), typeof FB != "undefined" && FB && FB.loadEntitlements && FB.loadEntitlements(email)
     }
     $("btn-login").addEventListener("click", function() {
         doLogin()
@@ -1148,7 +1154,6 @@
 
     function showLoading() {
         go("loading"), setTimeout(function() {
-            // 修改：規則 1/2 — render 系列加上 try/catch，避免登入後卡在「載入中」無法進入我的隨記
             try {
                 renderDiaryData(), renderCalendar(), renderCollect()
             } catch (e) {}
@@ -1290,9 +1295,10 @@
             m: now.getMonth() + 1,
             d: now.getDate(),
             type: res.method === "daily" ? "card" : "divination",
+            method: res.method || (res.method === "daily" ? "daily" : "coins"),
             ts: Date.now(),
             title: res.hex.num + " " + res.hex.symbolLabel,
-            cat: res.cat || "未選",
+            cat: normalizeCat(res.cat || ""),
             len: res.len || "",
             mood: "",
             verify: null,
@@ -1532,7 +1538,9 @@
         item && (item.classList.contains("locked") ? toast("尚未解鎖：完成任務或收集元素後解鎖") : toast("已收集 ✨"))
     });
     var GUARDIAN_KEY = "xingua_guardian_opened",
-        GUARDIAN_HEX_KEY = "xingua_guardian_hex";
+        GUARDIAN_HEX_KEY = "xingua_guardian_hex",
+        GUARDIAN_REDRAW_KEY = "xingua_guardian_redraw",
+        GUARDIAN_CLAIM_KEY = "xingua_guardian_claim";
 
     function guardianKey() {
         return GUARDIAN_KEY + "_" + uid()
@@ -1540,6 +1548,34 @@
 
     function guardianHexKey() {
         return GUARDIAN_HEX_KEY + "_" + uid()
+    }
+
+    function guardianRedrawKey() {
+        return GUARDIAN_REDRAW_KEY + "_" + uid()
+    }
+
+    function guardianClaimKey() {
+        return GUARDIAN_CLAIM_KEY + "_" + uid()
+    }
+
+    function guardianState() {
+        var s = {
+            beta: !1,
+            active: !1,
+            can: !1,
+            claimed: !1,
+            reason: ""
+        };
+        try {
+            s.claimed = localStorage.getItem(guardianClaimKey()) === "1"
+        } catch (e) {}
+        if (typeof FB != "undefined" && FB && FB.getConfig && FB.getConfig("betaProgramActive")) {
+            var c = FB.getConfig("betaProgramActive"),
+                a = c && c.active === !0;
+            if (!a) return s.reason = "off", s
+        } else return s.reason = "off", s;
+        var u = currentUser() || {};
+        return u.email ? (s.beta = u.betaTester === !0 || u.betaTester === "true" || u.betaTester === 1 || u.betaTester === "1", s.beta ? (s.can = !s.claimed, s) : (s.reason = "notBeta", s)) : (s.reason = "guest", s)
     }
 
     function guardianOpened() {
@@ -1565,6 +1601,57 @@
         }
     }
 
+    function guardianOverlay() {
+        return document.getElementById("guardian-overlay")
+    }
+
+    function playGuardianFlare() {
+        var ov = guardianOverlay(),
+            fx = ov && ov.querySelector(".guardian-flare");
+        fx || (fx = document.createElement("div"), fx.className = "guardian-flare", ov && ov.appendChild(fx)), fx.classList.remove("play"), fx.offsetWidth, fx.classList.add("play")
+    }
+
+    function guardianBannerHTML(s) {
+        return s.claimed ? '<div class="guardian-beta-banner claimed" id="guardian-beta-banner"><div class="gbb-ic">🎁</div><div class="gbb-main"><div class="gbb-title">封測感謝禮</div><div class="gbb-sub">你已保留「正式開放後再抽一次守護卡」的資格。</div><div class="gbb-status">✅ 已預約 · 正式開放時自動生效</div></div></div>' : '<div class="guardian-beta-banner" id="guardian-beta-banner"><div class="gbb-ic">🎁</div><div class="gbb-main"><div class="gbb-title">封測參與者限定</div><div class="gbb-sub">感謝你參與封測！正式開放後，你可再抽一次本命守護卡。</div><button class="gbb-btn" id="guardian-beta-btn">領取再抽資格</button><div class="gbb-status" id="guardian-beta-status">僅限封測帳號 · 由系統審核</div></div></div>'
+    }
+
+    function guardianBannerEN(s) {
+        return s.claimed ? '<div class="guardian-beta-banner claimed" id="guardian-beta-banner"><div class="gbb-ic">🎁</div><div class="gbb-main"><div class="gbb-title">Beta Thanks</div><div class="gbb-sub">Your extra Guardian Card draw after launch is reserved.</div><div class="gbb-status">✅ Reserved · activates at launch</div></div></div>' : '<div class="guardian-beta-banner" id="guardian-beta-banner"><div class="gbb-ic">🎁</div><div class="gbb-main"><div class="gbb-title">Beta Tester Perk</div><div class="gbb-sub">Thanks for beta testing! When DEC.12 officially launches, you can draw your Guardian Card once more.</div><button class="gbb-btn" id="guardian-beta-btn">Reserve extra draw</button><div class="gbb-status" id="guardian-beta-status">Beta accounts only · verified by system</div></div></div>'
+    }
+
+    function refreshGuardianBanner() {
+        var ov = guardianOverlay(),
+            wrap = ov && ov.querySelector(".guardian-beta-wrap");
+        if (wrap) {
+            var s = guardianState(),
+                oldB = document.getElementById("guardian-beta-banner");
+            if (oldB && oldB.parentNode === wrap && wrap.removeChild(oldB), !(!s.beta || !s.active)) {
+                var langEn = (function() {
+                    try {
+                        return localStorage.getItem("xingua_lang") === "en"
+                    } catch (e) {
+                        return !1
+                    }
+                })();
+                wrap.insertAdjacentHTML("beforeend", langEn ? guardianBannerEN(s) : guardianBannerHTML(s));
+                var btn = document.getElementById("guardian-beta-btn");
+                btn && btn.addEventListener("click", function() {
+                    if (!guardianState().claimed) {
+                        var st = guardianState();
+                        if (!st.beta || !st.active) {
+                            toast(t("toast.guardianBetaOff"));
+                            return
+                        }
+                        try {
+                            localStorage.setItem(guardianClaimKey(), "1")
+                        } catch (e) {}
+                        typeof FB != "undefined" && FB && FB.claimBetaPerk && FB.claimBetaPerk(uid()), refreshGuardianBanner(), toast(t("toast.guardianBetaClaimed"))
+                    }
+                })
+            }
+        }
+    }
+
     function renderGuardianBack() {
         var n = guardianStoredNum(),
             h = null,
@@ -1577,10 +1664,14 @@
                 }
         }
         h || (h = _H[Math.floor(Math.random() * _H.length)]);
-        var bk = document.querySelector("#guardian-back .guardian-back-k"),
+        var back = document.getElementById("guardian-back"),
+            bk = document.querySelector("#guardian-back .guardian-back-k"),
             bt = document.querySelector("#guardian-back .guardian-back-txt"),
-            be = $("guardian-back-el");
-        return bk && (bk.textContent = h.num + " " + h.symbolLabel), bt && (bt.textContent = h.blessingText || h.plainText || h.core || ""), be && (be.innerHTML = mainElIcon(h)), h
+            be = $("guardian-back-el"),
+            elN = "",
+            elN = h.upper && SYM_KEY[h.upper] || h.upperName || "",
+            bgSrc = ELEMENT_IMG && elN && ELEMENT_IMG[elN] || h.cardImg || "img/card-" + (h.num < 10 ? "0" + h.num : h.num) + "-" + h.key + ".png";
+        return back && (back.style.setProperty("--guardian-bg", "url('" + bgSrc + "')"), back.style.setProperty("background-image", "url('" + bgSrc + "')", "important"), back.style.setProperty("background-size", "cover", "important"), back.style.setProperty("background-position", "center", "important"), back.style.setProperty("background-repeat", "no-repeat", "important"), back.style.setProperty("background-color", "transparent", "important")), bk && (bk.textContent = h.num + " " + h.symbolLabel), bt && (bt.textContent = h.blessingText || h.plainText || h.core || ""), be && (be.innerHTML = ""), h
     }
 
     function openGuardian() {
@@ -1588,7 +1679,7 @@
             card = $("guardian-card"),
             flipBtn = $("guardian-flip"),
             note = $("guardian-locked-note");
-        guardianOpened() ? (renderGuardianBack(), card.classList.add("flipped"), flipBtn && (flipBtn.style.display = "none"), note && (note.style.display = "")) : (card.classList.remove("flipped"), flipBtn && (flipBtn.style.display = ""), note && (note.style.display = "none")), ov.classList.add("open")
+        guardianOpened() ? (renderGuardianBack(), card.classList.add("flipped"), flipBtn && (flipBtn.style.display = "none"), note && (note.style.display = "")) : (card.classList.remove("flipped"), flipBtn && (flipBtn.style.display = ""), note && (note.style.display = "none")), ov.classList.add("open"), refreshGuardianBanner()
     }
     $("btn-guardian").addEventListener("click", openGuardian), $("guardian-close").addEventListener("click", function() {
         $("guardian-overlay").classList.remove("open")
@@ -1603,7 +1694,7 @@
             try {
                 localStorage.setItem(guardianHexKey(), String(h.num))
             } catch (e) {}
-            card.classList.add("flipped"), markGuardianOpened(), flipBtn.style.display = "none", setTimeout(function() {
+            card.classList.add("flipped"), markGuardianOpened(), flipBtn.style.display = "none", playGuardianFlare(), setTimeout(function() {
                 note.style.display = "", toast("🛡️ 本命守護牌已固定")
             }, 1600)
         }
@@ -1616,12 +1707,12 @@
             var _pidx = keepPos && c && Math.round(c.scrollLeft / c.clientWidth) || 0,
                 h = rec.hex,
                 chg = changedHex(rec),
-                catTxt = rec.cat || "未選",
+                catTxt = catLabel(rec.cat),
                 changed = rec.changedLines || [],
-                changedTxt = changed.length ? "動爻：第 " + changed.join("、") + " 爻" : "沒有變爻",
+                changedTxt = changedText(changed),
                 title = h.num + " " + h.symbolLabel,
                 slides = "";
-            if (slides += '<div class="slide symbol-slide"><div class="el-ic">' + cardMainImg(h) + '</div><div class="pair">' + h.upper + " " + h.lower + (chg.none ? "" : "　→　" + chg.sym) + '</div><div class="name">' + esc(title) + "</div>" + (changedTxt ? '<div class="changed-line">' + esc(changedTxt) + "</div>" : "") + "</div>", slides += '<div class="slide"><div class="slide-k">' + esc(title) + '</div><div class="core-txt">' + esc(readingLineText(rec)) + "</div></div>", slides += '<div class="slide"><div class="slide-k">關於「' + esc(catTxt) + "×" + esc(rec.len || "") + '」</div><div class="focus">' + esc(readingFocusText(rec, catTxt)) + "</div></div>", slides += '<div class="slide"><div class="slide-k">參考建議</div><div class="core-txt">' + esc(readingGuideText(rec, catTxt)) + "</div></div>", c.innerHTML = slides, d) {
+            if (slides += '<div class="slide symbol-slide"><div class="el-ic">' + cardMainImg(h) + '</div><div class="pair">' + h.upper + " " + h.lower + (chg.none ? "" : "　→　" + chg.sym) + '</div><div class="name">' + esc(title) + "</div>" + (changedTxt ? '<div class="changed-line">' + esc(changedTxt) + "</div>" : "") + "</div>", slides += '<div class="slide"><div class="slide-k">' + esc(title) + '</div><div class="core-txt">' + esc(readingLineText(rec)) + "</div></div>", slides += '<div class="slide"><div class="slide-k">' + esc(t("result.aboutPrefix")) + "「" + esc(catTxt) + " × " + esc(lenLabel(rec.len || "")) + '」</div><div class="focus">' + esc(readingFocusText(rec, rec.cat)) + "</div></div>", slides += '<div class="slide"><div class="slide-k">' + esc(t("result.advice")) + '</div><div class="core-txt">' + esc(readingGuideText(rec, rec.cat)) + "</div></div>", c.innerHTML = slides, d) {
                 for (var dotsHtml = "", i = 0; i < 4; i++) dotsHtml += "<i" + (i === 0 ? ' class="on"' : "") + "></i>";
                 d.innerHTML = dotsHtml;
                 var _dc = $("detail-carousel");
@@ -1673,12 +1764,12 @@
             if (viewCard && viewCard.classList.add("on"), viewDiv && viewDiv.classList.remove("on"), viewCard) {
                 var hCard = rec.hex || hexFromTitle(rec.title || ""),
                     coreCard = hCard && hCard.core ? hCard.core : rec.note || rec.title || "",
-                    elCard = hCard ? mainElIcon(hCard) : "";
+                    elCard = hCard ? cardMainImg(hCard) : "";
                 viewCard.innerHTML = '<div class="detail-card">' + (elCard ? '<div class="el-ic">' + elCard + "</div>" : "") + '<div class="slide-k">' + esc(rec.title || "") + '</div><div class="core-txt">' + esc(coreCard) + "</div></div>"
             }
         } else viewCard && viewCard.classList.remove("on"), viewDiv && viewDiv.classList.add("on");
         var dd = document.querySelector(".detail-date");
-        if (dd && (dd.textContent = rec.date + " · " + (rec.cat || "") + " · " + (rec.len || "")), detailNoteDraft && detailNoteDraft.ts === rec.ts && detailNoteDraft.title === rec.title ? ($("detail-note").value = detailNoteDraft.text, setNoteSaveUI(!0, !1), setNoteBtnMode(!1)) : ($("detail-note").value = rec.note || "", setNoteSaveUI(!1, !!rec.note), setNoteBtnMode(!!rec.note)), detailMood = null, document.querySelectorAll("#detail-moods .mood-btn").forEach(function(b) {
+        if (dd && (dd.textContent = rec.date + " · " + catLabel(rec.cat) + " · " + lenLabel(rec.len || "")), detailNoteDraft && detailNoteDraft.ts === rec.ts && detailNoteDraft.title === rec.title ? ($("detail-note").value = detailNoteDraft.text, setNoteSaveUI(!0, !1), setNoteBtnMode(!1)) : ($("detail-note").value = rec.note || "", setNoteSaveUI(!1, !!rec.note), setNoteBtnMode(!!rec.note)), detailMood = null, document.querySelectorAll("#detail-moods .mood-btn").forEach(function(b) {
                 b.classList.remove("on"), rec.mood && b.getAttribute("data-mood") === rec.mood && (b.classList.add("on"), detailMood = rec.mood)
             }), verify = null, $("verify-y").classList.remove("on-y"), $("verify-x").classList.remove("on-x"), rec.verify === "y" && (verify = "y", $("verify-y").classList.add("on-y")), rec.verify === "x" && (verify = "x", $("verify-x").classList.add("on-x")), rec.hex) renderDetailCarousel(rec, !1);
         else if (rec.title) {
@@ -1690,15 +1781,19 @@
         go("detail")
     }
 
+    function recIsDivination(r) {
+        return r ? r.type ? r.type === "divination" : r.method ? r.method !== "daily" : r.cat !== "每日靈感" && r.cat !== "daily" && r.cat !== "card" : !1
+    }
+
     function renderDiaryData() {
-        for (var i = 0, dc = 0; i < diaryData.length; i++) diaryData[i].type === "divination" && dc++;
+        for (var i = 0, dc = 0, n = 0; i < diaryData.length; i++) {
+            var _r = diaryData[i];
+            recIsDivination(_r) && (dc++, !_r.verify && n++)
+        }
         var sc = $("stat-count");
         sc && (sc.textContent = dc);
         var sp = $("stat-pending");
-        if (sp) {
-            for (var n = 0, i = 0; i < diaryData.length; i++) diaryData[i].type === "divination" && !diaryData[i].verify && n++;
-            sp.textContent = n
-        }
+        sp && (sp.textContent = n)
     }
     $("about-back").addEventListener("click", function() {
         resetForm(), go("p1")
@@ -1709,7 +1804,7 @@
             toast("請先登入"), go("p5");
             return
         }
-        renderDiaryData(), renderCalendar(), renderCollect(), go("diary"), setTimeout(scrollCalToCurrent, 120)
+        refreshPerUserData(), go("diary"), setTimeout(scrollCalToCurrent, 120)
     }), $("saved-stay").addEventListener("click", function() {
         $("saved-overlay").classList.remove("open"), resetForm(), go("p1")
     }), $("saved-overlay").addEventListener("click", function(e) {
@@ -1798,7 +1893,6 @@
     });
 
     function guardLeave(after) {
-        // 修改：規則 7 — 未登入且有未儲存結果時也要跳「儲存/放棄」Overlay
         if (state.result && !state.saved) {
             window.__guardAfter = after || function() {}, $("guard-overlay").classList.add("open");
             return
@@ -1806,9 +1900,7 @@
         after && after()
     }
     $("guard-save").addEventListener("click", function() {
-        // 修改：規則 7 — 未登入時，先暫存草稿並跳登入/註冊；登入成功後 mergeDraftsOnLogin 會合併草稿並清除未儲存旗標（不再跳 Overlay）
-        $("guard-overlay").classList.remove("open");
-        if (!isLoggedIn()) {
+        if ($("guard-overlay").classList.remove("open"), !isLoggedIn()) {
             state.saved = !0, saveDraft(state.result), setTimeout(function() {
                 go("p5")
             }, 300);
@@ -1849,7 +1941,7 @@
             txt = "";
         return txt += `DEC. 12 · 我的卜卦結果
 `, txt += `====================
-`, txt += "類別：" + (res.cat || "未選") + `
+`, txt += "類別：" + catLabel(res.cat) + `
 `, txt += "顯化期長度：" + (res.len || "今日") + `
 
 `, txt += "本卦：" + h.symbolLabel + "（" + h.upper + " " + h.lower + `）
@@ -1860,7 +1952,7 @@
 `, txt += `白話卦辭：
 ` + h.plain + `
 
-`, txt += "情境解讀：關於" + res.cat + "：" + res.focus[res.cat] || res.focus.未選 + `
+`, txt += "情境解讀：關於" + res.cat + "：" + (h.focus[res.cat] || h.core || "") + `
 
 `, txt += `一事不宜多問
 `, txt += `這是指引，不是預言。
@@ -1928,7 +2020,7 @@
         var h = state.result.hex,
             cat = state.result.cat,
             changed = state.result.changedLines.join("、"),
-            focusText = h.focus[cat] || h.focus.未選,
+            focusText = h.focus[cat] || h.core || "",
             body = "";
         body += `DEC. 12 · 你的卜卦結果
 `, body += `========================
@@ -1975,9 +2067,9 @@
     function boot() {
         try {
             var v = localStorage.getItem("xingua_lang");
-            UI_LANG = v === "en" ? "en" : "zh"
+            (v === "en" || v === "zh") && (UI_LANG = v)
         } catch (e) {}
-        HEXAGRAMS = getHexagrams(), LINES = getLines(), initVisitCounter(), renderVisits(), onBoot()
+        HEXAGRAMS = getHexagrams(), LINES = getLines(), syncLangUI(), initVisitCounter(), renderVisits(), onBoot()
     }
 
     function initVisitCounter() {
@@ -2038,15 +2130,21 @@
                 detailNoteSave: "尚未儲存",
                 detailSave: "儲存",
                 detailMood: "表情符號",
-                detailVerify: "驗證",
-                verifyY: "◯ 應驗了",
-                verifyX: "未應驗",
-                detailNoteHint: "寫下心得與應驗，之後回到這裡對照，看看指引是否成真",
+                detailVerify: "感受",
+                verifyY: "◯ 有幫助",
+                verifyX: "沒有幫助",
+                detailNoteHint: "寫下心得，之後回到這裡，看看指引是否有所幫助",
                 collectSub: "完成任務或收集元素，解鎖彩色圖案",
-                guardianSub: "每個帳戶只有一次翻開本命卡機會",
-                guardianFront1: `請靜心翻開旅程起點的第一張卡片作為迎新祝福`,
-                guardianFlip: "翻開本命守護牌",
-                guardianLocked: "本命守護牌已固定，無法再次翻開"
+                guardianSub: "每個帳戶只有一次翻開守護卡機會",
+                guardianFront1: "請靜心翻開旅程起點的第一張卡片作為迎新祝福",
+                guardianFlip: "翻開守護卡",
+                guardianLocked: "守護卡已固定，無法再次翻開",
+                guardianBetaTitle: "封測參與者限定",
+                guardianBetaSub: "正式開放後，你可再抽一次守護卡",
+                guardianBetaBtn: "領取再抽資格",
+                guardianBetaReserved: "已預約 · 正式開放時自動生效",
+                guardianBetaClaimedTitle: "封測感謝禮",
+                guardianBetaClaimedSub: "你已保留正式開放後再抽一次的資格"
             },
             dash: {
                 helloPre: "你好，",
@@ -2109,6 +2207,15 @@
                 len4: "六個月",
                 start: "開始卜卦"
             },
+            result: {
+                category: "類別",
+                duration: "有效長度",
+                noChanging: "沒有變爻",
+                changingPrefix: "動爻：第",
+                changingSuffix: " 爻",
+                aboutPrefix: "關於",
+                advice: "參考建議"
+            },
             p2c: {
                 save: "儲存到日記",
                 redo: "重新起卦",
@@ -2166,10 +2273,10 @@
                 detailNoteSave: "尚未儲存",
                 detailSave: "儲存",
                 detailMood: "表情符號",
-                detailVerify: "驗證",
-                verifyY: "○ 應驗了",
-                verifyX: "未應驗",
-                detailNoteHint: "寫下心得與應驗，之後回到這裡對照，看看指引是否成真",
+                detailVerify: "感受",
+                verifyY: "○ 有幫助",
+                verifyX: "沒有幫助",
+                detailNoteHint: "寫下心得，之後回到這裡對照，看看指引是否有所幫助",
                 account: "帳號",
                 accountGuest: "未登入",
                 editName: "修改暱稱",
@@ -2185,11 +2292,22 @@
                 shareNote1: " ",
                 shareNote2: "若未收到請檢查垃圾郵件",
                 collectSub: "完成任務或收集元素，解鎖彩色圖案",
-                guardianSub: "送給你的迎新祝福，一生只有一次翻開機會",
+                guardianSub: "送給你的迎新祝福，每個帳戶只有一次翻開機會",
                 guardianFront1: "請靜心翻開旅程起點的第一張卡牌",
                 guardianFront2: "作為送給用戶的迎新祝福",
-                guardianFlip: "翻開本命守護牌",
-                guardianLocked: "本命守護牌已固定，無法再次翻開"
+                guardianFlip: "翻開守護卡",
+                guardianLocked: "守護卡已固定，無法再次翻開"
+            },
+            cardPreview: {
+                title: "下載圖卡",
+                hint: "長壓圖片即可儲存到手機",
+                download: "下載圖片"
+            },
+            guard: {
+                title: "尚未儲存",
+                sub: "這筆卜卦結果尚未儲存，要儲存到隨記嗎？",
+                save: "儲存至日記",
+                discard: "放棄儲存"
             },
             share: {
                 title: "分享",
@@ -2219,9 +2337,11 @@
                 noRecord: "這天沒有卜卦紀錄",
                 locked: "尚未解鎖：完成任務或收集元素後解鎖",
                 collected: "已收集 ✨",
-                guardianFixed: "🛡️ 本命守護牌已固定",
-                verifyY2: "已記錄：應驗了",
-                verifyX2: "已記錄：未應驗",
+                guardianFixed: "🛡️ 守護卡已固定",
+                guardianBetaClaimed: "已領取！正式開放後可再抽一次守護卡",
+                guardianBetaOff: "此功能尚未開放",
+                verifyY2: "已記錄：有幫助",
+                verifyX2: "已記錄：沒有幫助",
                 editMode: "已切換為編輯模式",
                 noteSaved: "已儲存這則觀察與感受",
                 divineFirst: "請先完成卜卦",
@@ -2237,48 +2357,53 @@
                 login: "Log in / Sign up"
             },
             lang: {
-                zh: "中文",
+                zh: "Chinese",
                 en: "EN"
             },
             menu: {
                 home: "Home",
-                diary: "My Diary",
+                diary: "My Journal",
                 about: "About DEC. 12",
                 milk: "Milk Tea Fund",
                 setting: "Settings",
                 lang: "Language",
-                langSub: "Switch between Chinese & English",
+                langSub: "Switch between Chinese and English",
                 logout: "⎋ Log out",
                 account: "Account",
                 accountGuest: "Not logged in",
-                editName: "Edit Nickname",
+                editName: "Edit nickname",
                 privacy: "Privacy Policy",
                 authEmail: "Account (Email)",
                 authName: "Username (for sign-up)",
                 authPass: "Password",
-                authPass2: "Confirm Password",
-                forgot: "Forgot account or password?",
-                forgotFind: "Find Password",
+                authPass2: "Confirm password",
+                forgot: "Forgot your account or password?",
+                forgotFind: "Find password",
                 forgotClose: "Close",
-                loading: "Loading your diary…",
-                shareNote1: "Only used to send this result, no account created",
-                shareNote2: "Didn't receive it? Check your spam folder",
-                langToggle: "System Language",
-                diaryHint: "Tap a date to view its reading; scroll for more months",
-                detailWrite: "Write observations & feelings",
+                loading: "Loading your journal…",
+                shareNote1: " ",
+                shareNote2: "If you don't receive it, check your spam folder",
+                langToggle: "Language",
+                diaryHint: "Tap any date to view its reading; scroll for more months",
+                detailWrite: "Write your thoughts and observations",
                 detailNoteSave: "Unsaved",
                 detailSave: "Save",
                 detailMood: "Mood",
-                detailVerify: "Verify",
-                verifyY: "◯ It came true",
-                verifyX: "Not yet",
-                detailNoteHint: "Write notes & outcomes, then come back to compare",
-                collectSub: "Complete missions or collect elements to unlock badges",
-                guardianSub: "A welcome blessing, flip it only once in a lifetime",
-                guardianFront1: `Quiet your heart and flip the first card of your journey
-A welcome blessing for every user`,
-                guardianFlip: "Flip Guardian Card",
-                guardianLocked: "Guardian card is fixed and cannot be flipped again"
+                detailVerify: "Feeling",
+                verifyY: "◯ It hels",
+                verifyX: "Doesn't help",
+                detailNoteHint: "Write what happened and how you felt, then come back later to compare",
+                collectSub: "Complete missions or collect elements to unlock artwork",
+                guardianSub: "Each account can reveal its Guardian Card only once",
+                guardianFront1: "Take a quiet moment, then reveal the first card of your journey as a welcome blessing",
+                guardianFlip: "Reveal Guardian Card",
+                guardianLocked: "Your Guardian Card is set and cannot be revealed again",
+                guardianBetaTitle: "Beta Tester Exclusive",
+                guardianBetaSub: "After the official launch, you can draw one more Guardian Card",
+                guardianBetaBtn: "Claim extra draw",
+                guardianBetaReserved: "Reserved · activates at launch",
+                guardianBetaClaimedTitle: "Beta Thank-You Gift",
+                guardianBetaClaimedSub: "Your extra Guardian Card draw after launch is reserved"
             },
             dash: {
                 helloPre: "Hello, ",
@@ -2286,17 +2411,17 @@ A welcome blessing for every user`,
                 helloGuest: "Hello, traveler",
                 collect: "Collection",
                 guardian: "Guardian Card",
-                statCount: "Divinations",
-                statPending: "Pending",
-                sec: "Every reading"
+                statCount: "Readings",
+                statPending: "Waiting to review",
+                sec: "Your readings"
             },
             setting: {
                 title: "Settings",
-                subtitle: "Manage notifications, privacy & account",
-                remind: "Email Reminder",
-                push: "Push Notifications",
-                dark: "Dark Mode",
-                darkVal: "Follow System",
+                subtitle: "Manage notifications, privacy, and your account",
+                remind: "Email reminders",
+                push: "Push notifications",
+                dark: "Dark mode",
+                darkVal: "Follow system",
                 lang: "Language",
                 account: "Account",
                 accountGuest: "Not logged in",
@@ -2306,161 +2431,184 @@ A welcome blessing for every user`,
             set: {
                 on: "On",
                 off: "Off",
-                pushOff: "On"
+                pushOff: "Enable"
             },
             p1: {
-                micro: "Spark Card",
-                microSub: "Bring inspiration & gentle guidance for the moment",
+                micro: "Glimmer Card",
+                microSub: "A little inspiration and gentle guidance for this moment",
                 draw: "Tap to reveal",
-                save: "Save to Diary",
-                redraw: "Draw Again",
+                save: "Save to Journal",
+                redraw: "Draw again",
                 share: "Share",
-                divider: "Need a more specific direction?",
-                advance: "Advanced Star Jar",
-                advanceSub: "Pick a category for focused guidance",
+                divider: "Need more specific guidance?",
+                advance: "Advanced Reading",
+                advanceSub: "Choose a category for more focused guidance",
                 enter: "Enter Star Jar",
-                footerPre: "If DEC.12 truly inspires you, feel free to ",
-                footerLink: "buy the developer a milk tea",
-                footerPost: " as a token of support",
+                footerPre: "If DEC.12 has encouraged you, you're welcome to ",
+                footerLink: "buy me a milk tea on Ko-fi",
+                footerPost: " to support the project",
                 visits: "{{n}} visitors today"
             },
             p2a: {
                 back: "← Back",
                 title: "Star Jar",
-                subtitle: "Close your eyes, pick a category, and let your thoughts focus under the stars.",
-                cat: "Category (required)",
+                subtitle: "Close your eyes, hold your question in mind, and choose a category.",
+                cat: "Question category (required)",
                 cat1: "Love",
                 cat2: "Career",
                 cat3: "Health",
-                cat4: "Wealth",
+                cat4: "Finances",
                 cat5: "Relationships",
-                len: "Manifestation window (required)",
-                len1: "Within a week",
-                len2: "Within a month",
+                len: "Time window (required)",
+                len1: "Within 1 week",
+                len2: "Within 1 month",
                 len3: "Within 3 months",
-                len4: "Long-term (6+ months)",
-                start: "Start Divination"
+                len4: "6 months",
+                start: "Start Reading"
+            },
+            result: {
+                category: "Category",
+                duration: "Time Window",
+                noChanging: "No changing lines",
+                changingPrefix: "Changing lines:",
+                changingSuffix: "",
+                aboutPrefix: "About",
+                advice: "Guidance"
             },
             p2c: {
-                save: "Save to Diary",
-                redo: "Redo",
+                save: "Save to Journal",
+                redo: "Start over",
                 share: "Share"
             },
             about: {
                 title: "About DEC. 12",
-                subtitle: "A pocket divination site that helps you slow down and face the present",
-                p1: "When you feel lost and your inner voice is drowned out by the noise, what you need is not fatalism but a gentle mirror that reflects your heart and points the way.",
-                p2: "The divination jar draws on the wisdom of the I Ching, an ancient philosophy of dynamic balance. Here, every question is a deep dialogue with yourself and the rhythm of the universe. Let this wisdom clear the fog and give you the courage to move forward.",
-                p3: "",
-                version: "DEC. 12 · Official v27"
+                subtitle: "Finding resonance in life's patterns",
+                p1: "While treating a patient, Carl Jung witnessed a moment he never forgot. The patient was describing a golden scarab from a dream when a similar beetle suddenly appeared at the window. Jung later called experiences like this “synchronicity”: an outer event and an inner experience are not causally linked, yet at the same moment they point to the same meaning.",
+                p2: "This is also one way to understand the I Ching. It is not a tool for predicting the future. At the moment you ask a question, it reflects through the hexagrams what you may already sense inside but have not yet put into words.",
+                p3: "DEC.12 combines simple readings with a journal. Each question leaves a record. When you look back, you may notice surprising echoes between the reading and real life—not because the hexagrams predicted anything, but because asking the question helped you observe your experience more honestly.",
+                p4: "I have used this practice myself during uncertain times as a way to turn inward and listen. My mother's gentleness has become a quiet foundation that stays with me through those moments of questioning. If you are standing at a crossroads and cannot see the way ahead, you do not have to believe first. Ask a question that truly matters to you and see what happens.",
+                version: "DEC. 12 · Beta v1"
             },
             draw: {
                 front: "Daily Inspiration",
-                hint: "Daily inspiration card. Tap to reveal.",
+                hint: "Your daily inspiration card. Tap to reveal.",
                 drawBtn: "Tap to reveal",
-                drawHint: "Daily inspiration card. Tap to reveal.",
-                swipeHint: "Tap to reveal"
+                drawHint: "Your daily inspiration card. Tap to reveal.",
+                swipeHint: " "
             },
             p2b: {
-                casting: "Divining…"
+                casting: "Casting…"
             },
             milk: {
                 title: "Milk Tea Fund",
-                subtitle: "Every cup of milk tea is fuel for the developer to keep writing and maintaining",
-                cups: "Total Cups",
-                total: "Total Amount",
-                ratio: "Net Profit Donated",
-                r1: "Server & Domain",
-                r2: "Milk Teas Bought",
-                r3: "Charity Donations",
-                support: "Buy the developer a milk tea",
-                note: "Amounts & allocation are transparent, updated monthly",
-                charity: "DEC.12 is a semi-nonprofit platform: half of net profit after operating costs goes to charity"
+                subtitle: "Every milk tea helps fuel the writing and upkeep behind DEC.12",
+                cups: "Total cups",
+                total: "Total amount",
+                ratio: "Net profit donated",
+                r1: "Fixed costs",
+                r2: "Creative rewards",
+                r3: "Amount donated",
+                support: "Buy me a milk tea on Ko-fi",
+                note: "Updated at the beginning of each month",
+                charity: "DEC.12 donations support No Kid Hungry and the Taiwan Fund for Children and Families"
             },
             p5: {
                 title: "Log in",
-                sub: "Record your divinations & outcomes. Welcome back to review and see if the guidance came true",
+                sub: "Save your readings and outcomes so you can come back later and see how the guidance unfolded",
                 login: "Log in",
                 register: "Sign up",
                 submit: "Log in",
-                later: "Later"
+                later: "Maybe later"
             },
             saved: {
-                title: "Record Saved",
-                sub: "This divination has been written into your diary",
-                go: "View It",
+                title: "Record saved",
+                sub: "This reading has been added to your journal",
+                go: "View record",
                 stay: "Back to Home",
-                langToggle: "System Language",
+                langToggle: "Language",
                 settingItem: "Settings",
-                diaryHint: "Tap a date to view its reading; scroll for more months",
-                detailWrite: "Write observations & feelings",
+                diaryHint: "Tap any date to view its reading; scroll for more months",
+                detailWrite: "Write your thoughts and observations",
                 detailNoteSave: "Unsaved",
                 detailSave: "Save",
                 detailMood: "Mood",
-                detailVerify: "Verify",
-                verifyY: "○ It came true",
-                verifyX: "Not yet",
-                detailNoteHint: "Write notes & outcomes, then come back to compare",
+                detailVerify: "Outcome",
+                verifyY: "○ Came true",
+                verifyX: "Didn't come true",
+                detailNoteHint: "Write what happened and how you felt, then come back later to compare",
                 account: "Account",
                 accountGuest: "Not logged in",
-                editName: "Edit Nickname",
+                editName: "Edit nickname",
                 privacy: "Privacy Policy",
                 authEmail: "Account (Email)",
                 authName: "Username (for sign-up)",
                 authPass: "Password",
-                authPass2: "Confirm Password",
-                forgot: "Forgot account or password?",
-                forgotFind: "Find Password",
+                authPass2: "Confirm password",
+                forgot: "Forgot your account or password?",
+                forgotFind: "Find password",
                 forgotClose: "Close",
-                loading: "Loading your diary…",
-                shareNote1: "Only used to send this result, no account created",
-                shareNote2: "Didn’t receive it? Check your spam folder",
-                collectSub: "Complete missions or collect elements to unlock badges",
-                guardianSub: "A welcome blessing, flip it only once in a lifetime",
-                guardianFront1: "Quiet your heart and flip the first card of your journey",
-                guardianFront2: "A welcome blessing for every user",
-                guardianFlip: "Flip Guardian Card",
-                guardianLocked: "Guardian card is fixed and cannot be flipped again"
+                loading: "Loading your journal…",
+                shareNote1: " ",
+                shareNote2: "If you don't receive it, check your spam folder",
+                collectSub: "Complete missions or collect elements to unlock artwork",
+                guardianSub: "A welcome blessing you can reveal only once",
+                guardianFront1: "Take a quiet moment and reveal the first card of your journey",
+                guardianFront2: "A welcome blessing for you",
+                guardianFlip: "Reveal Guardian Card",
+                guardianLocked: "Your Guardian Card is set and cannot be revealed again"
+            },
+            cardPreview: {
+                title: "Download Card",
+                hint: "Press and hold the image to save it to your phone",
+                download: "Download Image"
+            },
+            guard: {
+                title: "Not Saved",
+                sub: "This reading has not been saved. Save it to your journal?",
+                save: "Save to Journal",
+                discard: "Discard"
             },
             share: {
                 title: "Share",
-                sub: `Email it to yourself as a backup; unlike "Save to Diary", this won't be written into your diary`,
-                or: "Or email it",
+                sub: "Email is used only to send this result and will not create an account",
+                or: "Or send to Email",
                 send: "Send",
-                cardBtn: "Result Card"
+                cardBtn: "Download card"
             },
             save: {
                 done: "Saved"
             },
             toast: {
                 lang: "Language switched",
-                remindUpdated: "Reminder settings updated",
+                remindUpdated: "Email reminder settings updated",
                 pushUpdated: "Push notification settings updated",
                 needLogin: "Please log in first",
                 logout: "Logged out",
-                milkSoon: "Thank you for your support! Opening the donation page",
-                drawRevealed: "Today’s inspiration revealed",
-                needCat: "Please choose a category",
+                milkSoon: "Thanks for your support. Opening the donation page",
+                drawRevealed: "Today's inspiration is ready",
+                needCat: "Please choose a question category",
                 needLen: "Please choose a time window",
-                draftSaved: "Saved a draft of this result",
-                foundPw: "Password found via email",
+                draftSaved: "This result has been saved as a draft",
+                foundPw: "Password found by email",
                 nameEmpty: "Nickname cannot be blank",
-                nameLong: "Nickname max 16 characters",
-                nameUsed: "This nickname is taken, pick another",
-                noRecord: "No divination on this day",
-                locked: "Locked: complete missions or collect elements to unlock",
+                nameLong: "Nickname can be up to 16 characters",
+                nameUsed: "This nickname is already in use. Try another",
+                noRecord: "No reading recorded for this day",
+                locked: "Locked: complete a mission or collect elements to unlock",
                 collected: "Collected ✨",
-                guardianFixed: "🛡️ Guardian card fixed",
-                verifyY2: "Recorded: it came true",
-                verifyX2: "Recorded: not yet",
-                editMode: "Switched to edit mode",
-                noteSaved: "Saved this note",
-                divineFirst: "Please finish a divination first",
-                copied: "Share text copied, paste it in chat",
+                guardianFixed: "🛡️ Guardian Card set",
+                guardianBetaClaimed: "Claimed! You can draw one more Guardian Card after launch",
+                guardianBetaOff: "This feature is not available yet",
+                verifyY2: "Recorded: came true",
+                verifyX2: "Recorded: didn't come true",
+                editMode: "Edit mode enabled",
+                noteSaved: "Your note has been saved",
+                divineFirst: "Please complete a reading first",
+                copied: "Share text copied. Paste it into your chat",
                 needEmail: "Please enter an email",
-                badEmail: "That email looks invalid",
-                mailSent: "Sent — check your inbox",
-                mailOpened: "Email client opened"
+                badEmail: "That email address looks invalid",
+                mailSent: "Sent. Check your inbox",
+                mailOpened: "Email app opened"
             }
         }
     };
@@ -2476,7 +2624,33 @@ A welcome blessing for every user`,
     }
 
     function lang() {
-        return localStorage.getItem("xingua_lang") === "en" ? "en" : "zh"
+        return UI_LANG === "en" ? "en" : "zh"
+    }
+
+    function asiaLangPref() {
+        try {
+            var nl = (navigator.language || "").toLowerCase() || "";
+            if (nl.indexOf("zh") === 0 || nl.indexOf("ja") === 0 || nl.indexOf("ko") === 0 || nl.indexOf("th") === 0 || nl.indexOf("vi") === 0 || nl.indexOf("id") === 0 || nl.indexOf("ms") === 0 || nl.indexOf("fil") === 0 || nl.indexOf("tl") === 0) return "zh";
+            if (nl.indexOf("en") === 0) return "en";
+            var tz = (Intl.DateTimeFormat().resolvedOptions().timeZone || "").toLowerCase();
+            return tz.indexOf("asia/") === 0 ? "zh" : "en"
+        } catch (e) {
+            return "en"
+        }
+    }
+
+    function defaultLangByRegion() {
+        try {
+            if (navigator && navigator.languages && navigator.languages.length)
+                for (var i = 0; i < navigator.languages.length; i++) {
+                    var code = String(navigator.languages[i] || "").toLowerCase();
+                    if (code.indexOf("zh") === 0 || code.indexOf("ja") === 0 || code.indexOf("ko") === 0 || code.indexOf("th") === 0 || code.indexOf("vi") === 0 || code.indexOf("id") === 0 || code.indexOf("ms") === 0 || code.indexOf("fil") === 0 || code.indexOf("tl") === 0) return "zh";
+                    if (code.indexOf("en") === 0) return "en"
+                }
+            return asiaLangPref()
+        } catch (e) {
+            return asiaLangPref()
+        }
     }
 
     function detectLang() {
@@ -2484,20 +2658,15 @@ A welcome blessing for every user`,
             var saved = localStorage.getItem("xingua_lang");
             if (saved === "zh" || saved === "en") return saved
         } catch (e) {}
-        try {
-            var nl = (navigator.language || "").toLowerCase(),
-                tz = (Intl.DateTimeFormat().resolvedOptions().timeZone || "").toLowerCase();
-            if (nl.indexOf("zh") === 0 || tz.indexOf("asia/taipei") === 0 || tz.indexOf("asia/shanghai") === 0 || tz.indexOf("asia/hong_kong") === 0 || tz.indexOf("asia/macau") === 0 || tz.indexOf("asia/singapore") === 0) return "zh"
-        } catch (e) {}
-        return "en"
+        return defaultLangByRegion()
     }
 
     function setLang(l) {
-        l = l === "en" ? "en" : "zh";
+        l = l === "en" ? "en" : "zh", UI_LANG = l;
         try {
             localStorage.setItem("xingua_lang", l)
         } catch (e) {}
-        HEXAGRAMS = getHexagrams(), LINES = getLines(), applyLangTexts(), syncLangBtns(), updateNav(), toast(t("toast.lang"))
+        HEXAGRAMS = getHexagrams(), LINES = getLines(), applyLangTexts(), syncLangBtns(), syncLangUI(), updateNav(), toast(t("toast.lang"))
     }
 
     function syncLangBtns() {
@@ -2511,26 +2680,38 @@ A welcome blessing for every user`,
 
     function applyLangTexts() {
         document.querySelectorAll("[data-i18n]").forEach(function(el) {
-            var txt = t(el.getAttribute("data-i18n")),
+            var key = el.getAttribute("data-i18n"),
+                txt = t(key),
                 hasEl = !1,
                 i;
-            for (i = 0; i < el.childNodes.length; i++)
-                if (el.childNodes[i].nodeType === 1) {
-                    hasEl = !0;
-                    break
-                } if (!hasEl) {
-                el.textContent = txt;
-                return
-            }
-            for (i = 0; i < el.childNodes.length; i++) {
-                var c = el.childNodes[i];
-                c.nodeType === 3 && c.textContent.trim() !== "" && (c.textContent = txt)
+            if (txt !== key) {
+                for (i = 0; i < el.childNodes.length; i++)
+                    if (el.childNodes[i].nodeType === 1) {
+                        hasEl = !0;
+                        break
+                    } if (!hasEl) {
+                    el.textContent = txt;
+                    return
+                }
+                for (i = 0; i < el.childNodes.length; i++) {
+                    var c = el.childNodes[i];
+                    c.nodeType === 3 && c.textContent.trim() !== "" && (c.textContent = txt)
+                }
             }
         }), document.querySelectorAll("[data-i18n-title]").forEach(function(el) {
             el.textContent = t(el.getAttribute("data-i18n-title"))
         }), document.querySelectorAll("[data-i18n-label]").forEach(function(el) {
             el.textContent = t(el.getAttribute("data-i18n-label"))
         }), updateSettingAccount()
+    }
+
+    function i18nSanityCheck() {
+        try {
+            for (var keys = ["guard.title", "guard.sub", "guard.save", "guard.discard"], i = 0; i < keys.length; i++) {
+                var v = t(keys[i]);
+                v === keys[i] && typeof console != "undefined" && console.warn && console.warn("[i18n] Missing translation:", keys[i], "lang=", lang())
+            }
+        } catch (e) {}
     }
 
     function initLang() {
@@ -2541,7 +2722,7 @@ A welcome blessing for every user`,
                 localStorage.setItem("xingua_lang", d)
             }
         } catch (e) {}
-        applyLangTexts(), syncLangBtns()
+        applyLangTexts(), syncLangBtns(), i18nSanityCheck()
     }
 
     function syncLangUI() {

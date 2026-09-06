@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow"><!-- v19: beta-gated page, hide from search engines -->
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-WNF8X236MX"></script>
 <script>
@@ -56,7 +57,17 @@
   ]
 }
 </script>
-<link rel="stylesheet" href="css/style.css?v=47">
+<link rel="stylesheet" href="css/style.css?v=48">
+
+<style id="guardian-bg-fix">
+#guardian-back{
+  background-image:var(--guardian-bg) !important;
+  background-size:cover !important;
+  background-position:center !important;
+  background-repeat:no-repeat !important;
+}
+</style>
+
 </head>
 <body>
 <div class="phone-shell" id="shell">
@@ -155,11 +166,11 @@
         <div class="field">
           <label data-i18n="p2a.cat">問題類別(必填)</label>
           <div class="chips" id="cat-chips">
-            <button type="button" class="chip" data-cat="感情" data-i18n="p2a.cat1">感情</button>
-            <button type="button" class="chip" data-cat="事業" data-i18n="p2a.cat2">事業</button>
-            <button type="button" class="chip" data-cat="健康" data-i18n="p2a.cat3">健康</button>
-            <button type="button" class="chip" data-cat="財運" data-i18n="p2a.cat4">財運</button>
-            <button type="button" class="chip" data-cat="人際" data-i18n="p2a.cat5">人際</button>
+            <button type="button" class="chip" data-cat="love" data-i18n="p2a.cat1">感情</button>
+            <button type="button" class="chip" data-cat="career" data-i18n="p2a.cat2">事業</button>
+            <button type="button" class="chip" data-cat="health" data-i18n="p2a.cat3">健康</button>
+            <button type="button" class="chip" data-cat="finances" data-i18n="p2a.cat4">財運</button>
+            <button type="button" class="chip" data-cat="relationships" data-i18n="p2a.cat5">人際</button>
           </div>
         </div>
         <!-- <div class="field">
@@ -560,14 +571,14 @@
 <div class="overlay modal-mode" id="card-preview-overlay">
   <div class="sheet card-preview-box">
     <div class="sheet-head">
-      <h3>下載圖卡</h3>
+      <h3 data-i18n="cardPreview.title">下載圖卡</h3>
       <button class="icon-btn" id="card-preview-close"><img src='img/icon-close.png' class='glyph' alt=''></button>
     </div>
-    <p class="sub">長壓圖片即可儲存到手機</p>
+    <p class="sub" data-i18n="cardPreview.hint">長壓圖片即可儲存到手機</p>
     <div class="card-preview-scroll">
       <img id="card-preview-img" alt="下載圖卡">
     </div>
-    <button class="btn btn-primary" id="card-preview-download">下載圖片</button>
+    <button class="btn btn-primary" id="card-preview-download" data-i18n="cardPreview.download">下載圖片</button>
   </div>
 </div>
 
@@ -613,10 +624,10 @@
 <!-- 未儲存離開提示（登入狀態） -->
 <div class="overlay modal-mode" id="guard-overlay">
   <div class="sheet modal-box">
-    <h3>尚未儲存</h3>
-    <p class="sub">這筆卜卦結果尚未儲存，要儲存到隨記嗎？</p>
-    <button class="btn btn-primary" id="guard-save">儲存至日記</button>
-    <button class="btn btn-secondary" id="guard-discard">放棄儲存</button>
+    <h3 data-i18n="guard.title">尚未儲存</h3>
+    <p class="sub" data-i18n="guard.sub">這筆卜卦結果尚未儲存，要儲存到隨記嗎？</p>
+    <button class="btn btn-primary" id="guard-save" data-i18n="guard.save">儲存至日記</button>
+    <button class="btn btn-secondary" id="guard-discard" data-i18n="guard.discard">放棄儲存</button>
   </div>
 </div>
 
@@ -641,18 +652,20 @@
     </div>
     <p class="sub" data-i18n="menu.guardianSub">送給你的迎新祝福，每個帳號只有一次翻開機會</p>
     <div class="guardian-card" id="guardian-card">
+      <div class="guardian-flare" id="guardian-flare"></div>
       <div class="guardian-inner" id="guardian-inner">
         <div class="guardian-face guardian-front">
           <div class="guardian-seal"><img src='img/jar.png' class='glyph' alt=''></div>
-          <div class="guardian-front-txt" data-i18n="menu.guardianFront1">請靜心翻開旅程起點的第一張卡牌<br>作為送給用戶的迎新祝福</div>
+          <div class="guardian-front-txt" data-i18n="menu.guardianFront1">請靜心翻開旅程起點的第一張卡片作為迎新祝福</div>
         </div>
         <div class="guardian-face guardian-back" id="guardian-back">
-          <div class="guardian-back-k">58 斷捨離中迎來新生</div>
+          <div class="guardian-back-k"></div>
           <div class="guardian-back-el" id="guardian-back-el"></div>
-          <div class="guardian-back-txt"><img src='img/hex-li.png' class='glyph' alt=''><img src='img/hex-xun.png' class='glyph' alt=''> → <img src='img/hex-zhen.png' class='glyph' alt=''><img src='img/hex-xun.png' class='glyph' alt=''><br>這是你旅程的起點，也是宇宙送給你的第一份祝福。<br><br>願這份指引，陪你走過每一次迷茫。</div>
+          <div class="guardian-back-txt"></div>
         </div>
       </div>
     </div>
+    <div class="guardian-beta-wrap" id="guardian-beta-wrap"></div>
     <button class="guardian-flip-btn" id="guardian-flip" data-i18n="menu.guardianFlip">翻開本命守護牌</button>
     <p class="guardian-locked-note" id="guardian-locked-note" style="display:none" data-i18n="menu.guardianLocked"><img src='img/icon-lock.png' class='glyph' alt=''> 本命守護牌已固定，無法再次翻開</p>
   </div>
@@ -661,12 +674,12 @@
 <div id="toast"></div>
 
 <script src="js/firebase.js?v=47"></script>
-<script src="data/hexagrams.js?v=47"></script>
-<script src="data/hexagrams.en.js?v=47"></script>
+<script src="data/hexagrams.js?v=53"></script>
+<script src="data/hexagrams.en.js?v=53"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
 <script src="js/share-card.js?v=47"></script>
-<script src="js/app.js?v=47"></script>
+<script src="js/app.js?v=54"></script>
 <script>
 /* DEC.12 v35 · SEO 語言動態切換（title / meta / lang） */
 (function () {
