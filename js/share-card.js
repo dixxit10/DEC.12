@@ -35,7 +35,7 @@
                     letter-spacing: 1px;
                     text-align: left;
                     font-family: ${SANS};
-                ">掃碼回到 DEC. 12<br>每一次提問，都是一次與自己的對話</div>
+                ">${(isEn()?"Scan to return to DEC. 12<br>Every question is a conversation with yourself":"掃碼回到 DEC. 12<br>每一次提問，都是一次與自己的對話")}</div>
             </div>
         `}function domeFrameHtml(art,name,guide){var artImg=art?`<img src="${art}" style="
                 position: absolute;

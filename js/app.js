@@ -238,7 +238,7 @@
 
     function memberName() {
         var u = currentUser();
-        return u && u.name ? u.name : "會員"
+        return u && u.name ? u.name : t("toast.memberDefault")
     }
 
     function uid() {
@@ -296,10 +296,20 @@
             if(_H[hi].num === entry[1]) return _H[hi];
         return null
     }
-    var CARD2_COMBO_TPL = ["慢慢來，事情會走向{A}。中間會經歷一段{B}，這都是必經的過程。試著{C}，也記得提醒自己，先別{D}。", "不用太緊張，結果可能會是{A}。過程中如果遇到{B}，那也只是暫時的。你可以試著{C}，同時也讓自己留意，別掉進{D}的坑裡。", "放輕鬆，事情會走向{A}。路上會遇到{B}，這很正常。此刻不妨{C}，也提醒自己輕輕避開{D}。", "深呼吸一下，將會迎來{A}。只是這條路上，會先經歷{B}，辛苦你了。試著{C}，同時溫柔地提醒自己，先不要{D}。", "一步步來，結果會走向{A}。過程中若感到{B}，請對自己多一點耐心。先{C}，也記得留意別{D}。"],
-        CARD2_SIMPLE_TPL = ["一個階段正式結束了，新的方向會走向{A}。此刻，試著{C}。", "過去的都過去了，接著會走向{A}。給自己一點時間{C}。", "一切都翻開新的一頁，未來{A}。此刻最溫柔的做法，就是{C}。", "舊的已經放下了，眼前的路會{A}。你可以試著{C}，慢慢來。", "這是一個全新的開始，方向會是{A}。此刻，不妨先{C}。"],
+    var CARD2_COMBO_TPL_ZH = ["慢慢來，事情會走向{A}。中間會經歷一段{B}，這都是必經的過程。試著{C}，也記得提醒自己，先別{D}。", "不用太緊張，結果可能會是{A}。過程中如果遇到{B}，那也只是暫時的。你可以試著{C}，同時也讓自己留意，別掉進{D}的坑裡。", "放輕鬆，事情會走向{A}。路上會遇到{B}，這很正常。此刻不妨{C}，也提醒自己輕輕避開{D}。", "深呼吸一下，將會迎來{A}。只是這條路上，會先經歷{B}，辛苦你了。試著{C}，同時溫柔地提醒自己，先不要{D}。", "一步步來，結果會走向{A}。過程中若感到{B}，請對自己多一點耐心。先{C}，也記得留意別{D}。"],
+        CARD2_COMBO_TPL_EN = ["Take it slow — things are moving toward {A}. Along the way you'll go through {B}, which is a necessary part of the process. Try to {C}, and remind yourself not to {D} just yet.", "No need to be too tense — the outcome may well be {A}. If you run into {B} along the way, it's only temporary. You can try to {C}, while also watching out for {D}.", "Relax — things are moving toward {A}. You'll meet {B} on the way, and that's perfectly normal. Right now, try to {C}, and gently remind yourself to steer clear of {D}.", "Take a deep breath — {A} is on its way. It's just that this road starts with {B} first, which hasn't been easy. Try to {C}, while gently reminding yourself not to {D} for now.", "Step by step — the result is heading toward {A}. If you feel {B} along the way, be a little more patient with yourself. Start by {C}, and remember to watch out for {D}."],
+        CARD2_SIMPLE_TPL_ZH = ["一個階段正式結束了，新的方向會走向{A}。此刻，試著{C}。", "過去的都過去了，接著會走向{A}。給自己一點時間{C}。", "一切都翻開新的一頁，未來{A}。此刻最溫柔的做法，就是{C}。", "舊的已經放下了，眼前的路會{A}。你可以試著{C}，慢慢來。", "這是一個全新的開始，方向會是{A}。此刻，不妨先{C}。"],
+        CARD2_SIMPLE_TPL_EN = ["One chapter has officially closed, and the new direction is heading toward {A}. Right now, try to {C}.", "What's past is past, and next comes {A}. Give yourself a little time to {C}.", "Everything is turning a new page — the future holds {A}. The gentlest thing to do right now is {C}.", "The old has been set down, and the road ahead leads to {A}. You can try to {C}, taking your time.", "This is a brand-new beginning, heading toward {A}. Right now, why not start by {C}?"],
         CARD3_COMBO_TPL = ["{MAIN}{SUP}", "{MAIN}{SUP}", "{MAIN}{SUP}", "{MAIN}{SUP}", "{MAIN}{SUP}"],
         CARD4_COMBO_TPL = ["{MAIN}\n{SUP}", "{MAIN}\n{SUP}", "{MAIN}\n{SUP}", "{MAIN}\n{SUP}", "{MAIN}\n{SUP}"];
+
+    function CARD2_COMBO_TPL() {
+        return lang() === "en" ? CARD2_COMBO_TPL_EN : CARD2_COMBO_TPL_ZH
+    }
+
+    function CARD2_SIMPLE_TPL() {
+        return lang() === "en" ? CARD2_SIMPLE_TPL_EN : CARD2_SIMPLE_TPL_ZH
+    }
 
     function pickTplIdx(res, key, n) {
         var k = "_tpl_" + key;
@@ -469,7 +479,8 @@
                 if((A || C) && s) {
                     var B = s.support_risk || "",
                         D = s.support_warning || "",
-                        t2 = CARD2_COMBO_TPL[pickTplIdx(res, "l2", CARD2_COMBO_TPL.length)];
+                        _c2a = CARD2_COMBO_TPL(),
+                        t2 = _c2a[pickTplIdx(res, "l2", _c2a.length)];
                     return fillTpl(t2, {
                         A,
                         B,
@@ -489,7 +500,8 @@
                 if((A2 || C2) && s2) {
                     var B2 = s2.support_risk || "",
                         D2 = s2.support_warning || "",
-                        t22 = CARD2_COMBO_TPL[pickTplIdx(res, "l2", CARD2_COMBO_TPL.length)];
+                        _c2b = CARD2_COMBO_TPL(),
+                        t22 = _c2b[pickTplIdx(res, "l2", _c2b.length)];
                     return fillTpl(t22, {
                         A: A2,
                         B: B2,
@@ -508,10 +520,13 @@
                 var m3 = r.combo.main,
                     A3 = m3.main_state || "",
                     C3 = m3.main_strategy || "";
-                if(A3 || C3) return fillTpl(CARD2_SIMPLE_TPL[pickTplIdx(res, "l2s", CARD2_SIMPLE_TPL.length)], {
-                    A: A3,
-                    C: C3
-                })
+                if(A3 || C3) {
+                    var _c2s = CARD2_SIMPLE_TPL();
+                    return fillTpl(_c2s[pickTplIdx(res, "l2s", _c2s.length)], {
+                        A: A3,
+                        C: C3
+                    })
+                }
             }
             var zlabel = r.zhiGua ? r.zhiGua.num + " " + r.zhiGua.symbolLabel + "：" : "";
             return zlabel + r.zhiGuaText
@@ -686,7 +701,7 @@
             if(!m.classList.contains("menu-lang")) {
                 var act = m.getAttribute("data-act");
                 guardLeave(function() {
-                    $("menu-overlay").classList.remove("open"), act === "home" ? (resetForm(), go("p1")) : act === "diary" ? isLoggedIn() ? (refreshPerUserData(), go("diary"), setTimeout(scrollCalToCurrent, 120)) : (toast("請先登入"), go("p5")) : act === "about" ? (clearDraft(), state.result = null, state.saved = !1, go("about")) : act === "milk" ? (clearDraft(), state.result = null, state.saved = !1, go("milk")) : act === "setting" && (clearDraft(), state.result = null, state.saved = !1, settingReturnTo = document.querySelector(".screen.active") ? document.querySelector(".screen.active").getAttribute("data-screen") : "diary", go("setting"), updateSettingAccount())
+                    $("menu-overlay").classList.remove("open"), act === "home" ? (resetForm(), go("p1")) : act === "diary" ? isLoggedIn() ? (refreshPerUserData(), go("diary"), setTimeout(scrollCalToCurrent, 120)) : (toast(t("toast.needLogin")), go("p5")) : act === "about" ? (clearDraft(), state.result = null, state.saved = !1, go("about")) : act === "milk" ? (clearDraft(), state.result = null, state.saved = !1, go("milk")) : act === "setting" && (clearDraft(), state.result = null, state.saved = !1, settingReturnTo = document.querySelector(".screen.active") ? document.querySelector(".screen.active").getAttribute("data-screen") : "diary", go("setting"), updateSettingAccount())
                 })
             }
         })
@@ -714,7 +729,7 @@
             try {
                 localStorage.removeItem(guardianRedrawKey()), localStorage.removeItem(guardianClaimKey())
             } catch (e) {}
-        })(), toast("已登出")
+        })(), toast(t("toast.logout"))
     }
     $("menu-logout").addEventListener("click", doLogout);
 
@@ -732,7 +747,7 @@
     }), $("milk-link").addEventListener("click", function(e) {
         e.preventDefault(), go("milk")
     }), $("btn-milk-support").addEventListener("click", function() {
-        toast("感謝支持，將為你開啟捐款頁面")
+        toast(t("toast.milkSoon"))
     });
     var drawFlipped = !1;
 
@@ -745,7 +760,7 @@
                 dt = $("draw-back-txt");
             dk && (dk.textContent = res.hex.num + " " + res.hex.symbolLabel), dt && (dt.textContent = res.hex.core || res.hex.plainText || "");
             var del = $("draw-back-el");
-            del && (del.innerHTML = cardMainImg(res.hex)), window.__lastHex = res.hex, state.result = res, state.saved = !1, $("draw-actions").classList.add("hidden"), $("draw-actions-done").classList.remove("hidden"), toast("今日靈感已揭曉")
+            del && (del.innerHTML = cardMainImg(res.hex)), window.__lastHex = res.hex, state.result = res, state.saved = !1, $("draw-actions").classList.add("hidden"), $("draw-actions-done").classList.remove("hidden"), toast(t("toast.drawRevealed"))
         }
     }
     $("btn-draw").addEventListener("click", flipDailyCard), (function() {
@@ -767,11 +782,11 @@
         })
     }), $("btn-start").addEventListener("click", function() {
         if(!state.cat) {
-            toast("請先選擇問題類別");
+            toast(t("toast.needCat"));
             return
         }
         if(!state.len) {
-            toast("請先選擇顯化期長度");
+            toast(t("toast.needLen"));
             return
         }
         startDivination()
@@ -964,10 +979,12 @@
     function saveFlow() {
         if(state.result) {
             var freshEls = state.result.method === "daily" ? unlockElementsFromHex(state.result.hex) : [];
-            isLoggedIn() ? ($("saved-overlay").classList.add("open"), commitRecord(state.result), state.saved = !0, updateSaveBtn(), safeRenderDiary()) : (saveDraft(state.result), state.draftDate = state.result.date, state.saved = !0, toast("已幫你暫存這筆結果"), setTimeout(function() {
+            isLoggedIn() ? ($("saved-overlay").classList.add("open"), commitRecord(state.result), state.saved = !0, updateSaveBtn(), safeRenderDiary()) : (saveDraft(state.result), state.draftDate = state.result.date, state.saved = !0, toast(t("toast.draftSaved")), setTimeout(function() {
                 go("p5")
             }, 700)), freshEls.length && (renderCollect(), setTimeout(function() {
-                toast("✨ 元素任務完成：" + freshEls.join("、") + "（已解鎖收藏相簿）")
+                toast(fillTpl(t("toast.elementTaskDone"), {
+                    list: freshEls.join(lang() === "en" ? ", " : "、")
+                }) + t("toast.collectionUnlocked"))
             }, 1800))
         }
     }
@@ -1008,38 +1025,38 @@
             nameField = $("auth-name").value.trim(),
             fbReady = typeof FB != "undefined" && FB && FB.signIn && FB.signUp;
         if(!email) {
-            authFail("請輸入帳號（Email）");
+            authFail(t("authErr.emailRequired"));
             return
         }
         if(!isValidEmail(email)) {
-            authFail("Email 格式有誤（例：you@example.com，不可含空白或特殊字元）");
+            authFail(t("authErr.emailInvalid"));
             return
         }
         if(!pass) {
-            authFail("請輸入密碼");
+            authFail(t("authErr.passRequired"));
             return
         }
         if(!fbReady) {
-            authFail("需要連線才能註冊／登入，請確認網路後再試");
+            authFail(t("authErr.needNetwork"));
             return
         }
         purgeLegacyPasswords();
         var users = getUsers();
         if(authMode === "register") {
             if(!isStrongPassword(pass)) {
-                authFail("密碼強度不足：至少 8 碼，且需包含字母與數字");
+                authFail(t("authErr.weakPassword"));
                 return
             }
             if(!pass2 || pass !== pass2) {
-                authFail("密碼與確認密碼不符合");
+                authFail(t("authErr.passMismatch"));
                 return
             }
             if(users[email]) {
-                authFail("這個帳號已註冊，請直接登入");
+                authFail(t("authErr.emailInUse"));
                 return
             }
             if(!nameField) {
-                authFail("請輸入暱稱");
+                authFail(t("authErr.nameRequired"));
                 return
             }
             var dupName = null;
@@ -1048,14 +1065,14 @@
                     dupName = users[k].name;
                     break
                 } if(dupName) {
-                authFail("這個暱稱已被使用，請換一個");
+                authFail(t("authErr.nameTaken"));
                 return
             }
             var nm = nameField;
             FB.signUp(email, pass).then(function(r) {
                 if(!r || !r.ok) {
                     var ec = r && r.error || "";
-                    ec === "auth/email-already-in-use" ? authFail("這個帳號已註冊，請直接登入") : ec === "auth/weak-password" ? authFail("密碼強度不足：至少 8 碼，且需包含字母與數字") : ec === "auth/invalid-email" ? authFail("Email 格式有誤") : ec && ec.indexOf("network") >= 0 ? authFail("需要連線才能註冊，請確認網路後再試") : authFail("註冊失敗，請稍後再試");
+                    ec === "auth/email-already-in-use" ? authFail(t("authErr.emailInUse")) : ec === "auth/weak-password" ? authFail(t("authErr.weakPassword")) : ec === "auth/invalid-email" ? authFail(t("authErr.emailInvalidShort")) : ec && ec.indexOf("network") >= 0 ? authFail(t("authErr.registerNeedNetwork")) : authFail(t("authErr.registerFailed"));
                     return
                 }
                 users = getUsers(), users[email] = {
@@ -1064,22 +1081,26 @@
                 }, saveUsers(users), setSession({
                     email,
                     name: nm
-                }), toast("註冊成功，歡迎 " + nm), mergeDraftsOnLogin(), migrateGuestCollection(), refreshPerUserData(), updateNav(), updateMenuAuth(), showLoading(), typeof FB != "undefined" && FB && FB.loadEntitlements && FB.loadEntitlements(email)
+                }), toast(fillTpl(t("toast.registerWelcome"), {
+                    name: nm
+                })), mergeDraftsOnLogin(), migrateGuestCollection(), refreshPerUserData(), updateNav(), updateMenuAuth(), showLoading(), typeof FB != "undefined" && FB && FB.loadEntitlements && FB.loadEntitlements(email)
             });
             return
         }
         FB.signIn(email, pass).then(function(r) {
             if(!r || !r.ok) {
                 var e2 = r && r.error || "";
-                e2 && e2.indexOf("network") >= 0 ? authFail("需要連線才能登入，請確認網路後再試") : authFail("帳號或密碼不正確");
+                e2 && e2.indexOf("network") >= 0 ? authFail(t("authErr.loginNeedNetwork")) : authFail(t("authErr.loginFailed"));
                 return
             }
             var rec = getUsers()[email] || null,
-                sname = rec && rec.name || email.split("@")[0] || "會員";
+                sname = rec && rec.name || email.split("@")[0] || t("toast.memberDefault");
             setSession({
                 email,
                 name: sname
-            }), toast("登入成功，歡迎回來 " + sname), mergeDraftsOnLogin(), migrateGuestCollection(), refreshPerUserData(), updateNav(), updateMenuAuth(), showLoading(), typeof FB != "undefined" && FB && FB.loadUsers && FB.loadUsers().then(function(map) {
+            }), toast(fillTpl(t("toast.loginWelcome"), {
+                name: sname
+            })), mergeDraftsOnLogin(), migrateGuestCollection(), refreshPerUserData(), updateNav(), updateMenuAuth(), showLoading(), typeof FB != "undefined" && FB && FB.loadUsers && FB.loadUsers().then(function(map) {
                 var rr = map && map[email] || null;
                 rr && rr.name && (setSession({
                     email,
@@ -1129,38 +1150,38 @@
             res = $("forgot-result");
         if(res) {
             if(!em) {
-                res.innerHTML = '<span class="fr-err">請輸入註冊時的信箱</span>';
+                res.innerHTML = '<span class="fr-err">' + esc(t("forgotErr.emailRequired")) + '</span>';
                 return
             }
             if(!isValidEmail(em)) {
-                res.innerHTML = '<span class="fr-err">Email 格式有誤（例：you@example.com）</span>';
+                res.innerHTML = '<span class="fr-err">' + esc(t("forgotErr.emailInvalid")) + '</span>';
                 return
             }
             var users = getUsers(),
                 rec = users[em];
             if(!rec) {
-                res.innerHTML = '<span class="fr-err">此信箱未註冊，請確認是否曾以該信箱註冊（僅能以信箱查詢，無法用用戶名）</span>';
+                res.innerHTML = '<span class="fr-err">' + esc(t("forgotErr.notRegistered")) + '</span>';
                 return
             }
             if(typeof FB != "undefined" && FB && FB.resetPassword) {
                 FB.resetPassword(em).then(function(r) {
-                    if(r && r.ok) res.innerHTML = '<span class="fr-ok">重設密碼信件已寄出至 ' + esc(em) + "，請到信箱點擊連結設定新密碼。</span>", toast("重設密碼信件已寄出");
+                    if(r && r.ok) res.innerHTML = '<span class="fr-ok">' + esc(t("forgotErr.sentToPrefix")) + esc(em) + esc(t("forgotErr.sentToSuffix")) + "</span>", toast(t("forgotErr.sentToast"));
                     else {
                         var code = r && r.error || "";
                         if(code === "email_not_registered") {
-                            res.innerHTML = '<span class="fr-err">此信箱未註冊</span>';
+                            res.innerHTML = '<span class="fr-err">' + esc(t("forgotErr.notRegisteredShort")) + '</span>';
                             return
                         }
                         if(code === "firebase_off") {
-                            res.innerHTML = '<span class="fr-err">需要連線才能重設密碼，請確認網路後再試。</span>', toast("需要連線才能重設密碼");
+                            res.innerHTML = '<span class="fr-err">' + esc(t("forgotErr.needNetwork")) + '</span>', toast(t("forgotErr.needNetworkToast"));
                             return
                         }
-                        res.innerHTML = '<span class="fr-err">寄送失敗：' + esc(code) + "</span>"
+                        res.innerHTML = '<span class="fr-err">' + esc(t("forgotErr.sendFailedPrefix")) + esc(code) + "</span>"
                     }
                 });
                 return
             }
-            res.innerHTML = '<span class="fr-err">需要連線才能重設密碼，請確認網路後再試。</span>', toast("需要連線才能重設密碼")
+            res.innerHTML = '<span class="fr-err">' + esc(t("forgotErr.needNetwork")) + '</span>', toast(t("forgotErr.needNetworkToast"))
         }
     }), $("forgot-email").addEventListener("keydown", function(e) {
         e.key === "Enter" && $("btn-forgot-find").click()
@@ -1234,30 +1255,30 @@
                 nm = prompt("輸入新的暱稱（最多 16 字）", cur);
             if(nm !== null) {
                 if(nm = nm.trim(), !nm) {
-                    toast("暱稱不能空白");
+                    toast(t("toast.nameEmpty"));
                     return
                 }
                 if(nm.length > 16) {
-                    toast("暱稱最多 16 字");
+                    toast(t("toast.nameLong"));
                     return
                 }
                 var users = getUsers();
                 for(var k in users)
                     if(k !== u.email && users[k] && users[k].name && String(users[k].name).toLowerCase() === nm.toLowerCase()) {
-                        toast("這個暱稱已被使用，請換一個");
+                        toast(t("toast.nameUsed"));
                         return
                     } users[u.email] && (users[u.email].name = nm, saveUsers(users)), setSession({
                     email: u.email,
                     name: nm
-                }), updateNav(), updateSettingAccount(), toast("暱稱已更新為「" + nm + "」")
+                }), updateNav(), updateSettingAccount(), toast(fillTpl(t("toast.nameUpdated"), { name: nm }))
             }
         }
     }), $("set-remind").addEventListener("click", function() {
         var s = getSettings();
-        s.remind = s.remind === !1, saveSettings(s), applySettingsUI(), toast("寄信提醒設定已更新")
+        s.remind = s.remind === !1, saveSettings(s), applySettingsUI(), toast(t("toast.remindUpdated"))
     }), $("set-push").addEventListener("click", function() {
         var s = getSettings();
-        s.push = !s.push, saveSettings(s), applySettingsUI(), toast("推播通知設定已更新")
+        s.push = !s.push, saveSettings(s), applySettingsUI(), toast(t("toast.pushUpdated"))
     });
     var CAL_WEEK = ["日", "一", "二", "三", "四", "五", "六"],
         DIARY_KEY_PREFIX = "xingua_diary_";
@@ -1422,7 +1443,7 @@
             if(recs && recs.length) {
                 var rec = recs[0];
                 rec.fromDiary = !0, rec.siblings = recs, openDetail(rec)
-            } else toast("這天沒有卜卦紀錄")
+            } else toast(t("toast.noRecord"))
         }
     });
     var COLLECT_BOOKS = [{
@@ -1551,7 +1572,7 @@
         e.target === this && this.classList.remove("open")
     }), $("collect-body").addEventListener("click", function(e) {
         var item = e.target.closest(".collect-item");
-        item && (item.classList.contains("locked") ? toast("尚未解鎖：完成任務或收集元素後解鎖") : toast("已收集 ✨"))
+        item && (item.classList.contains("locked") ? toast(t("toast.locked")) : toast(t("toast.collected")))
     });
     var GUARDIAN_KEY = "xingua_guardian_opened",
         GUARDIAN_HEX_KEY = "xingua_guardian_hex",
@@ -1711,7 +1732,7 @@
                 localStorage.setItem(guardianHexKey(), String(h.num))
             } catch (e) {}
             card.classList.add("flipped"), markGuardianOpened(), flipBtn.style.display = "none", playGuardianFlare(), setTimeout(function() {
-                note.style.display = "", toast("🛡️ 本命守護牌已固定")
+                note.style.display = "", toast(t("toast.guardianFixed"))
             }, 1600)
         }
     });
@@ -1747,7 +1768,7 @@
         var df = $("detail-fields");
         df && (df.style.display = rec.type === "divination" ? "block" : "none");
         var tb = $("detail-topbar");
-        tb && (rec.fromDiary ? tb.innerHTML = '<button class="back" id="detail-back">← 返回</button><div class="right"></div>' : tb.innerHTML = '<div class="brand">DEC. 12</div><div class="right"><button class="navlink" id="nav-login">登入/註冊</button><button class="icon-btn" id="btn-menu" aria-label="選單">☰</button></div>', rec.fromDiary || updateNav(), bindDetailBack(!!rec.fromDiary), document.querySelectorAll("#btn-menu").forEach(function(el) {
+        tb && (rec.fromDiary ? tb.innerHTML = '<button class="back" id="detail-back">' + esc(t("p2a.back")) + '</button><div class="right"></div>' : tb.innerHTML = '<div class="brand">DEC. 12</div><div class="right"><button class="navlink" id="nav-login">' + esc(t("nav.login")) + '</button><button class="icon-btn" id="btn-menu" aria-label="\u9078\u55ae">\u2630</button></div>', rec.fromDiary || updateNav(), bindDetailBack(!!rec.fromDiary), document.querySelectorAll("#btn-menu").forEach(function(el) {
             el.addEventListener("click", function() {
                 $("menu-overlay").classList.add("open")
             })
@@ -1817,7 +1838,7 @@
         resetForm(), go("p1")
     }), $("saved-go").addEventListener("click", function() {
         if($("saved-overlay").classList.remove("open"), !isLoggedIn()) {
-            toast("請先登入"), go("p5");
+            toast(t("toast.needLogin")), go("p5");
             return
         }
         refreshPerUserData(), go("diary"), setTimeout(scrollCalToCurrent, 120)
@@ -1862,14 +1883,14 @@
         btn.addEventListener("click", function() {
             detailMood = btn.getAttribute("data-mood"), document.querySelectorAll("#detail-moods .mood-btn").forEach(function(b) {
                 b.classList.remove("on")
-            }), btn.classList.add("on"), toast("已記錄心情 " + detailMood), saveDetailField("mood", detailMood)
+            }), btn.classList.add("on"), toast(fillTpl(t("toast.moodRecorded"), { mood: detailMood })), saveDetailField("mood", detailMood)
         })
     });
     var verify = null;
     $("verify-y").addEventListener("click", function() {
-        verify = "y", $("verify-y").classList.add("on-y"), $("verify-x").classList.remove("on-x"), toast("已記錄：應驗了"), saveDetailField("verify", "y"), renderDiaryData()
+        verify = "y", $("verify-y").classList.add("on-y"), $("verify-x").classList.remove("on-x"), toast(t("toast.verifyY2")), saveDetailField("verify", "y"), renderDiaryData()
     }), $("verify-x").addEventListener("click", function() {
-        verify = "x", $("verify-x").classList.add("on-x"), $("verify-y").classList.remove("on-y"), toast("已記錄：未應驗"), saveDetailField("verify", "x"), renderDiaryData()
+        verify = "x", $("verify-x").classList.add("on-x"), $("verify-y").classList.remove("on-y"), toast(t("toast.verifyX2")), saveDetailField("verify", "x"), renderDiaryData()
     });
 
     function saveDetailField(field, val) {
@@ -1901,10 +1922,10 @@
         if(detailRec) {
             var text = $("detail-note").value;
             if(noteSaved) {
-                noteSaved = !1, setNoteBtnMode(!1), setNoteSaveUI(!1, !1), $("note-save-hint").textContent = "", $("detail-note").focus(), toast("已切換為編輯模式");
+                noteSaved = !1, setNoteBtnMode(!1), setNoteSaveUI(!1, !1), $("note-save-hint").textContent = "", $("detail-note").focus(), toast(t("toast.editMode"));
                 return
             }
-            saveDetailField("note", text), detailNoteDraft = null, setNoteSaveUI(!1, !!text), setNoteBtnMode(!0), toast("已儲存這則觀察與感受")
+            saveDetailField("note", text), detailNoteDraft = null, setNoteSaveUI(!1, !!text), setNoteBtnMode(!0), toast(t("toast.noteSaved"))
         }
     });
 
@@ -1945,7 +1966,7 @@
     var br = $("btn-remind");
     br && br.addEventListener("click", function() {
         var s = getSettings();
-        s.remind = s.remind === !1, saveSettings(s), applySettingsUI(), toast("寄信提醒設定已更新")
+        s.remind = s.remind === !1, saveSettings(s), applySettingsUI(), toast(t("toast.remindUpdated"))
     });
 
     function shareText() {
@@ -1985,7 +2006,7 @@
 
     function openShare() {
         if(!state.result) {
-            toast("請先完成卜卦");
+            toast(t("toast.divineFirst"));
             return
         }
         var ov = $("share-overlay");
@@ -1997,7 +2018,7 @@
 
     function shareViaApp(kind) {
         if(!state.result) {
-            toast("請先完成卜卦");
+            toast(t("toast.divineFirst"));
             return
         }
         var txt = shareText(),
@@ -2010,9 +2031,9 @@
         } else kind === "thread" ? url = "https://www.threads.net/intent/post?text=" + encodeURIComponent(txt) : kind === "x" && (url = "https://twitter.com/intent/tweet?text=" + encodeURIComponent(txt));
         if(url) try {
             var opened = window.open(url, "_blank");
-            toast(opened ? "已開啟分享" : "已複製分享內容，請貼到聊天室")
+            toast(opened ? t("toast.shareOpened") : t("toast.copied"))
         } catch (e) {
-            toast("已複製分享內容，請貼到聊天室")
+            toast(t("toast.copied"))
         }
         $("share-overlay").classList.remove("open")
     }
@@ -2026,11 +2047,11 @@
         var email = $("share-email").value.trim(),
             emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if(!email) {
-            toast("請輸入 email");
+            toast(t("toast.needEmail"));
             return
         }
         if(!emailRe.test(email)) {
-            toast("email 格式似乎有誤");
+            toast(t("toast.badEmail"));
             return
         }
         var h = state.result.hex,
@@ -2066,9 +2087,9 @@
         try {
             var mailto = "mailto:" + encodeURIComponent(email) + "?subject=" + encodeURIComponent("DEC. 12 · 我的卜卦結果") + "&body=" + encodeURIComponent(body),
                 w = window.open(mailto, "_blank");
-            toast(w ? "已開啟郵件客戶端" : "已寄出，請到信箱收信")
+            toast(w ? t("toast.mailOpened") : t("toast.mailSent"))
         } catch (e) {
-            toast("已寄出，請到信箱收信")
+            toast(t("toast.mailSent"))
         }
     });
 
@@ -2356,8 +2377,8 @@
                 guardianFixed: "🛡️ 守護卡已固定",
                 guardianBetaClaimed: "已領取！正式開放後可再抽一次守護卡",
                 guardianBetaOff: "此功能尚未開放",
-                verifyY2: "已記錄：有幫助",
-                verifyX2: "已記錄：沒有幫助",
+                verifyY2: "已記錄：應驗了",
+                verifyX2: "已記錄：未應驗",
                 editMode: "已切換為編輯模式",
                 noteSaved: "已儲存這則觀察與感受",
                 divineFirst: "請先完成卜卦",
@@ -2365,7 +2386,50 @@
                 needEmail: "請輸入 email",
                 badEmail: "email 格式似乎有誤",
                 mailSent: "已寄出，請到信箱收信",
-                mailOpened: "已開啟郵件客戶端"
+                mailOpened: "已開啟郵件客戶端",
+                registerWelcome: "註冊成功，歡迎 {name}",
+                loginWelcome: "登入成功，歡迎回來 {name}",
+                nameUpdated: "暱稱已更新為「{name}」",
+                moodRecorded: "已記錄心情 {mood}",
+                elementTaskDone: "✨ 元素任務完成：{list}",
+                shareOpened: "已開啟分享",
+                memberDefault: "會員",
+                collectionUnlocked: "（已解鎖收藏相簿）"
+            },
+            authErr: {
+                emailRequired: "請輸入帳號（Email）",
+                emailInvalid: "Email 格式有誤（例：you@example.com，不可含空白或特殊字元）",
+                emailInvalidShort: "Email 格式有誤",
+                passRequired: "請輸入密碼",
+                needNetwork: "需要連線才能註冊／登入，請確認網路後再試",
+                weakPassword: "密碼強度不足：至少 8 碼，且需包含字母與數字",
+                passMismatch: "密碼與確認密碼不符合",
+                emailInUse: "這個帳號已註冊，請直接登入",
+                nameRequired: "請輸入暱稱",
+                nameTaken: "這個暱稱已被使用，請換一個",
+                registerNeedNetwork: "需要連線才能註冊，請確認網路後再試",
+                registerFailed: "註冊失敗，請稍後再試",
+                loginNeedNetwork: "需要連線才能登入，請確認網路後再試",
+                loginFailed: "帳號或密碼不正確"
+            },
+            forgotErr: {
+                emailRequired: "請輸入註冊時的信箱",
+                emailInvalid: "Email 格式有誤（例：you@example.com）",
+                notRegistered: "此信箱未註冊，請確認是否曾以該信箱註冊（僅能以信箱查詢，無法用用戶名）",
+                notRegisteredShort: "此信箱未註冊",
+                sentToPrefix: "重設密碼信件已寄出至 ",
+                sentToSuffix: "，請到信箱點擊連結設定新密碼。",
+                sentToast: "重設密碼信件已寄出",
+                needNetwork: "需要連線才能重設密碼，請確認網路後再試。",
+                needNetworkToast: "需要連線才能重設密碼",
+                sendFailedPrefix: "寄送失敗："
+            },
+            ph: {
+                detailNote: "這段時間的觀察、感受，或是與指引對照的心得…",
+                authName: "想被稱呼的名字",
+                authPass: "至少 8 碼，含字母與數字",
+                authPass2: "再輸入一次密碼",
+                shareEmail: "輸入 email…"
             }
         },
         en: {
@@ -2624,7 +2688,50 @@
                 needEmail: "Please enter an email",
                 badEmail: "That email address looks invalid",
                 mailSent: "Sent. Check your inbox",
-                mailOpened: "Email app opened"
+                mailOpened: "Email app opened",
+                registerWelcome: "Signed up! Welcome, {name}",
+                loginWelcome: "Welcome back, {name}",
+                nameUpdated: "Nickname updated to \u201c{name}\u201d",
+                moodRecorded: "Mood recorded: {mood}",
+                elementTaskDone: "\u2728 Element mission complete: {list}",
+                shareOpened: "Share sheet opened",
+                memberDefault: "Member",
+                collectionUnlocked: " (Collection artwork unlocked)"
+            },
+            authErr: {
+                emailRequired: "Please enter your email",
+                emailInvalid: "Invalid email format (e.g. you@example.com, no spaces or special characters)",
+                emailInvalidShort: "Invalid email format",
+                passRequired: "Please enter your password",
+                needNetwork: "A connection is needed to sign up or log in. Please check your network and try again",
+                weakPassword: "Password too weak: at least 8 characters, including letters and numbers",
+                passMismatch: "Passwords do not match",
+                emailInUse: "This account is already registered. Please log in instead",
+                nameRequired: "Please enter a nickname",
+                nameTaken: "This nickname is already taken. Please choose another",
+                registerNeedNetwork: "A connection is needed to sign up. Please check your network and try again",
+                registerFailed: "Sign-up failed. Please try again later",
+                loginNeedNetwork: "A connection is needed to log in. Please check your network and try again",
+                loginFailed: "Incorrect email or password"
+            },
+            forgotErr: {
+                emailRequired: "Please enter the email you registered with",
+                emailInvalid: "Invalid email format (e.g. you@example.com)",
+                notRegistered: "This email isn't registered. Please check you used this email to sign up (lookup works by email only, not by username)",
+                notRegisteredShort: "This email isn't registered",
+                sentToPrefix: "Password reset email sent to ",
+                sentToSuffix: ". Please click the link in the email to set a new password.",
+                sentToast: "Password reset email sent",
+                needNetwork: "A connection is needed to reset your password. Please check your network and try again.",
+                needNetworkToast: "Connection needed to reset password",
+                sendFailedPrefix: "Send failed: "
+            },
+            ph: {
+                detailNote: "Write your observations and feelings here, or notes to compare against the reading later\u2026",
+                authName: "What should we call you?",
+                authPass: "At least 8 characters, with letters and numbers",
+                authPass2: "Enter your password again",
+                shareEmail: "Enter email\u2026"
             }
         }
     };
@@ -2718,6 +2825,8 @@
             el.textContent = t(el.getAttribute("data-i18n-title"))
         }), document.querySelectorAll("[data-i18n-label]").forEach(function(el) {
             el.textContent = t(el.getAttribute("data-i18n-label"))
+        }), document.querySelectorAll("[data-i18n-placeholder]").forEach(function(el) {
+            el.setAttribute("placeholder", t(el.getAttribute("data-i18n-placeholder")))
         }), updateSettingAccount()
     }
 
