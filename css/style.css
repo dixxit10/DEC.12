@@ -633,6 +633,19 @@ body {
   white-space: pre-line
 }
 
+.draw-back-more {
+  font-size: 12px;
+  color: #ffffffd9;
+  text-align: center;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  z-index: 2;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, .6);
+  margin-top: 10px;
+  position: relative;
+  width: 100%
+}
+
 .draw-actions {
   margin: 6px 0 4px;
   text-align: center
@@ -2148,7 +2161,7 @@ body {
   gap: 22px;
   margin-top: 18px;
   padding-top: 14px;
-  border-top: 1px solid var(--line)
+  /* border-top: 1px solid var(--line) */
 }
 
 .menu-social .social-icon {
