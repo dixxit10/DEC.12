@@ -768,7 +768,9 @@
             var dk = $("draw-back-k"),
                 dt = $("draw-back-txt");
             dk && (dk.textContent = res.hex.num + " " + res.hex.symbolLabel), dt && (dt.textContent = res.hex.core || res.hex.plainText || "");
-            var del = $("draw-back-el");
+            var del = $("draw-back-el"),
+                lm = $("draw-back-more");
+            lm && (lm.href = "hexagram/" + res.hex.num + "/", lm.style.display = "");
             del && (del.innerHTML = cardMainImg(res.hex)), window.__lastHex = res.hex, state.result = res, state.saved = !1, $("draw-actions").classList.add("hidden"), $("draw-actions-done").classList.remove("hidden"), toast(t("toast.drawRevealed"))
         }
     }
@@ -2296,13 +2298,10 @@
             about: {
                 title: "關於 DEC. 12",
                 subtitle: "在圓的軌跡裡，與宇宙共振",
-                p1: "榮格在治療一位病人時，遇到一個他始終記得的時刻。病人正描述夢裡一隻金龜子，話說到一半，窗外真的飛來一隻金龜子，停在窗台上。榮格後來把這類現象稱作「共時性」：外在發生的事，跟你內心正在經歷的，並非因果關係，卻在同一個時刻，指向同一個意義。",
-                p2: "《易經》運作的原理，正是這個。它不是預測未來的工具，而是在你提問的當下，把你內在早已知道、卻還沒說出口的答案，用卦象的方式映照出來。",
-                p3: "DEC.12 用簡單的文字x日記。讓每一次提問留下紀錄，每一次回頭看，你會發現卦象與現實之間，常常出現讓人愣住的呼應。不是因為卦象真的能預知什麼，而是因為提問本身，讓你更誠實地觀察自己正在經歷的一切。",
-                p4: "我自己也在最不確定的日子裡，靠這個方式一次次向內對話。母親的溫柔，如今已化作心底一抹安靜的底蘊，陪我走過那些反覆提問的時刻。如果你也正站在一個看不清方向的路口，那麼別急著相信，問一個你真正在意的問題，看看會發生什麼。",
-                p5: "我自己也在最不確定的日子裡，靠這個方式一次次向內對話。母親的溫柔，如今已化作心底一抹安靜的底蘊，陪我走過那些反覆提問的時刻。如果你也正站在一個看不清方向的路口，那麼別急著相信，問一個你真正在意的問題，看看會發生什麼。",
-                p6: "我自己也在最不確定的日子裡，靠這個方式一次次向內對話。母親的溫柔，如今已化作心底一抹安靜的底蘊，陪我走過那些反覆提問的時刻。如果你也正站在一個看不清方向的路口，那麼別急著相信，問一個你真正在意的問題，看看會發生什麼。",
-                p7: "我自己也在最不確定的日子裡，靠這個方式一次次向內對話。母親的溫柔，如今已化作心底一抹安靜的底蘊，陪我走過那些反覆提問的時刻。如果你也正站在一個看不清方向的路口，那麼別急著相信，問一個你真正在意的問題，看看會發生什麼。",
+                p1: "1949 年，卡爾·榮格為《易經》的西方譯本寫下序言。真正撼動他的，從來不是未卜先知的預言，而是一抹被他稱為「共時性」的心靈幽光。",
+                p2: "他曾提及一位病人，正喃喃述說著夢裡出現的金龜子；話音未落，一隻金龜子竟真憑空飛來，輕輕棲停在窗台的玻璃上。這並非萬物間的因果牽連，卻在同一個瞬間，於虛實兩端照亮了同一個意涵。",
+                p3: "《易經》的奧秘亦是如此。它從非預測未來的占卜羅盤，而是一面清澈的鏡子，映照出你心底早已瞭然、卻始終未曾啟齒的答案。",
+                p4: "DEC.12 建議將這份古老的智慧，揉入極簡的日常習練——記錄日記。將你拋向歲月的每一個叩問細心寫下。日後驀然回首，你定會驚覺，那些卦象與生活的軌跡竟是如此神合。那並非命運被提早預演，而是因為在誠心發問的那刻，你終於學會了對自己坦白。",
                 version: "DEC. 12 · 測試版 v1"
             },
             draw: {
@@ -2310,7 +2309,8 @@
                 hint: "每日靈感卡，點擊翻開。",
                 drawBtn: "點擊翻開",
                 drawHint: "每日靈感卡，點擊翻開。",
-                swipeHint: " "
+                swipeHint: " ",
+                learnMore: "深入了解這一卦 →"
             },
             p2b: {
                 casting: "起卦中"
@@ -2603,13 +2603,12 @@
             about: {
                 title: "About DEC. 12",
                 subtitle: "Finding resonance in life's patterns",
-                p1: "In 1949, Carl Jung wrote the foreword to the first major Western translation of the I Ching. What convinced him wasn't prophecy. It was a pattern he called synchronicity.",
-                p2: "He once described a moment with a patient describing a dream about a scarab beetle. Mid-sentence, a real beetle flew in and landed on the windowsill. Not cause and effect. Just two things, arriving at the same meaning, at the same moment.",
-                p3: "That's how the I Ching works. It's not a tool for predicting your future. It's a mirror, surfacing what you already know, but haven't said out loud yet.",
-                p4: "DEC.12 pairs this with something simple: a journal. Every question you ask gets recorded. Every time you look back, you'll notice how often the hexagram echoes what was actually happening in your life. Not because it predicted anything, but because asking the question made you more honest with yourself.",
-                p5: "I built this during my own uncertain days, asking one question after another, trying to hear myself think.",
-                p6: "If you're standing at a crossroad you can't quite see past, don't rush to believe anything. Just ask the one question that actually matters to you.",
-                p7: "Ask your first question.",
+                p1: "Carl Jung wrote the foreword to one of the most influential Western editions of the I Ching. What interested him was not fortune-telling, but a phenomenon he called synchronicity—moments when an inner experience and an outer event seem meaningfully connected, even without a clear causal link.",
+                p2: "One story he shared involved a patient describing a dream about a scarab-like beetle. During the conversation, a similar beetle appeared at the window. For Jung, the significance was not that one event caused the other, but that the coincidence carried meaning for the person experiencing it.",
+                p3: "The I Ching can be approached in a similar way.",
+                p4: "Rather than treating it as a tool for predicting the future, DEC.12 uses it as a prompt for reflection—a way to pause, look at a situation from another angle, and put thoughts or feelings into words.",
+                p5: "DEC.12 pairs this practice with journaling. Each time you ask a question, you can save the reading along with your own thoughts. When you return to it later, you may notice connections between the reading, the choices you made, and what eventually happened.",
+                p6: "Not because the future was already written, but because asking a meaningful question can help you notice what was already taking shape.",
                 version: "DEC. 12 · Beta v1"
             },
             draw: {
@@ -2617,7 +2616,8 @@
                 hint: "Your daily inspiration card. Tap to reveal.",
                 drawBtn: "Tap to reveal",
                 drawHint: "Your daily inspiration card. Tap to reveal.",
-                swipeHint: " "
+                swipeHint: " ",
+                learnMore: "Learn more about this hexagram →"
             },
             p2b: {
                 casting: "Casting…"
