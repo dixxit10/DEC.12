@@ -2357,6 +2357,7 @@
                 accountGuest: "未登入",
                 editName: "修改暱稱",
                 privacy: "隱私權政策",
+                credits: "圖片來源",
                 authEmail: "帳號（Email）",
                 authName: "用戶名（註冊用）",
                 authPass: "密碼",
@@ -2663,6 +2664,7 @@
                 accountGuest: "Not logged in",
                 editName: "Edit nickname",
                 privacy: "Privacy Policy",
+                credits: "Image Credits",
                 authEmail: "Account (Email)",
                 authName: "Username (for sign-up)",
                 authPass: "Password",
@@ -2905,9 +2907,20 @@
             state.result && (renderCarousel(!0), updateSaveBtn(), renderDiaryData(), renderCalendar(), renderCollect())
         } catch (e) {}
     }
+    function langSiblingUrl() {
+        var path = location.pathname,
+            m = path.match(/^(.*\/)zh\/(index\.html)?$/);
+        if(m) return m[1] + (m[2] || "");
+        var m2 = path.match(/^(.*\/)(index\.html)?$/);
+        return m2 ? m2[1] + "zh/" + (m2[2] || "") : path
+    }
     var menuLangToggle = $("menu-lang-toggle");
     menuLangToggle && menuLangToggle.addEventListener("change", function() {
         var want = this.checked ? "en" : "zh";
-        want !== UI_LANG && toggleLang()
+        if(want === UI_LANG) return;
+        try {
+            localStorage.setItem("xingua_lang", want)
+        } catch (e) {}
+        location.href = langSiblingUrl()
     }), initLang(), syncLangUI(), boot()
 })();
