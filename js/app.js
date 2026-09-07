@@ -1321,16 +1321,18 @@
 
     function saveDiary(arr) {
         diaryData = arr;
+        var remoteClean = [];
         try {
             for(var clean = [], si = 0; si < arr.length; si++) {
                 var r = arr[si],
-                    c = {};
-                for(var k in r) k === "siblings" || k === "fromDiary" || (c[k] = r[k]);
-                clean.push(c)
+                    c = {},
+                    rc = {};
+                for(var k in r) k === "siblings" || k === "fromDiary" || (c[k] = r[k], k === "note" || (rc[k] = r[k]));
+                clean.push(c), remoteClean.push(rc)
             }
             localStorage.setItem(diaryKey(), JSON.stringify(clean))
         } catch (e) {}
-        typeof FB != "undefined" && FB && FB.saveDiary && FB.saveDiary(uid(), clean)
+        typeof FB != "undefined" && FB && FB.saveDiary && FB.saveDiary(uid(), remoteClean)
     }
 
     function recordFromResult(res) {
@@ -2294,11 +2296,13 @@
             about: {
                 title: "關於 DEC. 12",
                 subtitle: "在圓的軌跡裡，與宇宙共振",
-                p1: "1949 年，卡爾·榮格為《易經》的西方譯本寫下序言。真正撼動他的，從來不是未卜先知的預言，而是一抹被他稱為「共時性」的心靈幽光。",
-                p2: "他曾提及一位病人，正喃喃述說著夢裡出現的金龜子；話音未落，一隻金龜子竟真憑空飛來，輕輕棲停在窗台的玻璃上。這並非萬物間的因果牽連，卻在同一個瞬間，於虛實兩端照亮了同一個意涵。",
-                p3: "《易經》的奧秘亦是如此。它從非預測未來的占卜羅盤，而是一面清澈的鏡子，映照出你心底早已瞭然、卻始終未曾啟齒的答案。",
-                p4: "DEC.12 將這份古老的智慧，揉入極簡的日常練習。將你拋向歲月的每一個叩問細心寫下。日後驀然回首，你定會驚覺，那些卦象與生活的軌跡竟是如此神合。那並非命運被提早預演，而是因為在誠心發問的那刻，你終於學會了對自己坦白。",
-                p5: "如果你也正站在一個看不清方向的路口，那麼別急著相信，問一個你真正在意的問題，看看會發生什麼。",
+                p1: "榮格在治療一位病人時，遇到一個他始終記得的時刻。病人正描述夢裡一隻金龜子，話說到一半，窗外真的飛來一隻金龜子，停在窗台上。榮格後來把這類現象稱作「共時性」：外在發生的事，跟你內心正在經歷的，並非因果關係，卻在同一個時刻，指向同一個意義。",
+                p2: "《易經》運作的原理，正是這個。它不是預測未來的工具，而是在你提問的當下，把你內在早已知道、卻還沒說出口的答案，用卦象的方式映照出來。",
+                p3: "DEC.12 用簡單的文字x日記。讓每一次提問留下紀錄，每一次回頭看，你會發現卦象與現實之間，常常出現讓人愣住的呼應。不是因為卦象真的能預知什麼，而是因為提問本身，讓你更誠實地觀察自己正在經歷的一切。",
+                p4: "我自己也在最不確定的日子裡，靠這個方式一次次向內對話。母親的溫柔，如今已化作心底一抹安靜的底蘊，陪我走過那些反覆提問的時刻。如果你也正站在一個看不清方向的路口，那麼別急著相信，問一個你真正在意的問題，看看會發生什麼。",
+                p5: "我自己也在最不確定的日子裡，靠這個方式一次次向內對話。母親的溫柔，如今已化作心底一抹安靜的底蘊，陪我走過那些反覆提問的時刻。如果你也正站在一個看不清方向的路口，那麼別急著相信，問一個你真正在意的問題，看看會發生什麼。",
+                p6: "我自己也在最不確定的日子裡，靠這個方式一次次向內對話。母親的溫柔，如今已化作心底一抹安靜的底蘊，陪我走過那些反覆提問的時刻。如果你也正站在一個看不清方向的路口，那麼別急著相信，問一個你真正在意的問題，看看會發生什麼。",
+                p7: "我自己也在最不確定的日子裡，靠這個方式一次次向內對話。母親的溫柔，如今已化作心底一抹安靜的底蘊，陪我走過那些反覆提問的時刻。如果你也正站在一個看不清方向的路口，那麼別急著相信，問一個你真正在意的問題，看看會發生什麼。",
                 version: "DEC. 12 · 測試版 v1"
             },
             draw: {
@@ -2348,6 +2352,7 @@
                 verifyY: "○ 有幫助",
                 verifyX: "沒有幫助",
                 detailNoteHint: "寫下心得，之後回到這裡對照，看看指引是否有所幫助",
+                detailNotePrivacy: "🔒 這段文字只存在你的裝置上，不會上傳，換裝置或清除資料會遺失",
                 account: "帳號",
                 accountGuest: "未登入",
                 editName: "修改暱稱",
@@ -2653,6 +2658,7 @@
                 verifyY: "○ Came true",
                 verifyX: "Didn't come true",
                 detailNoteHint: "Write what happened and how you felt, then come back later to compare",
+                detailNotePrivacy: "🔒 Saved only on this device — not uploaded. It will be lost if you switch devices or clear your data.",
                 account: "Account",
                 accountGuest: "Not logged in",
                 editName: "Edit nickname",
