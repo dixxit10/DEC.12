@@ -1,6 +1,6 @@
-(function(){"use strict";function isEn(){try{return localStorage.getItem("xingua_lang")==="en"}catch(e){return!1}}function siteUrl(){try{return location.href}catch(e){return"https://dec12.app/"}}function clean(s){return String(s==null?"":s).replace(/<[^>]*>/g,"").replace(/\s+/g," ").trim()}function cleanKeepNL(s){return String(s==null?"":s).replace(/<[^>]*>/g,"").replace(/[ \t]+/g," ").replace(/\n{3,}/g,`
+(function(){"use strict";function isEn(){try{return localStorage.getItem("xingua_lang")==="en"}catch(e){return!1}}window.__shareCard=function(){return shareCard()};function siteUrl(){try{return location.href}catch(e){return"https://dec12.app/"}}function clean(s){return String(s==null?"":s).replace(/<[^>]*>/g,"").replace(/\s+/g," ").trim()}function cleanKeepNL(s){return String(s==null?"":s).replace(/<[^>]*>/g,"").replace(/[ \t]+/g," ").replace(/\n{3,}/g,`
 
-`).trim()}function $(id){return document.getElementById(id)}function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}function hexList(){var en=typeof window!="undefined"&&window.HEXAGRAMS_EN||null,zh=typeof window!="undefined"&&window.HEXAGRAMS||[];return isEn()&&en&&en.length?en:zh}function findHex(num){for(var list=hexList(),i=0;i<list.length;i++)if(list[i].num===num)return list[i];return null}function toast(msg){try{var t=$("toast");t&&(t.textContent=msg,t.classList.add("show"),clearTimeout(t._timer),t._timer=setTimeout(function(){t.classList.remove("show")},2200))}catch(e){}}var dailySnapshot=null,divinationSnapshot=null;function watchDaily(){var k=$("draw-back-k"),t=$("draw-back-txt");if(k){var take=function(){var name=clean(k.textContent),guide=t?clean(t.textContent):"",hex=null;try{window.__lastHex&&window.__lastHex.num&&(hex=window.__lastHex)}catch(e){}if(!hex){var num=parseInt(name,10);hex=isNaN(num)?null:findHex(num)}dailySnapshot={num:hex?hex.num:NaN,name,guide:hex&&(hex.core||hex.plainText||hex.plain||"")||guide,art:hex&&hex.cardImg||""}},mo=new MutationObserver(take);mo.observe(k,{childList:!0,characterData:!0,subtree:!0}),t&&mo.observe(t,{childList:!0,characterData:!0,subtree:!0})}}function watchDivination(){var car=$("result-carousel");if(car){var take=function(){var slides=car.querySelectorAll(".slide");if(slides.length){var snap=[],s1=slides[0],nameEl=s1.querySelector(".name"),imgEl=s1.querySelector(".card-main-img");snap.push({kind:"main",name:nameEl?clean(nameEl.textContent):"",art:imgEl?imgEl.getAttribute("src"):""});for(var i=1;i<slides.length&&i<4;i++){var s=slides[i],kEl=s.querySelector(".slide-k"),coreEl=s.querySelector(".core-txt"),focusEl=s.querySelector(".focus");snap.push({kind:"text",title:kEl?clean(kEl.textContent):"",body:coreEl?cleanKeepNL(coreEl.textContent):focusEl?cleanKeepNL(focusEl.textContent):""})}divinationSnapshot=snap}},mo=new MutationObserver(take);mo.observe(car,{childList:!0,subtree:!0})}}function currentMode(){var active=document.querySelector(".screen.active"),name=active?active.getAttribute("data-screen"):"";return name==="p2c"&&divinationSnapshot&&divinationSnapshot.length>=4?"divination":dailySnapshot&&dailySnapshot.name?"daily":null}function drawQr(){return new Promise(function(resolve){if(typeof QRCode=="undefined"){resolve("");return}QRCode.toDataURL(siteUrl(),{width:300,margin:1,color:{dark:"#111111",light:"#f4f1ea"}}).then(function(url){resolve(url)}).catch(function(){resolve("")})})}var SANS="'Noto Sans TC','Songti TC','STSong','Georgia',sans-serif",SERIF="'Noto Serif TC','Songti TC','STSong','Georgia',serif";function brandHtml(){return`
+`).trim()}function $(id){return document.getElementById(id)}function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}function hexList(){var en=typeof window!="undefined"&&window.HEXAGRAMS_EN||null,zh=typeof window!="undefined"&&window.HEXAGRAMS||[];return isEn()&&en&&en.length?en:zh}function findHex(num){for(var list=hexList(),i=0;i<list.length;i++)if(list[i].num===num)return list[i];return null}function toast(msg){try{var t=$("toast");t&&(t.textContent=msg,t.classList.add("show"),clearTimeout(t._timer),t._timer=setTimeout(function(){t.classList.remove("show")},2200))}catch(e){}}var dailySnapshot=null,divinationSnapshot=null;function watchDaily(){var k=$("draw-back-k"),t=$("draw-back-txt");if(k){var take=function(){var name=clean(k.textContent),guide=t?clean(t.textContent):"",hex=null;try{window.__lastHex&&window.__lastHex.num&&(hex=window.__lastHex)}catch(e){}if(!hex){var num=parseInt(name,10);hex=isNaN(num)?null:findHex(num)}dailySnapshot={num:hex?hex.num:NaN,name,guide:hex&&(hex.core||hex.plainText||hex.plain||"")||guide,art:hex&&hex.cardImg||""}},mo=new MutationObserver(take);mo.observe(k,{childList:!0,characterData:!0,subtree:!0}),t&&mo.observe(t,{childList:!0,characterData:!0,subtree:!0})}}function watchDivination(){var car=$("result-carousel");if(car){var take=function(){var slides=car.querySelectorAll(".slide");if(slides.length){var snap=[],s1=slides[0],nameEl=s1.querySelector(".name"),imgEl=s1.querySelector(".card-main-img"),dv=null;try{window.__lastDivination&&(dv=window.__lastDivination)}catch(e){}var upper="",lower="",chgUpper="",chgLower="",changedTxt="";dv&&(upper=clean(String(dv.upper||"")),lower=clean(String(dv.lower||"")),dv.chgNone||(chgUpper=clean(String(dv.chgUpper||"")),chgLower=clean(String(dv.chgLower||""))),changedTxt=clean(String(dv.changedTxt||"")));snap.push({kind:"main",name:nameEl?clean(nameEl.textContent):"",art:imgEl?imgEl.getAttribute("src"):"",upper,lower,chgUpper,chgLower,changedTxt});for(var i=1;i<slides.length&&i<4;i++){var s=slides[i],kEl=s.querySelector(".slide-k"),coreEl=s.querySelector(".core-txt"),focusEl=s.querySelector(".focus");snap.push({kind:"text",title:kEl?clean(kEl.textContent):"",body:coreEl?cleanKeepNL(coreEl.textContent):focusEl?cleanKeepNL(focusEl.textContent):""})}divinationSnapshot=snap}},mo=new MutationObserver(take);mo.observe(car,{childList:!0,subtree:!0})}}function currentMode(){var active=document.querySelector(".screen.active"),name=active?active.getAttribute("data-screen"):"";return name==="p2c"&&divinationSnapshot&&divinationSnapshot.length>=4?"divination":dailySnapshot&&dailySnapshot.name?"daily":null}function drawQr(){return new Promise(function(resolve){if(typeof QRCode=="undefined"){resolve("");return}QRCode.toDataURL(siteUrl(),{width:300,margin:1,color:{dark:"#111111",light:"#f4f1ea"}}).then(function(url){resolve(url)}).catch(function(){resolve("")})})}var SANS="'Noto Sans TC','Songti TC','STSong','Georgia',sans-serif",SERIF="'Noto Serif TC','Songti TC','STSong','Georgia',serif";function brandHtml(){return`
             <div style="
                 font-size: 40px;
                 letter-spacing: 14px;
@@ -29,7 +29,7 @@
                     display: inline-block;
                     vertical-align: middle;
                     margin-left: 24px;
-                    font-size: 26px;
+                    font-size: 30px;
                     color: #a39d90;
                     line-height: 1.7;
                     letter-spacing: 1px;
@@ -37,13 +37,37 @@
                     font-family: ${SANS};
                 ">${(isEn()?"Scan to return to DEC. 12<br>Every question is a conversation with yourself":"掃碼回到 DEC. 12<br>每一次提問，都是一次與自己的對話")}</div>
             </div>
-        `}function domeFrameHtml(art,name,guide){var artImg=art?`<img src="${art}" style="
+        `}function domeFrameHtml(art,name,guide,upper,lower,chgUpper,chgLower,changedTxt){var artImg=art?`<img src="${art}" style="
                 position: absolute;
                 inset: 0;
                 width: 100%;
                 height: 100%;
                 object-fit: cover;
-              ">`:"";return`
+              ">`:"";var hasChg=!!(chgUpper||chgLower);var symRow=upper?`<div style="
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 30px;
+                        margin-top: 30px;
+                        font-size: 60px;
+                        color: #fff;
+                        text-shadow: 0 2px 10px rgba(0,0,0,.6);
+                        letter-spacing: 4px;
+                        font-family: ${SANS};
+                    ">
+                        <div style="display: flex; flex-direction: column; align-items: center; line-height: 1.15;">
+                            <span>${esc(upper)}</span>
+                            <span>${esc(lower)}</span>
+                        </div>
+                        ${hasChg?`<span style="font-size: 40px;">\u2192</span><div style="display: flex; flex-direction: column; align-items: center; line-height: 1.15;"><span>${esc(chgUpper)}</span><span>${esc(chgLower)}</span></div>`:""}
+                    </div>`:"";var changedRow=changedTxt?`<div style="
+                        font-size: 40px;
+                        color: #f4f1ea;
+                        opacity: .85;
+                        text-shadow: 0 1px 8px rgba(0,0,0,.6);
+                        margin-top: 10px;
+                        font-family: ${SANS};
+                    ">${esc(changedTxt)}</div>`:"";return`
             <div style="
                 width: 960px;
                 height: 960px;
@@ -64,11 +88,11 @@
                     position: absolute;
                     left: 100px;
                     right: 100px;
-                    top: 250px;
+                    top: 270px;
                     text-align: center;
                 ">
                     <div style="
-                        font-size: 40px;
+                        font-size: 50px;
                         font-weight: 700;
                         color: #fff;
                         text-shadow: 0 2px 12px rgba(0,0,0,.6);
@@ -76,21 +100,23 @@
                         line-height: 1.3;
                         font-family: ${SERIF};
                     ">${esc(name)}</div>
+                    ${symRow}
+                    ${changedRow}
                     <div style="
-                        font-size: 30px;
+                        font-size: 40px;
                         line-height: 1.7;
                         color: #fff;
                         text-shadow: 0 1px 10px rgba(0,0,0,.65);
                         white-space: pre-line;
                         letter-spacing: 1px;
-                        margin-top: 10px;
+                        margin-top: 20px;
                         height: 500px;
                         overflow: hidden;
                         font-family: ${SANS};
                     ">${esc(guide)}</div>
                 </div>
             </div>
-        `}function textCardHtml(title,body){var b=String(body==null?"":body).replace(/[ \t]*•[ \t]*/g,`
+        `}function textCardHtml(title,body){var b=String(body==null?"":body).replace(/\n?[ \t]*•[ \t]*/g,`
 •`).replace(/^\n+/,"");return`
             <div style="
                 width: 960px;
@@ -150,5 +176,5 @@
                 align-items: center;
             ">
                 ${brandHtml()}
-                ${domeFrameHtml(main.art,main.name,"")}
+                ${domeFrameHtml(main.art,main.name,"",main.upper,main.lower,main.chgUpper,main.chgLower,main.changedTxt)}
         `,i=1;i<snap.length;i++)html+=textCardHtml(snap[i].title,snap[i].body);return html+=qrHtml(qr),html+="</div>",html}function renderToCanvas(html,width,height){var stage=$("share-card-stage");return stage?typeof html2canvas=="undefined"?Promise.reject(new Error("html2canvas not loaded")):(stage.style.left="-9999px",stage.style.top="0",stage.style.zIndex="-1",stage.style.opacity="1",stage.style.width=width+"px",stage.style.height=height+"px",stage.innerHTML=html.trim(),html2canvas(stage.firstElementChild,{scale:2,backgroundColor:"#f4f1ea",useCORS:!0,logging:!1,width,height,windowWidth:width})):Promise.reject(new Error("no stage"))}function showPreview(canvas){var ov=$("card-preview-overlay"),img=$("card-preview-img");!ov||!img||(img.src=canvas.toDataURL("image/png"),ov.classList.add("open"))}function downloadCanvas(canvas){try{canvas.toBlob(function(blob){if(!blob){fallbackDownload(canvas);return}var url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url,a.download="dec12-reading.png",document.body.appendChild(a),a.click(),setTimeout(function(){document.body.removeChild(a),URL.revokeObjectURL(url)},800)},"image/png")}catch(e){fallbackDownload(canvas)}}function fallbackDownload(canvas){try{var a=document.createElement("a");a.href=canvas.toDataURL("image/png"),a.download="dec12-reading.png",document.body.appendChild(a),a.click(),setTimeout(function(){document.body.removeChild(a)},800)}catch(e){}}function shareCard(){var mode=currentMode();if(!mode){toast(isEn()?"Please finish a reading first.":"請先完成卜卦");return}var snap=mode==="daily"?dailySnapshot:divinationSnapshot;if(!snap){toast(isEn()?"Please finish a reading first.":"請先完成卜卦");return}drawQr().then(function(qr){var html,w,h;mode==="daily"?(w=1080,h=1440,html=dailyCardHtml(snap,qr)):(w=1080,h=0,html=divinationCardHtml(snap,qr));var stage=$("share-card-stage");h===0&&(stage.style.width=w+"px",stage.style.height="auto",stage.innerHTML=html.trim(),h=stage.scrollHeight),renderToCanvas(html,w,h).then(function(canvas){showPreview(canvas)}).catch(function(){toast(isEn()?"Could not generate card.":"圖卡生成失敗，請重試")})})}function bind(){var btn=$("social-card");btn&&btn.addEventListener("click",shareCard);var dl=$("card-preview-download");dl&&dl.addEventListener("click",function(){var img=$("card-preview-img");if(img&&img.src&&img.src.indexOf("data:image/png")===0){var a=document.createElement("a");a.href=img.src,a.download="dec12-reading.png",document.body.appendChild(a),a.click(),setTimeout(function(){document.body.removeChild(a)},800)}});var close=$("card-preview-close");close&&close.addEventListener("click",function(){var ov2=$("card-preview-overlay");ov2&&ov2.classList.remove("open")});var ov=$("card-preview-overlay");ov&&ov.addEventListener("click",function(e){e.target===this&&this.classList.remove("open")}),watchDaily(),watchDivination()}document.readyState==="loading"?document.addEventListener("DOMContentLoaded",bind):bind()})();

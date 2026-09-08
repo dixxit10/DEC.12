@@ -336,18 +336,21 @@
             健康: "health",
             財運: "finances",
             人際: "relationships",
+            每日靈感: "daily",
             love: "love",
             career: "career",
             health: "health",
             finances: "finances",
-            relationships: "relationships"
+            relationships: "relationships",
+            daily: "daily"
         },
         CAT_I18N = {
             love: "p2a.cat1",
             career: "p2a.cat2",
             health: "p2a.cat3",
             finances: "p2a.cat4",
-            relationships: "p2a.cat5"
+            relationships: "p2a.cat5",
+            daily: "draw.front"
         };
 
     function normalizeCat(cat) {
@@ -367,7 +370,9 @@
         "6 months": "p2a.len4",
         "Within 1 week": "p2a.len1",
         "Within 1 month": "p2a.len2",
-        "Within 3 months": "p2a.len3"
+        "Within 3 months": "p2a.len3",
+        今日: "draw.today",
+        Today: "draw.today"
     };
 
     function lenLabel(v) {
@@ -520,11 +525,11 @@
                 }
             }
             var label = r.zhiGua ? r.zhiGua.num + " " + r.zhiGua.symbolLabel : "";
-            return (label ? "之卦「" + label + "」：" : "") + r.zhiGuaText + (r.benGuaText ? `
-本卦：` + r.benGuaText : "")
+            return (label ? t("result.zhiGuaPrefix") + label + t("result.zhiGuaSuffix") : "") + r.zhiGuaText + (r.benGuaText ? `
+` + t("result.benGuaPrefix") + r.benGuaText : "")
         }
         if(r.mode === "zhiGua") {
-            if(r.special && r.special.text) return r.special.label + "：" + r.special.text;
+            if(r.special && r.special.text) return r.special.label + (lang() === "en" ? ": " : "：") + r.special.text;
             if(r.combo && r.combo.main) {
                 var m3 = r.combo.main,
                     A3 = m3.main_state || "",
@@ -537,7 +542,7 @@
                     })
                 }
             }
-            var zlabel = r.zhiGua ? r.zhiGua.num + " " + r.zhiGua.symbolLabel + "：" : "";
+            var zlabel = r.zhiGua ? r.zhiGua.num + " " + r.zhiGua.symbolLabel + (lang() === "en" ? ": " : "：") : "";
             return zlabel + r.zhiGuaText
         }
         return res.hex.core || res.hex.plain || ""
@@ -783,7 +788,7 @@
         drawFlipped = !1, $("draw-card").classList.remove("flipped"), state.result = null, state.saved = !1, clearDraft(), resetForm(), updateSaveBtn(), $("draw-actions").classList.remove("hidden"), $("draw-actions-done").classList.add("hidden")
     }), $("btn-save-draw").addEventListener("click", function() {
         saveFlow()
-    }), $("btn-share-draw").addEventListener("click", openShare), $("btn-advance").addEventListener("click", function() {
+    }), $("btn-share-draw").addEventListener("click", triggerShareCard), $("btn-advance").addEventListener("click", function() {
         guardLeave(function() {
             go("p2a")
         })
@@ -950,6 +955,15 @@
             var slides = "",
                 changedTxt = changedText(changed),
                 title = res.hex.num + " " + res.hex.symbolLabel;
+            var chgParts = chg.sym ? chg.sym.split(" ") : [];
+            window.__lastDivination = {
+                upper: h.upper,
+                lower: h.lower,
+                chgNone: chg.none,
+                chgUpper: chgParts[0] || "",
+                chgLower: chgParts[1] || "",
+                changedTxt
+            };
             slides += '<div class="slide symbol-slide"><div class="el-ic">' + cardMainImg(h) + '</div><div class="pair" style="display:flex;flex-direction:row;align-items:center;justify-content:center;gap:16px;"><div style="display:flex;flex-direction:column;align-items:center;">' + h.upper + "<br>" + h.lower + "</div>" + (chg.none ? "" : '<div style="margin:0 4px;">→</div><div style="display:flex;flex-direction:column;align-items:center;">' + chg.sym.split(" ").join("<br>") + "</div>") + '</div><div class="name">' + esc(title) + "</div>" + (changedTxt ? '<div class="changed-line">' + esc(changedTxt) + "</div>" : "") + "</div>", slides += '<div class="slide"><div class="slide-k">' + esc(title) + '</div><div class="core-txt">' + esc(readingLineText(res)) + "</div></div>", slides += '<div class="slide"><div class="slide-k">' + esc(t("result.aboutPrefix")) + "「" + esc(catTxt) + " × " + esc(lenLabel(lenTxt)) + '」</div><div class="focus">' + esc(readingFocusText(res, res.cat)) + "</div></div>", slides += '<div class="slide"><div class="slide-k">' + esc(t("result.advice")) + '</div><div class="core-txt">' + esc(readingGuideText(res, res.cat)) + "</div></div>", $("result-carousel").innerHTML = slides;
             for(var dotsHtml = "", i = 0; i < 4; i++) dotsHtml += "<i" + (i === 0 ? ' class="on"' : "") + "></i>";
             $("result-dots").innerHTML = dotsHtml, updateDots();
@@ -979,7 +993,7 @@
                 c.classList.remove("on")
             }), resetForm(), go("p2a")
         })
-    }), $("btn-share-p2c").addEventListener("click", openShare);
+    }), $("btn-share-p2c").addEventListener("click", triggerShareCard);
 
     function safeRenderDiary() {
         try {
@@ -1133,7 +1147,7 @@
                 passHint.style.display = "none", passHint.className = "pass-hint";
                 return
             }
-            passHint.style.display = "", isStrongPassword(p) ? (passHint.textContent = "✓ 密碼符合規範（至少 8 碼，含英文與數字）", passHint.className = "pass-hint ok") : (passHint.textContent = "密碼需至少 8 碼，且需含英文與數字", passHint.className = "pass-hint")
+            passHint.style.display = "", isStrongPassword(p) ? (passHint.textContent = t("authErr2.passHintOk"), passHint.className = "pass-hint ok") : (passHint.textContent = t("authErr2.passHintNeed"), passHint.className = "pass-hint")
         }
     });
 
@@ -1292,7 +1306,17 @@
         s.push = !s.push, saveSettings(s), applySettingsUI(), toast(t("toast.pushUpdated"))
     });
     var CAL_WEEK = ["日", "一", "二", "三", "四", "五", "六"],
+        CAL_WEEK_EN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+        CAL_MONTH_EN = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
         DIARY_KEY_PREFIX = "xingua_diary_";
+
+    function calWeekLabels() {
+        return lang() === "en" ? CAL_WEEK_EN : CAL_WEEK
+    }
+
+    function monthYearLabel(y, m) {
+        return lang() === "en" ? CAL_MONTH_EN[m - 1] + " " + y : y + " 年 " + m + " 月"
+    }
 
     function seedDiary() {
         return []
@@ -1394,8 +1418,8 @@
                 var ym = addMonths(new Date, mi - 4),
                     y = ym.getFullYear(),
                     m = ym.getMonth() + 1;
-                html += '<div class="cal-month" data-ym="' + y + "-" + m + '">', html += '<div class="cal-month-title">' + y + " 年 " + m + " 月</div>", html += '<div class="cal-week">';
-                for(var w = 0; w < 7; w++) html += "<span>" + CAL_WEEK[w] + "</span>";
+                html += '<div class="cal-month" data-ym="' + y + "-" + m + '">', html += '<div class="cal-month-title">' + monthYearLabel(y, m) + "</div>", html += '<div class="cal-week">';
+                for(var w = 0, wk = calWeekLabels(); w < 7; w++) html += "<span>" + wk[w] + "</span>";
                 html += "</div>", html += '<div class="cal-grid">';
                 for(var first = new Date(y, m - 1, 1).getDay(), days = new Date(y, m, 0).getDate(), today = new Date, pad = 0; pad < first; pad++) html += '<div class="cal-cell empty"></div>';
                 for(var day = 1; day <= days; day++) {
@@ -1432,7 +1456,7 @@
         var t2 = $("cal-title");
         if(t2 && monthEl) {
             var parts = monthEl.getAttribute("data-ym").split("-");
-            t2.textContent = parts[0] + " 年 " + parseInt(parts[1], 10) + " 月"
+            t2.textContent = monthYearLabel(parts[0], parseInt(parts[1], 10))
         }
     }
     $("cal-prev").addEventListener("click", function() {
@@ -2008,29 +2032,29 @@
 
     function shareText() {
         var res = state.result;
-        if(!res) return "DEC. 12 星星罐";
+        if(!res) return t("emailShare.brandName");
         var h = res.hex,
             chg = changedHex(res),
             changed = res.changedLines || [],
             txt = "";
-        return txt += `DEC. 12 · 我的卜卦結果
-`, txt += `====================
-`, txt += "類別：" + catLabel(res.cat) + `
-`, txt += "顯化期長度：" + (res.len || "今日") + `
+        return txt += t("emailShare.title") + `
+` + t("emailShare.divider") + `
+`, txt += t("emailShare.catPrefix") + catLabel(res.cat) + `
+`, txt += t("emailShare.lenPrefix") + lenLabel(res.len || "今日") + `
 
-`, txt += "本卦：" + h.symbolLabel + "（" + h.upper + " " + h.lower + `）
-`, chg.none || (txt += "變卦：" + chg.label + "（" + chg.sym + `）
-`), changed.length && (txt += "動爻：第 " + changed.join("、") + ` 爻
-`), txt += "核心：" + h.num + " " + h.symbolLabel + " " + (h.core || "") + `
+`, txt += t("emailShare.mainGuaPrefix") + h.symbolLabel + "（" + h.upper + " " + h.lower + `）
+`, chg.none || (txt += t("emailShare.changedGuaPrefix") + chg.label + "（" + chg.sym + `）
+`), changed.length && (txt += t("emailShare.changedLinePrefix") + changed.join(lang() === "en" ? ", " : "、") + t("emailShare.changedLineSuffix") + `
+`), txt += t("emailShare.corePrefix") + h.num + " " + h.symbolLabel + " " + (h.core || "") + `
 
-`, txt += `白話卦辭：
+`, txt += t("emailShare.plainLabel") + `
 ` + h.plain + `
 
-`, txt += "情境解讀：關於" + res.cat + "：" + (h.focus[res.cat] || h.core || "") + `
+`, txt += t("emailShare.contextPrefix") + catLabel(res.cat) + t("emailShare.contextMid") + (h.focus[res.cat] || h.core || "") + `
 
-`, txt += `一事不宜多問
-`, txt += `這是指引，不是預言。
-`, txt += "。 來自 DEC. 12 星星罐", txt
+`, txt += t("emailShare.footer1") + `
+` + t("emailShare.footer2") + `
+`, txt += "。 " + (lang() === "en" ? "From " : "來自 ") + t("emailShare.brandName"), txt
     }
 
     function shareUrl() {
@@ -2048,6 +2072,13 @@
         }
         var ov = $("share-overlay");
         $("share-email").value = "", $("email-preview").style.display = "none", ov.classList.add("open")
+    }
+    function triggerShareCard() {
+        if(!state.result) {
+            toast(t("toast.divineFirst"));
+            return
+        }
+        typeof window.__shareCard == "function" && window.__shareCard()
     }
     $("share-overlay").addEventListener("click", function(e) {
         e.target === this && this.classList.remove("open")
@@ -2093,32 +2124,32 @@
         }
         var h = state.result.hex,
             cat = state.result.cat,
-            changed = state.result.changedLines.join("、"),
+            changed = state.result.changedLines.join(lang() === "en" ? ", " : "、"),
             focusText = h.focus[cat] || h.core || "",
             body = "";
-        body += `DEC. 12 · 你的卜卦結果
-`, body += `========================
-`, body += "類別：" + cat + `
-`, body += "顯化期長度：" + state.result.len + `
+        body += t("emailShare.title") + `
+` + t("emailShare.divider") + `
+`, body += t("emailShare.catPrefix") + catLabel(cat) + `
+`, body += t("emailShare.lenPrefix") + lenLabel(state.result.len) + `
 
 `;
         var chg = changedHex(state.result);
-        body += "本卦：" + state.result.hex.symbolLabel + "（" + state.result.hex.upper + " " + state.result.hex.lower + `）
-`, body += "變卦：" + chg.label + "（" + chg.sym + `）
-`, body += "動爻：第 " + changed + ` 爻
-`, body += "核心：" + state.result.hex.num + " " + state.result.hex.symbolLabel + " " + (state.result.hex.core || "") + `
+        body += t("emailShare.mainGuaPrefix") + state.result.hex.symbolLabel + "（" + state.result.hex.upper + " " + state.result.hex.lower + `）
+`, body += t("emailShare.changedGuaPrefix") + chg.label + "（" + chg.sym + `）
+`, body += t("emailShare.changedLinePrefix") + changed + t("emailShare.changedLineSuffix") + `
+`, body += t("emailShare.corePrefix") + state.result.hex.num + " " + state.result.hex.symbolLabel + " " + (state.result.hex.core || "") + `
 
-`, body += `白話卦辭：
+`, body += t("emailShare.plainLabel") + `
 ` + state.result.hex.plain + `
 
-`, body += "情境解讀：關於" + cat + "：" + focusText + `
+`, body += t("emailShare.contextPrefix") + catLabel(cat) + t("emailShare.contextMid") + focusText + `
 
-`, body += `一事不宜多問
-`, body += `這是指引，不是預言
+`, body += t("emailShare.footer1") + `
+` + t("emailShare.footer2") + `
 
 `, body += `。。
-`, body += `本信件由「DEC. 12」寄出，僅用於備份這份結果。
-`, body += "若不想再收到提醒，可隨時回覆「退訂」停止寄送。", $("email-preview").textContent = "寄送給 " + email + `：
+`, body += t("emailShare.signature") + `
+`, body += t("emailShare.unsubscribe"), $("email-preview").textContent = t("emailShare.previewTo") + email + t("emailShare.previewColon") + `
 
 ` + body, $("email-preview").style.display = "block";
         try {
@@ -2288,7 +2319,10 @@
                 changingPrefix: "動爻：第",
                 changingSuffix: " 爻",
                 aboutPrefix: "關於",
-                advice: "參考建議"
+                advice: "參考建議",
+                zhiGuaPrefix: "之卦「",
+                zhiGuaSuffix: "」：",
+                benGuaPrefix: "本卦："
             },
             p2c: {
                 save: "儲存到日記",
@@ -2310,7 +2344,8 @@
                 drawBtn: "點擊翻開",
                 drawHint: "每日靈感卡，點擊翻開。",
                 swipeHint: " ",
-                learnMore: "深入了解這一卦 →"
+                learnMore: "深入了解這一卦 →",
+                today: "今日"
             },
             p2b: {
                 casting: "起卦中"
@@ -2364,6 +2399,7 @@
                 authPass2: "確認密碼",
                 forgot: "忘記帳號或密碼？",
                 forgotFind: "尋找密碼",
+                forgotLabel: "輸入註冊時的信箱尋找密碼",
                 forgotClose: "關閉",
                 loading: "載入你的隨記中…",
                 shareNote1: " ",
@@ -2470,6 +2506,31 @@
                 authPass: "至少 8 碼，含字母與數字",
                 authPass2: "再輸入一次密碼",
                 shareEmail: "輸入 email…"
+            },
+            authErr2: {
+                passHintOk: "✓ 密碼符合規範（至少 8 碼，含英文與數字）",
+                passHintNeed: "密碼需至少 8 碼，且需含英文與數字"
+            },
+            emailShare: {
+                brandName: "DEC. 12 星星罐",
+                title: "DEC. 12 · 你的卜卦結果",
+                divider: "========================",
+                catPrefix: "類別：",
+                lenPrefix: "顯化期長度：",
+                mainGuaPrefix: "本卦：",
+                changedGuaPrefix: "變卦：",
+                changedLinePrefix: "動爻：第 ",
+                changedLineSuffix: " 爻",
+                corePrefix: "核心：",
+                plainLabel: "白話卦辭：",
+                contextPrefix: "情境解讀：關於",
+                contextMid: "：",
+                footer1: "一事不宜多問",
+                footer2: "這是指引，不是預言",
+                signature: "本信件由「DEC. 12」寄出，僅用於備份這份結果。",
+                unsubscribe: "若不想再收到提醒，可隨時回覆「退訂」停止寄送。",
+                previewTo: "寄送給 ",
+                previewColon: "："
             }
         },
         en: {
@@ -2499,6 +2560,7 @@
                 authPass2: "Confirm password",
                 forgot: "Forgot your account or password?",
                 forgotFind: "Find password",
+                forgotLabel: "Enter the email you signed up with to find your password",
                 forgotClose: "Close",
                 loading: "Loading your journal…",
                 shareNote1: " ",
@@ -2593,7 +2655,10 @@
                 changingPrefix: "Changing lines:",
                 changingSuffix: "",
                 aboutPrefix: "About",
-                advice: "Guidance"
+                advice: "Guidance",
+                zhiGuaPrefix: "Resulting Hexagram “",
+                zhiGuaSuffix: "”: ",
+                benGuaPrefix: "Original Hexagram: "
             },
             p2c: {
                 save: "Save to Journal",
@@ -2617,7 +2682,8 @@
                 drawBtn: "Tap to reveal",
                 drawHint: "Your daily inspiration card. Tap to reveal.",
                 swipeHint: " ",
-                learnMore: "Learn more about this hexagram →"
+                learnMore: "Learn more about this hexagram →",
+                today: "Today"
             },
             p2b: {
                 casting: "Casting…"
@@ -2671,6 +2737,7 @@
                 authPass2: "Confirm password",
                 forgot: "Forgot your account or password?",
                 forgotFind: "Find password",
+                forgotLabel: "Enter the email you signed up with to find your password",
                 forgotClose: "Close",
                 loading: "Loading your journal…",
                 shareNote1: " ",
@@ -2777,6 +2844,31 @@
                 authPass: "At least 8 characters, with letters and numbers",
                 authPass2: "Enter your password again",
                 shareEmail: "Enter email\u2026"
+            },
+            authErr2: {
+                passHintOk: "\u2713 Password meets the requirements (8+ characters, letters and numbers)",
+                passHintNeed: "Password needs at least 8 characters, with letters and numbers"
+            },
+            emailShare: {
+                brandName: "DEC. 12 Starry Jar",
+                title: "DEC. 12 \u00b7 Your Reading Result",
+                divider: "========================",
+                catPrefix: "Category: ",
+                lenPrefix: "Manifestation window: ",
+                mainGuaPrefix: "Original Hexagram: ",
+                changedGuaPrefix: "Changed Hexagram: ",
+                changedLinePrefix: "Changing line(s): ",
+                changedLineSuffix: "",
+                corePrefix: "Core: ",
+                plainLabel: "In Plain Words:",
+                contextPrefix: "Contextual Reading: Regarding ",
+                contextMid: ": ",
+                footer1: "One question at a time",
+                footer2: "This is guidance, not prophecy",
+                signature: "This email was sent by \u201cDEC. 12\u201d, solely to back up this reading.",
+                unsubscribe: "If you\u2019d rather not receive these, just reply \u201cunsubscribe\u201d anytime to stop.",
+                previewTo: "Sending to ",
+                previewColon: ": "
             }
         }
     };
