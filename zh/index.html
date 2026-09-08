@@ -113,6 +113,7 @@
               <div class="draw-back-k" id="draw-back-k">58 斷捨離中迎來新生</div>
               <div class="draw-back-el" id="draw-back-el"></div>
               <div class="draw-back-txt" id="draw-back-txt" data-i18n="draw.hint">每日靈感卡，點擊翻開。</div>
+              <a class="draw-back-more" id="draw-back-more" data-i18n="draw.learnMore" style="display:none">深入了解這一卦 →</a>
             </div>
           </div>
         </div>
@@ -151,7 +152,7 @@
 
   <section class="screen" id="screen-p2a" data-screen="p2a">
     <header class="topbar">
-      <button class="back" id="p2a-back" style="display:none">← 返回</button>
+      <button class="back" id="p2a-back" style="display:none" data-i18n="p2a.back">← 返回</button>
       <div class="brand">DEC. 12</div>
       <div class="right">
         <button class="navlink" id="nav-login" data-i18n="nav.login">登入/註冊</button>
@@ -243,7 +244,7 @@
 
   <section class="screen" id="screen-about" data-screen="about">
     <header class="topbar">
-      <button class="back" id="about-back" style="display:none">← 返回</button>
+      <button class="back" id="about-back" style="display:none" data-i18n="p2a.back">← 返回</button>
       <div class="brand">DEC. 12</div>
       <div class="right">
         <button class="navlink" id="nav-login" data-i18n="nav.login">登入/註冊</button>
@@ -262,13 +263,14 @@
         <p data-i18n="about.p3">DEC.12 用簡單的文字x日記。讓每一次提問留下紀錄，每一次回頭看，你會發現卦象與現實之間，常常出現讓人愣住的呼應。不是因為卦象真的能預知什麼，而是因為提問本身，讓你更誠實地觀察自己正在經歷的一切。</p>
         <p data-i18n="about.p4">我自己也在最不確定的日子裡，靠這個方式一次次向內對話。母親的溫柔，如今已化作心底一抹安靜的底蘊，陪我走過那些反覆提問的時刻。如果你也正站在一個看不清方向的路口，那麼別急著相信，問一個你真正在意的問題，看看會發生什麼。</p>
         <p style="color:var(--dim); font-size:12px" data-i18n="about.version">DEC. 12 · 測試版 v1</p>
+        <p style="font-size:13px; margin-top:14px"><a href="credits/" data-i18n="menu.credits" style="color:var(--sub)">圖片來源</a></p>
       </div>
     </div>
   </section>
 
   <section class="screen" id="screen-milk" data-screen="milk">
     <header class="topbar">
-      <button class="back" id="milk-back" style="display:none">← 返回</button>
+      <button class="back" id="milk-back" style="display:none" data-i18n="p2a.back">← 返回</button>
       <div class="brand">DEC. 12</div>
       <div class="right">
         <button class="navlink" id="nav-login" data-i18n="nav.login">登入/註冊</button>
@@ -412,7 +414,7 @@
 
   <section class="screen" id="screen-setting" data-screen="setting">
     <header class="topbar">
-      <button class="back" id="setting-back" style="display:none">← 返回</button>
+      <button class="back" id="setting-back" style="display:none" data-i18n="p2a.back">← 返回</button>
       <div class="brand">DEC. 12</div>
       <div class="right">
         <button class="navlink" id="nav-login" data-i18n="nav.login">登入/註冊</button>
@@ -501,7 +503,7 @@
 
         <div class="forgot-box" id="forgot-box" style="display:none">
           <div class="forgot-field">
-            <label>輸入註冊時的信箱尋找密碼</label>
+            <label data-i18n="menu.forgotLabel">輸入註冊時的信箱尋找密碼</label>
             <input type="email" id="forgot-email" placeholder="you@example.com" inputmode="email">
           </div>
           <button type="button" class="btn btn-secondary btn-sm" id="btn-forgot-find" data-i18n="menu.forgotFind">尋找密碼</button>
@@ -589,12 +591,11 @@
       </label>
     </div>
     <button class="menu-item" data-act="setting" id="menu-setting-item" data-i18n="setting.title">設定</button>
-    <a class="menu-item" href="credits/" data-i18n="menu.credits">圖片來源</a>
     <button class="menu-item danger" id="menu-logout" data-i18n="menu.logout">⎋ 登出</button>
     <div class="menu-social">
       <a class="social-icon" href="https://www.instagram.com/" target="_blank" rel="noopener" aria-label="Instagram"><img src='../img/icon-camera.png' class='glyph' alt=''></a>
       <a class="social-icon" href="https://www.threads.net/" target="_blank" rel="noopener" aria-label="Threads"><img src='../img/icon-speech.png' class='glyph' alt=''></a>
-      <a class="social-icon" href="https://github.com/" target="_blank" rel="noopener" aria-label="GitHub"><img src='../img/icon-bird.png' class='glyph' alt=''></a>
+    <!--  <a class="social-icon" href="https://github.com/" target="_blank" rel="noopener" aria-label="GitHub"><img src='../img/icon-bird.png' class='glyph' alt=''></a> -->
     </div>
   </div>
 </div>
