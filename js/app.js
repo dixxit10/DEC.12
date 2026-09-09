@@ -2285,7 +2285,7 @@
                 draw: "點擊翻開",
                 save: "儲存至日記",
                 redraw: "重新抽卡",
-                share: "分享",
+                share: "下載圖片",
                 divider: "需要更具體的方向？",
                 advance: "進階卜卦",
                 advanceSub: "透過類別，讓指引更聚焦",
@@ -2327,7 +2327,7 @@
             p2c: {
                 save: "儲存到日記",
                 redo: "重新起卦",
-                share: "分享"
+                share: "儲存圖片"
             },
             about: {
                 title: "關於 DEC. 12",
@@ -2387,7 +2387,7 @@
                 verifyY: "○ 有幫助",
                 verifyX: "沒有幫助",
                 detailNoteHint: "寫下心得，之後回到這裡對照，看看指引是否有所幫助",
-                detailNotePrivacy: "🔒 這段文字只存在你的裝置上，不會上傳，換裝置或清除資料會遺失",
+                detailNotePrivacy: "心得只會存在你的裝置上",
                 account: "帳號",
                 accountGuest: "未登入",
                 editName: "修改暱稱",
@@ -2423,7 +2423,7 @@
                 discard: "放棄儲存"
             },
             share: {
-                title: "分享",
+                title: "下載圖片",
                 sub: "使用Email僅寄送這份結果，不會註冊帳戶",
                 or: "或寄到 Email",
                 send: "寄送",
@@ -2621,7 +2621,7 @@
                 draw: "Tap to reveal",
                 save: "Save to Journal",
                 redraw: "Draw again",
-                share: "Share",
+                share: "Download Image",
                 divider: "Need more specific guidance?",
                 advance: "Advanced Reading",
                 advanceSub: "Choose a category for more focused guidance",
@@ -2663,7 +2663,7 @@
             p2c: {
                 save: "Save to Journal",
                 redo: "Start over",
-                share: "Share"
+                share: "Download Image"
             },
             about: {
                 title: "About DEC. 12",
@@ -2725,7 +2725,7 @@
                 verifyY: "○ Came true",
                 verifyX: "Didn't come true",
                 detailNoteHint: "Write what happened and how you felt, then come back later to compare",
-                detailNotePrivacy: "🔒 Saved only on this device — not uploaded. It will be lost if you switch devices or clear your data.",
+                detailNotePrivacy: "Saved only on this device",
                 account: "Account",
                 accountGuest: "Not logged in",
                 editName: "Edit nickname",
