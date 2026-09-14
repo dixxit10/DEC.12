@@ -1243,8 +1243,22 @@
         typeof FB != "undefined" && FB && FB.saveSettings && FB.saveSettings(uid(), s)
     }
 
+    var diaryJustEditedLocally = !1;
+
+    function loadDiaryRemote() {
+        typeof FB != "undefined" && FB && FB.loadDiary && FB.loadDiary(uid()).then(function(remote) {
+            if(diaryJustEditedLocally) return;
+            if(remote && remote.length) {
+                try {
+                    localStorage.setItem(diaryKey(), JSON.stringify(remote))
+                } catch (e) {}
+                diaryData = remote, renderDiaryData(), renderCalendar(), renderCollect()
+            }
+        })
+    }
+
     function refreshPerUserData() {
-        diaryData = loadDiary(), renderDiaryData(), renderCalendar(), renderCollect(), loadGuardianRemote()
+        diaryData = loadDiary(), renderDiaryData(), renderCalendar(), renderCollect(), loadGuardianRemote(), loadDiaryRemote()
     }
 
     function applySettingsUI() {
@@ -1359,6 +1373,7 @@
             localStorage.setItem(diaryKey(), JSON.stringify(clean))
         } catch (e) {}
         typeof FB != "undefined" && FB && FB.saveDiary && FB.saveDiary(uid(), remoteClean)
+        diaryJustEditedLocally = !0
     }
 
     function recordFromResult(res) {
@@ -2162,7 +2177,7 @@
     });
 
     function onBoot() {
-        purgeLegacyPasswords(), clearLegacySession(), updateNav(), updateMenuAuth(), applySettingsUI(), go("p1"), isLoggedIn() && loadGuardianRemote(), typeof FB != "undefined" && FB && FB.loadUsers && FB.loadUsers().then(function(remote) {
+        purgeLegacyPasswords(), clearLegacySession(), updateNav(), updateMenuAuth(), applySettingsUI(), go("p1"), isLoggedIn() && (loadGuardianRemote(), loadDiaryRemote()), typeof FB != "undefined" && FB && FB.loadUsers && FB.loadUsers().then(function(remote) {
             if(remote) try {
                 localStorage.setItem(FB_USERS_KEY, JSON.stringify(remote))
             } catch (e) {}
