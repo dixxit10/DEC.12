@@ -10,8 +10,9 @@
   --line2: #d8d3c8;
   --accent: #111111;
   --accent-soft: #f4f1ea;
-  --blue: #aac8e4;
-  --blue-soft: rgba(57, 112, 164, .12);
+  --blue: #3970a4;
+  --blue-deep: #2c5a85;
+  --blue-soft: rgba(57, 112, 164, .10);
   --gold: #dab455;
   --gold-soft: rgba(218, 180, 85, .16);
   --purp: #b286b1;
@@ -902,7 +903,6 @@ body {
   font-size: 14px;
   color: var(--text);
   border-radius: 10px;
-  /* padding: 12px 14px; */
   line-height: 1.7;
   white-space: pre-line
 }
@@ -1033,147 +1033,212 @@ body {
   padding-bottom: 110px
 }
 
-.cal-nav {
+.jr-tabs {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 8px 10px;
-  margin-bottom: 12px
+  gap: 6px;
+  margin: 4px 0 10px;
+  border-bottom: 1px solid var(--line)
 }
 
-.cal-nav .cal-nav-title {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text);
+.jr-tab {
   flex: 1;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 11px 6px 10px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--dim);
+  letter-spacing: .04em;
+  cursor: pointer;
+  margin-bottom: -1px;
+  transition: color .16s ease, border-color .16s ease
+}
+
+.jr-tab.on {
+  color: var(--text);
+  border-bottom-color: var(--text)
+}
+
+.jr-stats {
+  font-size: 11.5px;
+  color: var(--dim);
+  letter-spacing: .05em;
+  margin: 0 0 14px;
   text-align: center
 }
 
-.cal-nav .cal-nav-btn {
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
-  border: 1px solid var(--line2);
-  background: var(--card2);
-  color: var(--text);
-  font-size: 16px;
-  cursor: pointer;
+.jr-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 12px
+}
+
+.jr-grid.hidden {
+  display: none
+}
+
+.jr-groups {
+  margin-bottom: 12px
+}
+
+.jr-groups.hidden {
+  display: none
+}
+
+.jr-group {
+  margin-bottom: 2px
+}
+
+.jr-cats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 2px 0 14px;
+  padding: 0 1px
+}
+
+.jr-cats.hidden {
+  display: none
+}
+
+.jr-cat {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 5px 11px 6px;
   font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: .04em;
+  line-height: 1;
+  color: var(--dim);
+  cursor: pointer;
+  transition: color .16s ease, background .16s ease, border-color .16s ease
+}
+
+.jr-cat:active {
+  transform: translateY(1px)
+}
+
+.jr-cat.on {
+  color: var(--text);
+  border-color: var(--text);
+  background: var(--card)
+}
+
+.jr-card {
+  position: relative;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 130px 130px 14px 14px;
+  padding: 14px 12px 13px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: border-color .16s ease, transform .16s ease
+}
+
+.jr-card:active {
+  border-color: var(--blue);
+  transform: translateY(1px)
+}
+
+.jr-card .jr-thumb {
+  width: 100%;
+  aspect-ratio: 3/4;
+  border-radius: 104px 104px 10px 10px;
+  background: var(--card2);
+  border: 1px solid var(--line);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px
+}
+
+.jr-card .jr-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block
+}
+
+.jr-card .jr-thumb.ph img {
+  width: 46%;
+  height: 46%;
+  object-fit: contain;
+  opacity: .5
+}
+
+.jr-card .jr-date {
+  font-size: 10.5px;
+  color: var(--dim);
+  letter-spacing: .06em;
+  margin-bottom: 5px
+}
+
+.jr-card .jr-line {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--sub);
+  text-align: center;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden
+}
+
+.jr-card .jr-mark {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center
 }
 
-.cal-nav .cal-nav-btn:active {
-  background: var(--card)
+.jr-card .jr-mark img {
+  width: 12px;
+  height: 12px;
+  object-fit: contain
 }
 
-.cal-scroll {
-  overflow-y: auto;
-  max-height: 520px;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-  margin-bottom: 14px;
-  position: relative;
-  flex-shrink: 0;
-  min-height: 0
-}
-
-.cal-scroll::-webkit-scrollbar {
-  display: none
-}
-
-.cal-month {
-  margin-bottom: 22px
-}
-
-.cal-month-title {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--blue);
-  margin-bottom: 8px;
-  text-align: center;
-  letter-spacing: .05em
-}
-
-.cal-week {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
-  margin-bottom: 4px
-}
-
-.cal-week span {
-  font-size: 11px;
-  color: var(--dim);
-  text-align: center;
-  padding: 2px 0
-}
-
-.cal-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 4px
-}
-
-.cal-cell {
-  position: relative;
-  aspect-ratio: 1/1;
-  border-radius: 10px;
-  background: var(--card);
-  border: 1px solid var(--line);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  color: var(--sub);
-  cursor: pointer;
-  transition: border-color .15s ease
-}
-
-.cal-cell:active {
-  border-color: var(--blue)
-}
-
-.cal-cell.empty {
-  background: none;
-  border: none;
-  cursor: default
-}
-
-.cal-cell .cal-mood {
-  font-size: 16px;
-  line-height: 1;
-  margin-top: 2px
-}
-
-.cal-cell .cal-mood img {
-  width: 14px;
-  height: 14px;
-  object-fit: contain;
-  margin: 0 -1px;
-  vertical-align: middle
-}
-
-.cal-cell.has-hex {
-  border-color: var(--blue);
-  color: var(--blue);
-  font-weight: 600;
+.jr-card .jr-mark.y {
   background: var(--blue-soft)
 }
 
-.cal-cell.has-mood {
-  border-color: var(--gold);
+.jr-card .jr-mark.x {
+  background: var(--card2)
+}
+
+.jr-card .jr-mark.m {
   background: var(--gold-soft)
 }
 
-.cal-cell.today {
-  border-color: var(--gold);
-  box-shadow: 0 0 0 1px var(--gold)
+.jr-empty {
+  font-size: 13px;
+  color: var(--dim);
+  line-height: 1.9;
+  text-align: center;
+  letter-spacing: .04em;
+  padding: 34px 24px 40px;
+  margin: 0
+}
+
+.jr-empty img {
+  display: block;
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  opacity: .35;
+  margin: 0 auto 16px
 }
 
 .diary-hero {
@@ -1316,34 +1381,23 @@ body {
   margin-bottom: 12px
 }
 
-.detail-tabs {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  margin: 12px 0 2px;
-  flex-wrap: wrap
-}
-
-.detail-tab {
-  font-size: 12px;
-  padding: 6px 14px;
-  border-radius: 999px;
-  border: 1px solid var(--line);
-  background: var(--card);
-  color: var(--sub);
-  cursor: pointer;
-  transition: border-color .15s ease, color .15s ease
-}
-
-.detail-tab.on {
-  color: var(--text);
-  border-color: var(--text);
-  background: var(--card2);
-  font-weight: 600
-}
-
-.detail-tabs.hidden,
 .detail-view {
+  display: none
+}
+
+.detail-deep {
+  display: block;
+  text-align: center;
+  font-size: 13px;
+  color: var(--blue);
+  letter-spacing: .04em;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  padding: 4px 0 14px;
+  cursor: pointer
+}
+
+.detail-deep.hidden {
   display: none
 }
 
@@ -2161,7 +2215,6 @@ body {
   gap: 22px;
   margin-top: 18px;
   padding-top: 14px;
-  /* border-top: 1px solid var(--line) */
 }
 
 .menu-social .social-icon {
@@ -2335,9 +2388,9 @@ body {
 }
 
 .dash-stats .stat .n {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--blue);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--blue-deep);
   margin-bottom: 2px
 }
 
@@ -3206,10 +3259,6 @@ body.lang-en .chip {
   padding: 9px 12px
 }
 
-body.lang-en .cal-month-title {
-  letter-spacing: 0
-}
-
 body.lang-en .setting-row {
   font-size: 13px;
   padding: 13px 14px
@@ -3295,7 +3344,7 @@ body.lang-en .milk-row {
 }
 
 body.lang-en .badge,
-body.lang-en .detail-tab {
+body.lang-en .detail-deep {
   font-size: 11px
 }
 

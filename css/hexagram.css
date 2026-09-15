@@ -1,8 +1,3 @@
-/* Overrides for standalone content pages (hexagram encyclopedia).
-   style.css assumes a fixed-size "phone shell" app frame with
-   overflow:hidden on html/body — that breaks a normal scrolling
-   article page, so we undo just that part here. Load this file
-   AFTER style.css. */
 
 html, body {
   height: auto;
@@ -138,7 +133,6 @@ body {
   border-color: var(--dim);
 }
 
-/* Credits page */
 .credits-list {
   list-style: none;
   padding: 0;

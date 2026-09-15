@@ -93,11 +93,10 @@
     function pad2(n) {
         return n < 10 ? "0" + n : "" + n
     }
-    for(var HEXAGRAM_IMG = {}, _hi = 1; _hi <= 64; _hi++) HEXAGRAM_IMG[_hi] = ASSET_ROOT + "img/hexagram-" + pad2(_hi) + ".png";
 
     function cardMainImg(hex) {
         if(!hex) return "";
-        var src = hex.cardImg || HEXAGRAM_IMG[hex.num] || "";
+        var src = hex.cardImg || "";
         return src ? '<img class="card-main-img" src="' + src + '" alt="' + esc(hex.symbolLabel || "") + '">' : mainElIcon(hex)
     }
 
@@ -775,7 +774,7 @@
             dk && (dk.textContent = res.hex.num + " " + res.hex.symbolLabel), dt && (dt.textContent = res.hex.core || res.hex.plainText || "");
             var del = $("draw-back-el"),
                 lm = $("draw-back-more");
-            lm && (lm.href = "hexagram/" + res.hex.num + "/", lm.style.display = "");
+            lm && (lm.href = "hexagram/" + res.hex.num + "/index.html", lm.style.display = "");
             del && (del.innerHTML = cardMainImg(res.hex)), window.__lastHex = res.hex, state.result = res, state.saved = !1, $("draw-actions").classList.add("hidden"), $("draw-actions-done").classList.remove("hidden"), toast(t("toast.drawRevealed"))
         }
     }
@@ -1243,22 +1242,8 @@
         typeof FB != "undefined" && FB && FB.saveSettings && FB.saveSettings(uid(), s)
     }
 
-    var diaryJustEditedLocally = !1;
-
-    function loadDiaryRemote() {
-        typeof FB != "undefined" && FB && FB.loadDiary && FB.loadDiary(uid()).then(function(remote) {
-            if(diaryJustEditedLocally) return;
-            if(remote && remote.length) {
-                try {
-                    localStorage.setItem(diaryKey(), JSON.stringify(remote))
-                } catch (e) {}
-                diaryData = remote, renderDiaryData(), renderCalendar(), renderCollect()
-            }
-        })
-    }
-
     function refreshPerUserData() {
-        diaryData = loadDiary(), renderDiaryData(), renderCalendar(), renderCollect(), loadGuardianRemote(), loadDiaryRemote()
+        diaryData = loadDiary(), renderDiaryData(), renderCalendar(), renderCollect(), loadGuardianRemote()
     }
 
     function applySettingsUI() {
@@ -1373,7 +1358,6 @@
             localStorage.setItem(diaryKey(), JSON.stringify(clean))
         } catch (e) {}
         typeof FB != "undefined" && FB && FB.saveDiary && FB.saveDiary(uid(), remoteClean)
-        diaryJustEditedLocally = !0
     }
 
     function recordFromResult(res) {
@@ -1426,7 +1410,153 @@
         }), out
     }
 
+    var journalTab = "card";
+
+    function JS() {
+        try {
+            if(typeof window.JOURNAL_I18N === "function") return window.JOURNAL_I18N(lang())
+        } catch (e) {}
+        return {
+            tabs: { card: "\u62bd\u5361\u6536\u85cf", divination: "\u535c\u5366\u6536\u85cf" },
+            stats: { summary: "\u535c\u5366 {n} \u6b21 \u00b7 \u5f85\u61c9\u9a57 {p} \u6b21" },
+            empty: {
+                card: "\u9084\u6c92\u6709\u6536\u85cf\u3002\u53bb\u62bd\u4e00\u5f35\u5361\u5427\u3002",
+                divination: "\u9084\u6c92\u6709\u6536\u85cf\u3002\u554f\u4e00\u500b\u554f\u984c\uff0c\u958b\u59cb\u7b2c\u4e00\u6b21\u535c\u5366\u3002"
+            },
+            fallback: { line: "\u9019\u4e00\u5366\u9084\u6c92\u6709\u5beb\u4e0b\u5167\u5bb9\u3002" }
+        }
+    }
+
+    function journalCatLabel(cat) {
+        var k = normalizeCat(cat),
+            d = JS();
+        if(!k || !CAT_I18N[k] || k === "daily") return d.catOther || (lang() === "en" ? "Other" : "其他");
+        return catLabel(cat)
+    }
+
+    function journalStore() {
+        return typeof window != "undefined" && window.JournalStore ? window.JournalStore : null
+    }
+
+    function diaryStore() {
+        return journalStore() || {
+            group: function() {
+                return { card: [], divination: [] }
+            },
+            stats: function() {
+                return { count: 0, pending: 0 }
+            },
+            clip: function(s) {
+                return s
+            },
+            oneLine: function(r) {
+                return r && r.note || ""
+            }
+        }
+    }
+
+    function applyJournalText() {
+        var d = JS(),
+            tabs = $("jr-tabs");
+        if(tabs) {
+            var btns = tabs.querySelectorAll(".jr-tab");
+            for(var i = 0; i < btns.length; i++) {
+                var k = btns[i].getAttribute("data-tab"),
+                    txt = d.tabs && d.tabs[k];
+                txt && (btns[i].textContent = txt)
+            }
+        }
+        var st = journalStore(),
+            line = $("jr-stats");
+        if(line && st) {
+            var s = st.stats(diaryData),
+                tpl = d.stats && d.stats.summary || "";
+            line.textContent = tpl.replace(/\{n\}/g, String(s.count)).replace(/\{p\}/g, String(s.pending))
+        }
+    }
+
+    function renderJournalCard(rec) {
+        var st = diaryStore(),
+            d = JS(),
+            dateTxt = rec.date || String(rec.m || "") + "/" + String(rec.d || ""),
+            h = rec.hex || hexFromTitle(rec.title || ""),
+            thumb = h && h.cardImg ? '<img src="' + h.cardImg + '" alt="">' : '<div class="ph"><img src="' + ASSET_ROOT + 'img/card.png" alt=""></div>',
+            line = st.clip(st.oneLine(rec) || (d.fallback && d.fallback.line) || "", 46),
+            mark = "";
+        if(rec.verify === "y") mark = '<span class="jr-mark y"><img src="' + ASSET_ROOT + 'img/icon-sparkle.png" alt=""></span>';
+        else if(rec.verify === "x") mark = '<span class="jr-mark x"><img src="' + ASSET_ROOT + 'img/icon-close.png" alt=""></span>';
+        else rec.mood && (mark = '<span class="jr-mark m"><img src="' + ASSET_ROOT + 'img/icon-moon.png" alt=""></span>');
+        return '<div class="jr-card" data-ts="' + (rec.ts || 0) + '">' + mark + '<div class="jr-thumb">' + thumb + '</div><div class="jr-date">' + esc(dateTxt) + '</div><div class="jr-line">' + esc(line) + "</div></div>"
+    }
+
+    function journalCatTabLabel(key) {
+        var st = journalStore(),
+            emoji = st && typeof st.catEmoji === "function" ? st.catEmoji(key) : "";
+        return emoji ? emoji + " " + journalCatLabel(key) : journalCatLabel(key)
+    }
+
+    var journalCat = "all";
+
+    function renderJournalCats() {
+        var box = $("jr-cats");
+        if(!box) return;
+        if(journalTab !== "divination") {
+            box.innerHTML = "", box.classList.add("hidden");
+            return
+        }
+        var st = journalStore(),
+            cats = st && typeof st.allCats === "function" ? st.allCats() : [],
+            d = JS(),
+            allTxt = d.catAll || (lang() === "en" ? "All" : "全部"),
+            html = '<button class="jr-cat' + (journalCat === "all" ? " on" : "") + '" data-cat="all">✦ ' + esc(allTxt) + "</button>",
+            i;
+        for(i = 0; i < cats.length; i++) { if(cats[i] === "other") continue; html += '<button class="jr-cat' + (journalCat === cats[i] ? " on" : "") + '" data-cat="' + esc(cats[i]) + '">' + esc(journalCatTabLabel(cats[i])) + "</button>" }
+        box.innerHTML = html, box.classList.remove("hidden")
+    }
+
+    function renderJournal() {
+        var grid = $("jr-grid"),
+            empty = $("jr-empty");
+        if(!grid || !empty) return;
+        applyJournalText(), renderJournalCats();
+        var st = diaryStore(),
+            list = st.group(diaryData)[journalTab] || [],
+            d = JS(),
+            html = "",
+            i,
+            showEmpty = function(src, txt) {
+                grid.innerHTML = "", grid.classList.add("hidden"), empty.className = "jr-empty", empty.innerHTML = '<img src="' + src + '" alt="">' + esc(txt || "")
+            };
+        if(journalTab === "card") {
+            if(!list.length) {
+                showEmpty(ASSET_ROOT + "img/card.png", (d.empty && d.empty.card) || "");
+                return
+            }
+            for(i = 0; i < list.length; i++) html += renderJournalCard(list[i]);
+        } else {
+            if(typeof st.groupByCat === "function") {
+                var gs = st.groupByCat(list),
+                    byCat = {};
+                for(i = 0; i < gs.length; i++) byCat[gs[i].key] = gs[i].records;
+                list = journalCat === "all" ? list : byCat[journalCat] || []
+            }
+            if(!list.length) {
+                var one = journalCat === "all" ? (d.empty && d.empty.divination) || "" : (d.catEmptyOne || "").replace(/\{cat\}/g, journalCatLabel(journalCat));
+                showEmpty(ASSET_ROOT + "img/jar.png", one);
+                return
+            }
+            for(i = 0; i < list.length; i++) html += renderJournalCard(list[i]);
+        }
+        grid.className = "jr-grid", grid.innerHTML = html, empty.className = "jr-empty hidden", empty.innerHTML = ""
+    }
+
     function renderCalendar() {
+        try {
+            renderJournal()
+        } catch (e) {}
+    }
+
+    function renderCalendarLegacy() {
         var box = $("cal-months");
         if(box) {
             for(var html = "", mi = 0; mi < 14; mi++) {
@@ -1474,30 +1604,49 @@
             t2.textContent = monthYearLabel(parts[0], parseInt(parts[1], 10))
         }
     }
-    $("cal-prev").addEventListener("click", function() {
-        var box = $("cal-scroll");
-        box.scrollBy({
-            top: -300,
-            behavior: "smooth"
-        })
-    }), $("cal-next").addEventListener("click", function() {
-        var box = $("cal-scroll");
-        box.scrollBy({
-            top: 300,
-            behavior: "smooth"
-        })
-    }), $("cal-scroll").addEventListener("scroll", function() {
-        for(var box = $("cal-scroll"), months = box.querySelectorAll(".cal-month"), i = 0; i < months.length; i++) months[i].offsetTop <= box.scrollTop + 30 && updateCalTitle(months[i])
-    }), $("cal-months").addEventListener("click", function(e) {
-        var cell = e.target.closest(".cal-cell");
-        if(!(!cell || cell.classList.contains("empty"))) {
-            var recs = diaryByDate(parseInt(cell.getAttribute("data-y"), 10), parseInt(cell.getAttribute("data-m"), 10), parseInt(cell.getAttribute("data-d"), 10));
-            if(recs && recs.length) {
-                var rec = recs[0];
-                rec.fromDiary = !0, rec.siblings = recs, openDetail(rec)
-            } else toast(t("toast.noRecord"))
+    function setJournalTab(tab) {
+        journalTab = tab === "divination" ? "divination" : "card";
+        journalCat = "all";
+        var box = $("jr-tabs");
+        if(box) {
+            var btns = box.querySelectorAll(".jr-tab");
+            for(var i = 0; i < btns.length; i++) btns[i].classList.toggle("on", btns[i].getAttribute("data-tab") === journalTab)
         }
-    });
+        renderJournal()
+    }
+
+    function openJournalRecord(rec) {
+        try {
+            rec.fromDiary = !0;
+            var same = diaryByDate(rec.y, rec.m, rec.d);
+            same.length > 1 && (rec.siblings = same), openDetail(rec)
+        } catch (e) {}
+    }
+
+    (function bindJournalTabs() {
+        var box = $("jr-tabs");
+        box && box.addEventListener("click", function(e) {
+            var b = e.target.closest(".jr-tab");
+            b && setJournalTab(b.getAttribute("data-tab"))
+        });
+        var cats = $("jr-cats");
+        cats && cats.addEventListener("click", function(e) {
+            var b = e.target.closest(".jr-cat");
+            if(!b) return;
+            journalCat = b.getAttribute("data-cat") || "all", renderJournal()
+        });
+        var grid = $("jr-grid");
+        grid && grid.addEventListener("click", function(e) {
+            var card = e.target.closest(".jr-card");
+            if(!card) return;
+            var all = diaryStore().group(diaryData).all || [];
+            for(var ts = parseInt(card.getAttribute("data-ts"), 10), i = 0; i < all.length; i++)
+                if((all[i].ts || 0) === ts) {
+                    openJournalRecord(all[i]);
+                    return
+                }
+        })
+    })();
     var COLLECT_BOOKS = [{
             title: "🎯 系統任務",
             grid: "three",
@@ -1593,39 +1742,8 @@
         } catch (e) {}
     }
 
-    function renderCollect() {
-        var body = $("collect-body");
-        if(body) {
-            for(var arr = loadDiary(), divCount = 0, feedbackCount = 0, di = 0; di < arr.length; di++) arr[di].type === "divination" && divCount++, (arr[di].note || arr[di].mood || arr[di].verify) && feedbackCount++;
-            var mission0 = divCount >= 1,
-                mission1 = divCount >= 10,
-                mission2 = feedbackCount >= 3;
-            COLLECT_BOOKS[0].items[0].locked = !mission0, COLLECT_BOOKS[0].items[1].locked = !mission1, COLLECT_BOOKS[0].items[2].locked = !mission2;
-            for(var html = "", unlockedCount = 0, collected = getCollectedElements(), b = 0; b < COLLECT_BOOKS.length; b++) {
-                var book = COLLECT_BOOKS[b];
-                html += '<div class="collect-book"><div class="book-title">' + book.title + "</div>", html += '<div class="collect-grid ' + (book.grid === "three" ? "three" : "") + '">';
-                for(var i = 0; i < book.items.length; i++) {
-                    var it = book.items[i],
-                        isLocked = it.locked;
-                    b === 1 && (isLocked = collected.indexOf(it.label) === -1), isLocked || unlockedCount++, html += '<div class="collect-item' + (isLocked ? " locked" : "") + '" data-idx="' + b + "-" + i + '">', html += '<div class="ci-emoji">' + it.e + "</div>", html += '<div class="ci-label">' + it.label + "</div></div>"
-                }
-                html += "</div></div>"
-            }
-            body.innerHTML = html;
-            var cnt = $("collect-count");
-            cnt && (cnt.textContent = unlockedCount)
-        }
-    }
-    $("btn-collect").addEventListener("click", function() {
-        renderCollect(), $("collect-overlay").classList.add("open")
-    }), $("collect-close").addEventListener("click", function() {
-        $("collect-overlay").classList.remove("open")
-    }), $("collect-overlay").addEventListener("click", function(e) {
-        e.target === this && this.classList.remove("open")
-    }), $("collect-body").addEventListener("click", function(e) {
-        var item = e.target.closest(".collect-item");
-        item && (item.classList.contains("locked") ? toast(t("toast.locked")) : toast(t("toast.collected")))
-    });
+    function renderCollect() {}
+
     var GUARDIAN_KEY = "xingua_guardian_opened",
         GUARDIAN_HEX_KEY = "xingua_guardian_hex",
         GUARDIAN_REDRAW_KEY = "xingua_guardian_redraw",
@@ -1842,7 +1960,7 @@
     function openDetail(rec) {
         detailRec = rec;
         var df = $("detail-fields");
-        df && (df.style.display = rec.type === "divination" ? "block" : "none");
+        df && (df.style.display = "block");
         var tb = $("detail-topbar");
         tb && (rec.fromDiary ? tb.innerHTML = '<button class="back" id="detail-back">' + esc(t("p2a.back")) + '</button><div class="right"></div>' : tb.innerHTML = '<div class="brand">DEC. 12</div><div class="right"><button class="navlink" id="nav-login">' + esc(t("nav.login")) + '</button><button class="icon-btn" id="btn-menu" aria-label="\u9078\u55ae">\u2630</button></div>', rec.fromDiary || updateNav(), bindDetailBack(!!rec.fromDiary), document.querySelectorAll("#btn-menu").forEach(function(el) {
             el.addEventListener("click", function() {
@@ -1851,26 +1969,6 @@
         }), document.querySelectorAll("#nav-login").forEach(function(el) {
             el.addEventListener("click", navLoginClick)
         }));
-        var tabsBox = $("detail-tabs"),
-            siblings = rec.siblings && rec.siblings.length ? rec.siblings : [rec];
-        if(rec.fromDiary)
-            for(var sif = 0; sif < siblings.length; sif++) siblings[sif].fromDiary = !0, siblings[sif].siblings = siblings;
-        if(tabsBox)
-            if(siblings.length > 1) {
-                tabsBox.classList.remove("hidden");
-                for(var html = "", si = 0; si < siblings.length; si++) {
-                    var s = siblings[si],
-                        label = s.type === "card" ? "🎴 抽卡" : "🔮 卜卦",
-                        active = s === rec ? " on" : "";
-                    html += '<button class="detail-tab' + active + '" data-idx="' + si + '">' + label + (si === 0 ? "（最近）" : "") + "</button>"
-                }
-                tabsBox.innerHTML = html;
-                for(var tabs = tabsBox.querySelectorAll(".detail-tab"), ti = 0; ti < tabs.length; ti++)(function(idx) {
-                    tabs[ti].addEventListener("click", function() {
-                        openDetail(siblings[idx])
-                    })
-                })(ti)
-            } else tabsBox.classList.add("hidden"), tabsBox.innerHTML = "";
         var viewCard = $("detail-view-card"),
             viewDiv = $("detail-view-divination");
         if(rec.type === "card") {
@@ -1881,6 +1979,12 @@
                 viewCard.innerHTML = '<div class="detail-card">' + (elCard ? '<div class="el-ic">' + elCard + "</div>" : "") + '<div class="slide-k">' + esc(rec.title || "") + '</div><div class="core-txt">' + esc(coreCard) + "</div></div>"
             }
         } else viewCard && viewCard.classList.remove("on"), viewDiv && viewDiv.classList.add("on");
+        var deep = $("detail-deep");
+        if(deep) {
+            var hDeep = rec.hex || hexFromTitle(rec.title || "");
+            if(!recIsDivination(rec) && hDeep && hDeep.num) deep.href = ASSET_ROOT + "hexagram/" + hDeep.num + "/index.html", deep.textContent = t("draw.learnMore"), deep.classList.remove("hidden");
+            else deep.classList.add("hidden"), deep.removeAttribute("href")
+        }
         var dd = document.querySelector(".detail-date");
         if(dd && (dd.textContent = rec.date + " · " + catLabel(rec.cat) + " · " + lenLabel(rec.len || "")), detailNoteDraft && detailNoteDraft.ts === rec.ts && detailNoteDraft.title === rec.title ? ($("detail-note").value = detailNoteDraft.text, setNoteSaveUI(!0, !1), setNoteBtnMode(!1)) : ($("detail-note").value = rec.note || "", setNoteSaveUI(!1, !!rec.note), setNoteBtnMode(!!rec.note)), detailMood = null, document.querySelectorAll("#detail-moods .mood-btn").forEach(function(b) {
                 b.classList.remove("on"), rec.mood && b.getAttribute("data-mood") === rec.mood && (b.classList.add("on"), detailMood = rec.mood)
@@ -1899,14 +2003,9 @@
     }
 
     function renderDiaryData() {
-        for(var i = 0, dc = 0, n = 0; i < diaryData.length; i++) {
-            var _r = diaryData[i];
-            recIsDivination(_r) && (dc++, !_r.verify && n++)
-        }
-        var sc = $("stat-count");
-        sc && (sc.textContent = dc);
-        var sp = $("stat-pending");
-        sp && (sp.textContent = n)
+        try {
+            renderJournal()
+        } catch (e) {}
     }
     $("about-back").addEventListener("click", function() {
         resetForm(), go("p1")
@@ -2177,7 +2276,7 @@
     });
 
     function onBoot() {
-        purgeLegacyPasswords(), clearLegacySession(), updateNav(), updateMenuAuth(), applySettingsUI(), go("p1"), isLoggedIn() && (loadGuardianRemote(), loadDiaryRemote()), typeof FB != "undefined" && FB && FB.loadUsers && FB.loadUsers().then(function(remote) {
+        purgeLegacyPasswords(), clearLegacySession(), updateNav(), updateMenuAuth(), applySettingsUI(), go("p1"), isLoggedIn() && loadGuardianRemote(), typeof FB != "undefined" && FB && FB.loadUsers && FB.loadUsers().then(function(remote) {
             if(remote) try {
                 localStorage.setItem(FB_USERS_KEY, JSON.stringify(remote))
             } catch (e) {}
