@@ -68,7 +68,7 @@
   ]
 }
 </script>
-<link rel="stylesheet" href="../css/style.css?v=48">
+<link rel="stylesheet" href="../css/style.css?v=53">
 
 <style id="guardian-bg-fix">
 #guardian-back{
@@ -312,28 +312,22 @@
         <div class="avatar"><img src='../img/avatar.png' class='glyph' alt=''></div>
         <div class="dash-name" id="dash-name">你好，旅人</div>
         <div class="dash-badges">
-          <span class="badge" id="btn-collect"><img src='../img/trophy.png' class='glyph' alt=''> 收藏相簿 <span id="collect-count">3</span></span>
           <span class="badge" id="btn-guardian"><img src='../img/shield.png' class='glyph' alt='' data-i18n="dash.guardian"> 本命守護牌</span>
         </div>
       </div>
 
-      <div class="dash-stats">
-        <div class="stat"><div class="n" id="stat-count">0</div><div class="l" data-i18n="dash.statCount">卜卦次數</div></div>
-        <div class="stat"><div class="n" id="stat-pending">0</div><div class="l" data-i18n="dash.statPending">待回來對照</div></div>
-
+      <div class="jr-tabs" id="jr-tabs">
+        <button class="jr-tab on" data-tab="card">抽卡收藏</button>
+        <button class="jr-tab" data-tab="divination">卜卦收藏</button>
       </div>
 
-      <h3 class="dash-sec" data-i18n="dash.sec">每一筆卜卦</h3>
+      <div class="jr-cats" id="jr-cats"></div>
 
-      <div class="cal-nav">
-        <button class="cal-nav-btn" id="cal-prev">‹</button>
-        <div class="cal-nav-title" id="cal-title">2026 年 8 月</div>
-        <button class="cal-nav-btn" id="cal-next">›</button>
-      </div>
-      <div class="cal-scroll" id="cal-scroll">
-        <div id="cal-months"></div>
-      </div>
-      <p class="hint" style="text-align:center; margin-top:-4px" data-i18n="menu.diaryHint">點任一格子可查看每一筆紀錄；滑動看更多月份</p>
+      <p class="jr-stats" id="jr-stats"></p>
+
+      <div class="jr-groups" id="jr-grid"></div>
+
+      <p class="jr-empty" id="jr-empty"></p>
 
     </div>
 
@@ -348,8 +342,6 @@
     <div class="main">
       <div class="detail-wrap">
         <div class="detail-date">8/26 · 感情 · 一個月內</div>
-
-        <div class="detail-tabs hidden" id="detail-tabs"></div>
 
         <div class="detail-view on" id="detail-view-card">
           <div class="detail-card">
@@ -379,6 +371,8 @@
           <div class="dots" id="detail-dots"></div>
         </div>
 
+        <a class="detail-deep hidden" id="detail-deep" href="#"></a>
+
         <div class="detail-card" id="detail-fields">
           <div class="detail-field">
             <div class="field-label" data-i18n="menu.detailWrite"><img src='../img/icon-pencil.png' class='glyph' alt=''> 寫下觀察與感受</div>
@@ -387,7 +381,7 @@
               <span class="note-save-hint" id="note-save-hint" data-i18n="menu.detailNoteSave">尚未儲存</span>
               <button class="note-save-btn" id="note-save-btn" data-i18n="menu.detailSave"><img src='../img/act-save.png' class='glyph' alt=''> 儲存</button>
             </div>
-            <p class="note-privacy-hint" data-i18n="menu.detailNotePrivacy">這段文字只會存在你的裝置上</p>
+            <p class="note-privacy-hint" data-i18n="menu.detailNotePrivacy">🔒 這段文字只存在你的裝置上，不會上傳，換裝置或清除資料會遺失</p>
           </div>
           <div class="detail-field">
             <div class="field-label" data-i18n="menu.detailMood">表情符號</div>
@@ -595,7 +589,6 @@
     <div class="menu-social">
       <a class="social-icon" href="https://www.instagram.com/" target="_blank" rel="noopener" aria-label="Instagram"><img src='../img/icon-camera.png' class='glyph' alt=''></a>
       <a class="social-icon" href="https://www.threads.net/" target="_blank" rel="noopener" aria-label="Threads"><img src='../img/icon-speech.png' class='glyph' alt=''></a>
-    <!--  <a class="social-icon" href="https://github.com/" target="_blank" rel="noopener" aria-label="GitHub"><img src='../img/icon-bird.png' class='glyph' alt=''></a> -->
     </div>
   </div>
 </div>
@@ -615,17 +608,6 @@
     <p class="sub" data-i18n="guard.sub">這筆卜卦結果尚未儲存，要儲存到隨記嗎？</p>
     <button class="btn btn-primary" id="guard-save" data-i18n="guard.save">儲存至日記</button>
     <button class="btn btn-secondary" id="guard-discard" data-i18n="guard.discard">放棄儲存</button>
-  </div>
-</div>
-
-<div class="overlay modal-mode" id="collect-overlay">
-  <div class="sheet collect-box">
-    <div class="sheet-head">
-      <h3><img src='../img/trophy.png' class='glyph' alt='' data-i18n="dash.collect"> 收藏相簿</h3>
-      <button class="icon-btn" id="collect-close"><img src='../img/icon-close.png' class='glyph' alt=''></button>
-    </div>
-    <p class="sub" style="margin-bottom:14px" data-i18n="menu.collectSub">完成任務或收集元素，解鎖圖卡</p>
-    <div id="collect-body"></div>
   </div>
 </div>
 
@@ -659,12 +641,14 @@
 <div id="toast"></div>
 
 <script src="../js/firebase.js?v=47"></script>
+<script src="../data/journal.js?v=3"></script>
+<script src="../js/storage.js?v=3"></script>
 <script src="../data/hexagrams.js?v=53"></script>
 <script src="../data/hexagrams.en.js?v=53"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
 <script src="../js/share-card.js?v=47"></script>
-<script src="../js/app.js?v=54"></script>
+<script src="../js/app.js?v=61"></script>
 <script>
 
 (function () {
