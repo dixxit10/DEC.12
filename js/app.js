@@ -714,7 +714,7 @@
             if(!m.classList.contains("menu-lang")) {
                 var act = m.getAttribute("data-act");
                 guardLeave(function() {
-                    $("menu-overlay").classList.remove("open"), act === "home" ? (resetForm(), go("p1")) : act === "diary" ? isLoggedIn() ? (refreshPerUserData(), go("diary"), setTimeout(scrollCalToCurrent, 120)) : (toast(t("toast.needLogin")), go("p5")) : act === "about" ? (clearDraft(), state.result = null, state.saved = !1, go("about")) : act === "milk" ? (clearDraft(), state.result = null, state.saved = !1, go("milk")) : act === "setting" && (clearDraft(), state.result = null, state.saved = !1, settingReturnTo = document.querySelector(".screen.active") ? document.querySelector(".screen.active").getAttribute("data-screen") : "diary", go("setting"), updateSettingAccount())
+                    $("menu-overlay").classList.remove("open"), act === "home" ? (resetForm(), go("p1")) : act === "diary" ? isLoggedIn() ? (refreshPerUserData(), go("diary"), setTimeout(scrollCalToCurrent, 120)) : (toast(t("toast.needLogin")), go("p5")) : act === "about" ? (clearDraft(), state.result = null, state.saved = !1, go("about")) : act === "milk" ? (clearDraft(), state.result = null, state.saved = !1, go("milk")) : act === "setting" && (clearDraft(), state.result = null, state.saved = !1, settingReturnTo = document.querySelector(".screen.active") ? document.querySelector(".screen.active").getAttribute("data-screen") : "diary", go("setting"), updateSettingAccount(), loadSettingsRemote())
                 })
             }
         })
@@ -1242,8 +1242,19 @@
         typeof FB != "undefined" && FB && FB.saveSettings && FB.saveSettings(uid(), s)
     }
 
+    function loadSettingsRemote() {
+        typeof FB != "undefined" && FB && FB.loadSettings && FB.loadSettings(uid()).then(function(remote) {
+            if(remote && typeof remote == "object") {
+                try {
+                    localStorage.setItem(settingsKey(), JSON.stringify(remote))
+                } catch (e) {}
+                applySettingsUI()
+            }
+        })
+    }
+
     function refreshPerUserData() {
-        diaryData = loadDiary(), renderDiaryData(), renderCalendar(), renderCollect(), loadGuardianRemote()
+        diaryData = loadDiary(), renderDiaryData(), renderCalendar(), renderCollect(), loadGuardianRemote(), loadSettingsRemote(), loadCollectRemote()
     }
 
     function applySettingsUI() {
@@ -1322,18 +1333,18 @@
     }
 
     function loadDiary() {
+        var local = seedDiary();
         try {
             var raw = localStorage.getItem(diaryKey());
-            if(raw) return JSON.parse(raw)
+            if(raw) local = JSON.parse(raw)
         } catch (e) {}
-        var seed = seedDiary();
         try {
-            localStorage.setItem(diaryKey(), JSON.stringify(seed))
+            localStorage.getItem(diaryKey()) === null && localStorage.setItem(diaryKey(), JSON.stringify(local))
         } catch (e) {}
         if(typeof FB != "undefined" && FB && FB.loadDiary) {
             var remoteUid = uid();
             FB.loadDiary(remoteUid).then(function(remote) {
-                if(remote && remote.length) {
+                if(remote) {
                     try {
                         localStorage.setItem(diaryKey(), JSON.stringify(remote))
                     } catch (e) {}
@@ -1341,7 +1352,7 @@
                 }
             })
         }
-        return seed
+        return local
     }
 
     function saveDiary(arr) {
@@ -1719,6 +1730,18 @@
             localStorage.setItem(collectKey(), JSON.stringify(arr))
         } catch (e) {}
         typeof FB != "undefined" && FB && FB.saveCollect && FB.saveCollect(uid(), arr)
+    }
+
+    function loadCollectRemote() {
+        typeof FB != "undefined" && FB && FB.loadCollect && FB.loadCollect(uid()).then(function(remote) {
+            if(remote) {
+                var arr = Array.isArray(remote) ? remote : (remote && Array.isArray(remote.c) ? remote.c : []);
+                try {
+                    localStorage.setItem(collectKey(), JSON.stringify(arr))
+                } catch (e) {}
+                renderCollect()
+            }
+        })
     }
 
     function unlockElementsFromHex(hex) {
