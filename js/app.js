@@ -1,5 +1,680 @@
 (function() {
     "use strict";
+    var I18N = {
+        zh: {
+            nav: {
+                login: "登入/註冊"
+            },
+            lang: {
+                zh: "中文",
+                en: "EN"
+            },
+            menu: {
+                home: "首頁",
+                diary: "我的隨記",
+                about: "關於 DEC. 12",
+                milk: "奶茶金",
+                setting: "設定",
+                lang: "語言設置",
+                langSub: "切換中文／English 介面",
+                logout: "⎋ 登出",
+                account: "帳戶",
+                accountGuest: "未登入",
+                editName: "修改暱稱",
+                privacy: "隱私權政策",
+                authEmail: "帳戶（Email）",
+                authName: "用戶名（註冊用）",
+                authPass: "密碼",
+                authPass2: "確認密碼",
+                forgot: "忘記帳戶或密碼？",
+                forgotFind: "尋找密碼",
+                forgotClose: "關閉",
+                loading: "載入你的隨記中…",
+                shareNote1: " ",
+                shareNote2: "若未收到請檢查垃圾郵件",
+                langToggle: "系統語言切換",
+                diaryHint: "點任一個格子可查看該卦內容；滑動查看更多月份",
+                detailWrite: "寫下觀察與感受",
+                detailNoteSave: "尚未儲存",
+                detailSave: "儲存",
+                detailMood: "表情符號",
+                detailVerify: "感受",
+                verifyY: "◯ 有幫助",
+                verifyX: "沒有幫助",
+                detailNoteHint: "寫下心得，之後回到這裡，看看指引是否有所幫助",
+                guardianSub: "每個帳戶只有一次翻開守護卡機會",
+                guardianFront1: "請靜心翻開旅程起點的第一張卡片作為迎新祝福",
+                guardianFlip: "翻開守護卡",
+                guardianLocked: "守護卡已固定，無法再次翻開",
+                guardianBetaTitle: "封測參與者限定",
+                guardianBetaSub: "正式開放後，你可再抽一次守護卡",
+                guardianBetaBtn: "領取再抽資格",
+                guardianBetaReserved: "已預約 · 正式開放時自動生效",
+                guardianBetaClaimedTitle: "封測感謝禮",
+                guardianBetaClaimedSub: "你已保留正式開放後再抽一次的資格"
+            },
+            dash: {
+                helloPre: "你好，",
+                helloPost: "，歡迎回來",
+                helloGuest: "你好，旅人",
+                collect: "收藏相簿",
+                guardian: "本命守護牌",
+                statCount: "卜卦次數",
+                statPending: "待回來對照",
+                sec: "每一筆卜卦"
+            },
+            setting: {
+                title: "設定",
+                subtitle: "管理你的通知、隱私與帳號",
+                remind: "寄信提醒",
+                push: "推播通知",
+                dark: "深色模式",
+                darkVal: "跟隨系統",
+                lang: "語言設置",
+                account: "帳號",
+                accountGuest: "未登入",
+                accountLogged: "（已登入）",
+                privacy: "隱私權政策"
+            },
+            set: {
+                on: "已開啟",
+                off: "已關閉",
+                pushOff: "開啟"
+            },
+            p1: {
+                micro: "微光卡",
+                microSub: "為當下的自己帶來靈感與溫柔指引",
+                draw: "點擊翻開",
+                save: "儲存至日記",
+                redraw: "重新抽卡",
+                share: "下載圖片",
+                divider: "需要更具體的方向？",
+                advance: "進階卜卦",
+                advanceSub: "透過類別，讓指引更聚焦",
+                enter: "進入星星瓶",
+                footerPre: "若DEC.12真的有鼓舞到您，歡迎",
+                footerLink: "Ko-fi一杯奶茶",
+                footerPost: "表示支持",
+                visits: "今日瀏覽 {{n}} 人"
+            },
+            p2a: {
+                back: "← 返回",
+                title: "星星瓶",
+                subtitle: "閉上眼，帶著問題選擇類別，讓思緒在星光中聚焦。",
+                cat: "問題類別(必填)",
+                cat1: "感情",
+                cat2: "事業",
+                cat3: "健康",
+                cat4: "財運",
+                cat5: "人際",
+                len: "顯化期(必填)",
+                len1: "一週內",
+                len2: "一個月內",
+                len3: "三個月內",
+                len4: "六個月",
+                start: "開始卜卦"
+            },
+            result: {
+                category: "類別",
+                duration: "有效長度",
+                noChanging: "沒有變爻",
+                changingPrefix: "動爻：第",
+                changingSuffix: " 爻",
+                aboutPrefix: "關於",
+                advice: "參考建議",
+                zhiGuaPrefix: "之卦「",
+                zhiGuaSuffix: "」：",
+                benGuaPrefix: "本卦："
+            },
+            p2c: {
+                save: "儲存到日記",
+                redo: "重新起卦",
+                share: "儲存圖片"
+            },
+            about: {
+                title: "關於 DEC. 12",
+                subtitle: "在圓的軌跡裡，與宇宙共振",
+                p1: "1949 年，卡爾·榮格為《易經》的西方譯本寫下序言。真正撼動他的，從來不是未卜先知的預言，而是一抹被他稱為「共時性」的心靈幽光。",
+                p2: "他曾提及一位病人，正喃喃述說著夢裡出現的金龜子；話音未落，一隻金龜子竟真憑空飛來，輕輕棲停在窗台的玻璃上。這並非萬物間的因果牽連，卻在同一個瞬間，於虛實兩端照亮了同一個意涵。",
+                p3: "《易經》的奧秘亦是如此。它從非預測未來的占卜羅盤，而是一面清澈的鏡子，映照出你心底早已瞭然、卻始終未曾啟齒的答案。",
+                p4: "DEC.12 建議將這份古老的智慧，揉入極簡的日常習練——記錄日記。將你拋向歲月的每一個叩問細心寫下。日後驀然回首，你定會驚覺，那些卦象與生活的軌跡竟是如此神合。那並非命運被提早預演，而是因為在誠心發問的那刻，你終於學會了對自己坦白。",
+                version: "DEC. 12 · 測試版 v1"
+            },
+            draw: {
+                front: "每日靈感",
+                hint: "每日靈感卡，點擊翻開。",
+                drawBtn: "點擊翻開",
+                drawHint: "每日靈感卡，點擊翻開。",
+                swipeHint: " ",
+                learnMore: "深入了解這一卦 →",
+                today: "今日"
+            },
+            p2b: {
+                casting: "起卦中"
+            },
+            milk: {
+                title: "奶茶基金",
+                subtitle: "每一杯奶茶，都是開發者繼續寫字和維護的燃料",
+                cups: "累積杯數",
+                total: "累積金額",
+                ratio: "淨利潤捐出",
+                r1: "固定費用",
+                r2: "創作獎勵",
+                r3: "已捐金額",
+                support: "Ko-fi一杯奶茶",
+                note: "每月月初更新金額",
+                charity: "DEC.12捐款流向 No Kid Hungry & 家扶基金會"
+            },
+            p5: {
+                title: "登入",
+                sub: "記錄你的卜卦與應驗，歡迎回來對照，看看指引是否成真",
+                login: "登入",
+                register: "註冊",
+                submit: "登入",
+                later: "稍後再說"
+            },
+            saved: {
+                title: "已儲存該筆紀錄",
+                sub: "這筆卜卦已寫入你的隨記",
+                go: "前往查看",
+                stay: "回到首頁",
+                langToggle: "系統語言切換",
+                settingItem: "設定",
+                diaryHint: "點任一格子可查看該卦內容；滑動查看更多月份",
+                detailWrite: "寫下觀察與感受",
+                detailNoteSave: "尚未儲存",
+                detailSave: "儲存",
+                detailMood: "表情符號",
+                detailVerify: "感受",
+                verifyY: "○ 有幫助",
+                verifyX: "沒有幫助",
+                detailNoteHint: "寫下心得，之後回到這裡對照，看看指引是否有所幫助",
+                detailNotePrivacy: "心得只會存在你的裝置上",
+                account: "帳號",
+                accountGuest: "未登入",
+                editName: "修改暱稱",
+                privacy: "隱私權政策",
+                credits: "圖片來源",
+                authEmail: "帳號（Email）",
+                authName: "用戶名（註冊用）",
+                authPass: "密碼",
+                authPass2: "確認密碼",
+                forgot: "忘記帳號或密碼？",
+                forgotFind: "尋找密碼",
+                forgotLabel: "輸入註冊時的信箱尋找密碼",
+                forgotClose: "關閉",
+                loading: "載入你的隨記中…",
+                shareNote1: " ",
+                shareNote2: "若未收到請檢查垃圾郵件",
+                guardianSub: "送給你的迎新祝福，每個帳戶只有一次翻開機會",
+                guardianFront1: "請靜心翻開旅程起點的第一張卡牌",
+                guardianFront2: "作為送給用戶的迎新祝福",
+                guardianFlip: "翻開守護卡",
+                guardianLocked: "守護卡已固定，無法再次翻開"
+            },
+            cardPreview: {
+                title: "下載圖卡",
+                hint: "長壓圖片即可儲存到手機",
+                download: "下載圖片"
+            },
+            guard: {
+                title: "尚未儲存",
+                sub: "這筆卜卦結果尚未儲存，要儲存到隨記嗎？",
+                save: "儲存至日記",
+                discard: "放棄儲存"
+            },
+            share: {
+                title: "下載圖片",
+                sub: "使用Email僅寄送這份結果，不會註冊帳戶",
+                or: "或寄到 Email",
+                send: "寄送",
+                cardBtn: "下載圖卡"
+            },
+            save: {
+                done: "已儲存"
+            },
+            toast: {
+                lang: "已切換語言",
+                remindUpdated: "寄信提醒設定已更新",
+                pushUpdated: "推播通知設定已更新",
+                needLogin: "請先登入",
+                logout: "已登出",
+                milkSoon: "感謝支持，將為你開啟捐款頁面",
+                drawRevealed: "今日靈感已揭曉",
+                needCat: "請先選擇問題類別",
+                needLen: "請先選擇預測顯化期長度",
+                draftSaved: "已幫你暫存這筆結果",
+                foundPw: "已透過信箱找到密碼",
+                nameEmpty: "暱稱不能空白",
+                nameLong: "暱稱最多 16 字",
+                nameUsed: "這個暱稱已被使用，請換一個",
+                noRecord: "這天沒有卜卦紀錄",
+                collected: "已收集 ✨",
+                guardianFixed: "🛡️ 守護卡已固定",
+                guardianBetaClaimed: "已領取！正式開放後可再抽一次守護卡",
+                guardianBetaOff: "此功能尚未開放",
+                verifyY2: "已記錄：應驗了",
+                verifyX2: "已記錄：未應驗",
+                editMode: "已切換為編輯模式",
+                noteSaved: "已儲存這則觀察與感受",
+                divineFirst: "請先完成卜卦",
+                copied: "已複製分享內容，請貼到聊天室",
+                needEmail: "請輸入 email",
+                badEmail: "email 格式似乎有誤",
+                mailSent: "已寄出，請到信箱收信",
+                mailOpened: "已開啟郵件客戶端",
+                registerWelcome: "註冊成功，歡迎 {name}",
+                loginWelcome: "登入成功，歡迎回來 {name}",
+                nameUpdated: "暱稱已更新為「{name}」",
+                moodRecorded: "已記錄心情 {mood}",
+                shareOpened: "已開啟分享",
+                memberDefault: "會員"
+            },
+            authErr: {
+                emailRequired: "請輸入帳號（Email）",
+                emailInvalid: "Email 格式有誤（例：you@example.com，不可含空白或特殊字元）",
+                emailInvalidShort: "Email 格式有誤",
+                passRequired: "請輸入密碼",
+                needNetwork: "需要連線才能註冊／登入，請確認網路後再試",
+                weakPassword: "密碼強度不足：至少 8 碼，且需包含字母與數字",
+                passMismatch: "密碼與確認密碼不符合",
+                emailInUse: "這個帳號已註冊，請直接登入",
+                nameRequired: "請輸入暱稱",
+                nameTaken: "這個暱稱已被使用，請換一個",
+                registerNeedNetwork: "需要連線才能註冊，請確認網路後再試",
+                registerFailed: "註冊失敗，請稍後再試",
+                loginNeedNetwork: "需要連線才能登入，請確認網路後再試",
+                loginFailed: "帳號或密碼不正確"
+            },
+            forgotErr: {
+                emailRequired: "請輸入註冊時的信箱",
+                emailInvalid: "Email 格式有誤（例：you@example.com）",
+                notRegistered: "此信箱未註冊，請確認是否曾以該信箱註冊（僅能以信箱查詢，無法用用戶名）",
+                notRegisteredShort: "此信箱未註冊",
+                sentToPrefix: "重設密碼信件已寄出至 ",
+                sentToSuffix: "，請到信箱點擊連結設定新密碼。",
+                sentToast: "重設密碼信件已寄出",
+                needNetwork: "需要連線才能重設密碼，請確認網路後再試。",
+                needNetworkToast: "需要連線才能重設密碼",
+                sendFailedPrefix: "寄送失敗："
+            },
+            ph: {
+                detailNote: "這段時間的觀察、感受，或是與指引對照的心得…",
+                authName: "想被稱呼的名字",
+                authPass: "至少 8 碼，含字母與數字",
+                authPass2: "再輸入一次密碼",
+                shareEmail: "輸入 email…"
+            },
+            authErr2: {
+                passHintOk: "✓ 密碼符合規範（至少 8 碼，含英文與數字）",
+                passHintNeed: "密碼需至少 8 碼，且需含英文與數字"
+            },
+            emailShare: {
+                brandName: "DEC. 12 星星罐",
+                title: "DEC. 12 · 你的卜卦結果",
+                divider: "========================",
+                catPrefix: "類別：",
+                lenPrefix: "顯化期長度：",
+                mainGuaPrefix: "本卦：",
+                changedGuaPrefix: "變卦：",
+                changedLinePrefix: "動爻：第 ",
+                changedLineSuffix: " 爻",
+                corePrefix: "核心：",
+                plainLabel: "白話卦辭：",
+                contextPrefix: "情境解讀：關於",
+                contextMid: "：",
+                footer1: "一事不宜多問",
+                footer2: "這是指引，不是預言",
+                signature: "本信件由「DEC. 12」寄出，僅用於備份這份結果。",
+                unsubscribe: "若不想再收到提醒，可隨時回覆「退訂」停止寄送。",
+                previewTo: "寄送給 ",
+                previewColon: "："
+            }
+        },
+        en: {
+            nav: {
+                login: "Log in / Sign up"
+            },
+            lang: {
+                zh: "Chinese",
+                en: "EN"
+            },
+            menu: {
+                home: "Home",
+                diary: "My Journal",
+                about: "About DEC. 12",
+                milk: "Milk Tea Fund",
+                setting: "Settings",
+                lang: "Language",
+                langSub: "Switch between Chinese and English",
+                logout: "⎋ Log out",
+                account: "Account",
+                accountGuest: "Not logged in",
+                editName: "Edit nickname",
+                privacy: "Privacy Policy",
+                authEmail: "Account (Email)",
+                authName: "Username (for sign-up)",
+                authPass: "Password",
+                authPass2: "Confirm password",
+                forgot: "Forgot your account or password?",
+                forgotFind: "Find password",
+                forgotLabel: "Enter the email you signed up with to find your password",
+                forgotClose: "Close",
+                loading: "Loading your journal…",
+                shareNote1: " ",
+                shareNote2: "If you don't receive it, check your spam folder",
+                langToggle: "Language",
+                diaryHint: "Tap any date to view its reading; scroll for more months",
+                detailWrite: "Write your thoughts and observations",
+                detailNoteSave: "Unsaved",
+                detailSave: "Save",
+                detailMood: "Mood",
+                detailVerify: "Feeling",
+                verifyY: "◯ It helps",
+                verifyX: "Doesn't help",
+                detailNoteHint: "Write what happened and how you felt, then come back later to compare",
+                guardianSub: "Each account can reveal its Guardian Card only once",
+                guardianFront1: "Take a quiet moment, then reveal the first card of your journey as a welcome blessing",
+                guardianFlip: "Reveal Guardian Card",
+                guardianLocked: "Your Guardian Card is set and cannot be revealed again",
+                guardianBetaTitle: "Beta Tester Exclusive",
+                guardianBetaSub: "After the official launch, you can draw one more Guardian Card",
+                guardianBetaBtn: "Claim extra draw",
+                guardianBetaReserved: "Reserved · activates at launch",
+                guardianBetaClaimedTitle: "Beta Thank-You Gift",
+                guardianBetaClaimedSub: "Your extra Guardian Card draw after launch is reserved"
+            },
+            dash: {
+                helloPre: "Hello, ",
+                helloPost: ", welcome back",
+                helloGuest: "Hello, traveler",
+                collect: "Collection",
+                guardian: "Guardian Card",
+                statCount: "Readings",
+                statPending: "Waiting to review",
+                sec: "Your readings"
+            },
+            setting: {
+                title: "Settings",
+                subtitle: "Manage notifications, privacy, and your account",
+                remind: "Email reminders",
+                push: "Push notifications",
+                dark: "Dark mode",
+                darkVal: "Follow system",
+                lang: "Language",
+                account: "Account",
+                accountGuest: "Not logged in",
+                accountLogged: " (logged in)",
+                privacy: "Privacy Policy"
+            },
+            set: {
+                on: "On",
+                off: "Off",
+                pushOff: "Enable"
+            },
+            p1: {
+                micro: "Glimmer Card",
+                microSub: "A little inspiration and gentle guidance for this moment",
+                draw: "Tap to reveal",
+                save: "Save to Journal",
+                redraw: "Draw again",
+                share: "Download Image",
+                divider: "Need more specific guidance?",
+                advance: "Advanced Reading",
+                advanceSub: "Choose a category for more focused guidance",
+                enter: "Enter Star Jar",
+                footerPre: "If DEC.12 has encouraged you, you're welcome to ",
+                footerLink: "buy me a milk tea on Ko-fi",
+                footerPost: " to support the project",
+                visits: "{{n}} visitors today"
+            },
+            p2a: {
+                back: "← Back",
+                title: "Star Jar",
+                subtitle: "Close your eyes, hold your question in mind, and choose a category.",
+                cat: "Question category (required)",
+                cat1: "Love",
+                cat2: "Career",
+                cat3: "Health",
+                cat4: "Finances",
+                cat5: "Relationships",
+                len: "Time window (required)",
+                len1: "Within 1 week",
+                len2: "Within 1 month",
+                len3: "Within 3 months",
+                len4: "6 months",
+                start: "Start Reading"
+            },
+            result: {
+                category: "Category",
+                duration: "Time Window",
+                noChanging: "No changing lines",
+                changingPrefix: "Changing lines:",
+                changingSuffix: "",
+                aboutPrefix: "About",
+                advice: "Guidance",
+                zhiGuaPrefix: "Resulting Hexagram “",
+                zhiGuaSuffix: "”: ",
+                benGuaPrefix: "Original Hexagram: "
+            },
+            p2c: {
+                save: "Save to Journal",
+                redo: "Start over",
+                share: "Download Image"
+            },
+            about: {
+                title: "About DEC. 12",
+                subtitle: "Finding resonance in life's patterns",
+                p1: "Carl Jung wrote the foreword to one of the most influential Western editions of the I Ching. What interested him was not fortune-telling, but a phenomenon he called synchronicity—moments when an inner experience and an outer event seem meaningfully connected, even without a clear causal link.",
+                p2: "One story he shared involved a patient describing a dream about a scarab-like beetle. During the conversation, a similar beetle appeared at the window. For Jung, the significance was not that one event caused the other, but that the coincidence carried meaning for the person experiencing it.",
+                p3: "The I Ching can be approached in a similar way.",
+                p4: "Rather than treating it as a tool for predicting the future, DEC.12 uses it as a prompt for reflection—a way to pause, look at a situation from another angle, and put thoughts or feelings into words.",
+                p5: "DEC.12 pairs this practice with journaling. Each time you ask a question, you can save the reading along with your own thoughts. When you return to it later, you may notice connections between the reading, the choices you made, and what eventually happened.",
+                p6: "Not because the future was already written, but because asking a meaningful question can help you notice what was already taking shape.",
+                version: "DEC. 12 · Beta v1"
+            },
+            draw: {
+                front: "Daily Inspiration",
+                hint: "Your daily inspiration card. Tap to reveal.",
+                drawBtn: "Tap to reveal",
+                drawHint: "Your daily inspiration card. Tap to reveal.",
+                swipeHint: " ",
+                learnMore: "Learn more about this hexagram →",
+                today: "Today"
+            },
+            p2b: {
+                casting: "Casting…"
+            },
+            milk: {
+                title: "Milk Tea Fund",
+                subtitle: "Every milk tea helps fuel the writing and upkeep behind DEC.12",
+                cups: "Total cups",
+                total: "Total amount",
+                ratio: "Net profit donated",
+                r1: "Fixed costs",
+                r2: "Creative rewards",
+                r3: "Amount donated",
+                support: "Buy me a milk tea on Ko-fi",
+                note: "Updated at the beginning of each month",
+                charity: "DEC.12 donations support No Kid Hungry and the Taiwan Fund for Children and Families"
+            },
+            p5: {
+                title: "Log in",
+                sub: "Save your readings and outcomes so you can come back later and see how the guidance unfolded",
+                login: "Log in",
+                register: "Sign up",
+                submit: "Log in",
+                later: "Maybe later"
+            },
+            saved: {
+                title: "Record saved",
+                sub: "This reading has been added to your journal",
+                go: "View record",
+                stay: "Back to Home",
+                langToggle: "Language",
+                settingItem: "Settings",
+                diaryHint: "Tap any date to view its reading; scroll for more months",
+                detailWrite: "Write your thoughts and observations",
+                detailNoteSave: "Unsaved",
+                detailSave: "Save",
+                detailMood: "Mood",
+                detailVerify: "Outcome",
+                verifyY: "○ Came true",
+                verifyX: "Didn't come true",
+                detailNoteHint: "Write what happened and how you felt, then come back later to compare",
+                detailNotePrivacy: "Saved only on this device",
+                account: "Account",
+                accountGuest: "Not logged in",
+                editName: "Edit nickname",
+                privacy: "Privacy Policy",
+                credits: "Image Credits",
+                authEmail: "Account (Email)",
+                authName: "Username (for sign-up)",
+                authPass: "Password",
+                authPass2: "Confirm password",
+                forgot: "Forgot your account or password?",
+                forgotFind: "Find password",
+                forgotLabel: "Enter the email you signed up with to find your password",
+                forgotClose: "Close",
+                loading: "Loading your journal…",
+                shareNote1: " ",
+                shareNote2: "If you don't receive it, check your spam folder",
+                guardianSub: "A welcome blessing you can reveal only once",
+                guardianFront1: "Take a quiet moment and reveal the first card of your journey",
+                guardianFront2: "A welcome blessing for you",
+                guardianFlip: "Reveal Guardian Card",
+                guardianLocked: "Your Guardian Card is set and cannot be revealed again"
+            },
+            cardPreview: {
+                title: "Download Card",
+                hint: "Press and hold the image to save it to your phone",
+                download: "Download Image"
+            },
+            guard: {
+                title: "Not Saved",
+                sub: "This reading has not been saved. Save it to your journal?",
+                save: "Save to Journal",
+                discard: "Discard"
+            },
+            share: {
+                title: "Share",
+                sub: "Email is used only to send this result and will not create an account",
+                or: "Or send to Email",
+                send: "Send",
+                cardBtn: "Download card"
+            },
+            save: {
+                done: "Saved"
+            },
+            toast: {
+                lang: "Language switched",
+                remindUpdated: "Email reminder settings updated",
+                pushUpdated: "Push notification settings updated",
+                needLogin: "Please log in first",
+                logout: "Logged out",
+                milkSoon: "Thanks for your support. Opening the donation page",
+                drawRevealed: "Today's inspiration is ready",
+                needCat: "Please choose a question category",
+                needLen: "Please choose a time window",
+                draftSaved: "This result has been saved as a draft",
+                foundPw: "Password found by email",
+                nameEmpty: "Nickname cannot be blank",
+                nameLong: "Nickname can be up to 16 characters",
+                nameUsed: "This nickname is already in use. Try another",
+                noRecord: "No reading recorded for this day",
+                collected: "Collected ✨",
+                guardianFixed: "🛡️ Guardian Card set",
+                guardianBetaClaimed: "Claimed! You can draw one more Guardian Card after launch",
+                guardianBetaOff: "This feature is not available yet",
+                verifyY2: "Recorded: came true",
+                verifyX2: "Recorded: didn't come true",
+                editMode: "Edit mode enabled",
+                noteSaved: "Your note has been saved",
+                divineFirst: "Please complete a reading first",
+                copied: "Share text copied. Paste it into your chat",
+                needEmail: "Please enter an email",
+                badEmail: "That email address looks invalid",
+                mailSent: "Sent. Check your inbox",
+                mailOpened: "Email app opened",
+                registerWelcome: "Signed up! Welcome, {name}",
+                loginWelcome: "Welcome back, {name}",
+                nameUpdated: "Nickname updated to \u201c{name}\u201d",
+                moodRecorded: "Mood recorded: {mood}",
+                shareOpened: "Share sheet opened",
+                memberDefault: "Member"
+            },
+            authErr: {
+                emailRequired: "Please enter your email",
+                emailInvalid: "Invalid email format (e.g. you@example.com, no spaces or special characters)",
+                emailInvalidShort: "Invalid email format",
+                passRequired: "Please enter your password",
+                needNetwork: "A connection is needed to sign up or log in. Please check your network and try again",
+                weakPassword: "Password too weak: at least 8 characters, including letters and numbers",
+                passMismatch: "Passwords do not match",
+                emailInUse: "This account is already registered. Please log in instead",
+                nameRequired: "Please enter a nickname",
+                nameTaken: "This nickname is already taken. Please choose another",
+                registerNeedNetwork: "A connection is needed to sign up. Please check your network and try again",
+                registerFailed: "Sign-up failed. Please try again later",
+                loginNeedNetwork: "A connection is needed to log in. Please check your network and try again",
+                loginFailed: "Incorrect email or password"
+            },
+            forgotErr: {
+                emailRequired: "Please enter the email you registered with",
+                emailInvalid: "Invalid email format (e.g. you@example.com)",
+                notRegistered: "This email isn't registered. Please check you used this email to sign up (lookup works by email only, not by username)",
+                notRegisteredShort: "This email isn't registered",
+                sentToPrefix: "Password reset email sent to ",
+                sentToSuffix: ". Please click the link in the email to set a new password.",
+                sentToast: "Password reset email sent",
+                needNetwork: "A connection is needed to reset your password. Please check your network and try again.",
+                needNetworkToast: "Connection needed to reset password",
+                sendFailedPrefix: "Send failed: "
+            },
+            ph: {
+                detailNote: "Write your observations and feelings here, or notes to compare against the reading later\u2026",
+                authName: "What should we call you?",
+                authPass: "At least 8 characters, with letters and numbers",
+                authPass2: "Enter your password again",
+                shareEmail: "Enter email\u2026"
+            },
+            authErr2: {
+                passHintOk: "\u2713 Password meets the requirements (8+ characters, letters and numbers)",
+                passHintNeed: "Password needs at least 8 characters, with letters and numbers"
+            },
+            emailShare: {
+                brandName: "DEC. 12 Starry Jar",
+                title: "DEC. 12 \u00b7 Your Reading Result",
+                divider: "========================",
+                catPrefix: "Category: ",
+                lenPrefix: "Manifestation window: ",
+                mainGuaPrefix: "Original Hexagram: ",
+                changedGuaPrefix: "Changed Hexagram: ",
+                changedLinePrefix: "Changing line(s): ",
+                changedLineSuffix: "",
+                corePrefix: "Core: ",
+                plainLabel: "In Plain Words:",
+                contextPrefix: "Contextual Reading: Regarding ",
+                contextMid: ": ",
+                footer1: "One question at a time",
+                footer2: "This is guidance, not prophecy",
+                signature: "This email was sent by \u201cDEC. 12\u201d, solely to back up this reading.",
+                unsubscribe: "If you\u2019d rather not receive these, just reply \u201cunsubscribe\u201d anytime to stop.",
+                previewTo: "Sending to ",
+                previewColon: ": "
+            }
+        }
+    };
+
+    (function() {
+        var add = function(lang, key, val) {
+                var parts = key.split("."),
+                    node = I18N[lang];
+                for(var i = 0; i < parts.length - 1; i++) node[parts[i]] || (node[parts[i]] = {}), node = node[parts[i]];
+                node[parts[parts.length - 1]] = val
+            };
+        add("zh", "menu.credits", "\u5716\u7247\u4f86\u6e90"), add("en", "menu.credits", "Image Credits"), add("zh", "menu.detailNotePrivacy", "\u5fc3\u5f97\u53ea\u6703\u5b58\u5728\u4f60\u7684\u88dd\u7f6e\u4e0a"), add("en", "menu.detailNotePrivacy", "Your note is saved only on your device"), add("zh", "menu.forgotLabel", "\u8f38\u5165\u4f60\u8a3b\u518a\u6642\u4f7f\u7528\u7684 Email\uff0c\u6211\u5011\u6703\u5bc4\u51fa\u91cd\u8a2d\u9023\u7d50"), add("zh", "about.p5", "DEC.12 \u628a\u9019\u4efd\u7df4\u7fd2\u8207\u65e5\u8a18\u7d50\u5408\u3002\u6bcf\u4e00\u6b21\u63d0\u554f\uff0c\u4f60\u53ef\u4ee5\u628a\u5366\u8c61\u548c\u81ea\u5df1\u7684\u60f3\u6cd5\u4e00\u8d77\u5b58\u4e0b\u4f86\u3002\u56de\u982d\u518d\u770b\uff0c\u4f60\u6703\u767c\u73fe\u5366\u8c61\u3001\u4f60\u505a\u7684\u9078\u64c7\uff0c\u8207\u6700\u5f8c\u767c\u751f\u7684\u4e8b\u4e4b\u9593\uff0c\u5e38\u5e38\u6709\u8457\u547c\u61c9\u3002"), add("zh", "about.p6", "\u4e0d\u662f\u56e0\u70ba\u672a\u4f86\u65e9\u5df2\u5beb\u5b9a\uff0c\u800c\u662f\u56e0\u70ba\u4e00\u500b\u8a8d\u771f\u7684\u63d0\u554f\uff0c\u6709\u52a9\u65bc\u4f60\u770b\u898b\u65e9\u5df2\u5728\u6210\u5f62\u7684\u6771\u897f\u3002"), add("zh", "note.unsaved", "\u5c1a\u672a\u5132\u5b58"), add("en", "note.unsaved", "Not saved yet"), add("zh", "note.saved", "\u5df2\u5132\u5b58"), add("en", "note.saved", "Saved"), add("zh", "note.edit", "\u7de8\u8f2f"), add("en", "note.edit", "Edit"), add("zh", "prompt.editName", "\u8f38\u5165\u65b0\u7684\u66b1\u7a31\uff08\u6700\u591a 16 \u5b57\uff09"), add("en", "prompt.editName", "Enter your new nickname (up to 16 characters)"), add("zh", "emailShare.subject", "DEC. 12 \u00b7 \u6211\u7684\u535c\u5366\u7d50\u679c"), add("en", "emailShare.subject", "DEC. 12 \u00b7 My reading"), add("zh", "set.turnOff", "\u95dc\u9589"), add("en", "set.turnOff", "Turn off"), add("zh", "set.turnOn", "\u958b\u555f"), add("en", "set.turnOn", "Turn on"), add("zh", "set.pushOn", "\u5df2\u958b\u555f"), add("en", "set.pushOn", "On"), add("zh", "auth.login", "\u767b\u5165"), add("en", "auth.login", "Sign in"), add("zh", "auth.register", "\u8a3b\u518a"), add("en", "auth.register", "Sign up"), add("zh", "auth.subRegister", "\u5efa\u7acb\u5e33\u865f\uff0c\u4e4b\u5f8c\u7684\u535c\u5366\u8207\u61c9\u9a57\u90fd\u6703\u70ba\u4f60\u4fdd\u5b58"), add("en", "auth.subRegister", "Create an account to keep every reading and outcome"), add("zh", "auth.subLogin", "\u8a18\u9304\u4f60\u7684\u535c\u5366\u8207\u61c9\u9a57\uff0c\u6b61\u8fce\u56de\u4f86\u5c0d\u7167\uff0c\u770b\u770b\u6307\u5f15\u662f\u5426\u6210\u771f"), add("en", "auth.subLogin", "Your readings and outcomes are saved \u2014 welcome back to review them"), add("zh", "auth.btnRegister", "\u8a3b\u518a\u4e26\u767b\u5165"), add("en", "auth.btnRegister", "Sign up and sign in"), add("zh", "auth.btnLogin", "\u767b\u5165"), add("en", "auth.btnLogin", "Sign in"), add("zh", "emailShare.from", "\u4f86\u81ea "), add("en", "emailShare.from", "From ")
+    })();
     var ASSET_ROOT = (function() {
         try {
             var s = document.currentScript && document.currentScript.src || "";
@@ -714,7 +1389,7 @@
             if(!m.classList.contains("menu-lang")) {
                 var act = m.getAttribute("data-act");
                 guardLeave(function() {
-                    $("menu-overlay").classList.remove("open"), act === "home" ? (resetForm(), go("p1")) : act === "diary" ? isLoggedIn() ? (refreshPerUserData(), go("diary"), setTimeout(scrollCalToCurrent, 120)) : (toast(t("toast.needLogin")), go("p5")) : act === "about" ? (clearDraft(), state.result = null, state.saved = !1, go("about")) : act === "milk" ? (clearDraft(), state.result = null, state.saved = !1, go("milk")) : act === "setting" && (clearDraft(), state.result = null, state.saved = !1, settingReturnTo = document.querySelector(".screen.active") ? document.querySelector(".screen.active").getAttribute("data-screen") : "diary", go("setting"), updateSettingAccount(), loadSettingsRemote())
+                    $("menu-overlay").classList.remove("open"), act === "home" ? (resetForm(), go("p1")) : act === "diary" ? isLoggedIn() ? (refreshPerUserData(), go("diary"), setTimeout(scrollCalToCurrent, 120)) : (toast(t("toast.needLogin")), go("p5")) : act === "about" ? (clearDraft(), state.result = null, state.saved = !1, go("about")) : act === "milk" ? (clearDraft(), state.result = null, state.saved = !1, go("milk")) : act === "setting" && (clearDraft(), state.result = null, state.saved = !1, settingReturnTo = document.querySelector(".screen.active") ? document.querySelector(".screen.active").getAttribute("data-screen") : "diary", go("setting"), updateSettingAccount())
                 })
             }
         })
@@ -732,9 +1407,8 @@
 
     function updateMenuAuth() {
         var ok = isLoggedIn(),
-            si = $("menu-setting-item"),
             lo = $("menu-logout");
-        si && (si.style.display = ok ? "" : "none"), lo && (lo.style.display = ok ? "" : "none")
+        lo && (lo.style.display = ok ? "" : "none")
     }
 
     function doLogout() {
@@ -1002,20 +1676,16 @@
 
     function saveFlow() {
         if(state.result) {
-            var freshEls = state.result.method === "daily" ? unlockElementsFromHex(state.result.hex) : [];
+            state.result.method === "daily" && recordElementsFromHex(state.result.hex);
             isLoggedIn() ? ($("saved-overlay").classList.add("open"), commitRecord(state.result), state.saved = !0, updateSaveBtn(), safeRenderDiary()) : (saveDraft(state.result), state.draftDate = state.result.date, state.saved = !0, toast(t("toast.draftSaved")), setTimeout(function() {
                 go("p5")
-            }, 700)), freshEls.length && (renderCollect(), setTimeout(function() {
-                toast(fillTpl(t("toast.elementTaskDone"), {
-                    list: freshEls.join(lang() === "en" ? ", " : "、")
-                }) + t("toast.collectionUnlocked"))
-            }, 1800))
+            }, 700))
         }
     }
     var authMode = "login";
 
     function setAuthMode(mode) {
-        authMode = mode, $("tab-login").classList.toggle("on", mode === "login"), $("tab-register").classList.toggle("on", mode === "register"), $("auth-name-field").style.display = mode === "register" ? "" : "none", $("auth-pass2-field").style.display = mode === "register" ? "" : "none", $("login-title").textContent = mode === "register" ? "註冊" : "登入", $("login-sub").textContent = mode === "register" ? "建立帳號，之後的卜卦與應驗都會為你保存" : "記錄你的卜卦與應驗，歡迎回來對照，看看指引是否成真", $("btn-login").textContent = mode === "register" ? "註冊並登入" : "登入";
+        authMode = mode, $("tab-login").classList.toggle("on", mode === "login"), $("tab-register").classList.toggle("on", mode === "register"), $("auth-name-field").style.display = mode === "register" ? "" : "none", $("auth-pass2-field").style.display = mode === "register" ? "" : "none", $("login-title").textContent = mode === "register" ? t("auth.register") : t("auth.login"), $("login-sub").textContent = mode === "register" ? t("auth.subRegister") : t("auth.subLogin"), $("btn-login").textContent = mode === "register" ? t("auth.btnRegister") : t("auth.btnLogin");
         var fg = $("auth-forgot");
         fg && (fg.style.display = mode === "login" ? "" : "none");
         var fb = $("forgot-box");
@@ -1242,19 +1912,8 @@
         typeof FB != "undefined" && FB && FB.saveSettings && FB.saveSettings(uid(), s)
     }
 
-    function loadSettingsRemote() {
-        typeof FB != "undefined" && FB && FB.loadSettings && FB.loadSettings(uid()).then(function(remote) {
-            if(remote && typeof remote == "object") {
-                try {
-                    localStorage.setItem(settingsKey(), JSON.stringify(remote))
-                } catch (e) {}
-                applySettingsUI()
-            }
-        })
-    }
-
     function refreshPerUserData() {
-        diaryData = loadDiary(), renderDiaryData(), renderCalendar(), renderCollect(), loadGuardianRemote(), loadSettingsRemote(), loadCollectRemote()
+        diaryData = loadDiary(), renderDiaryData(), renderCalendar(), renderCollect(), hydrateFromCloud()
     }
 
     function applySettingsUI() {
@@ -1262,15 +1921,15 @@
             r = $("set-remind");
         if(r) {
             var on = s.remind !== !1;
-            r.textContent = on ? "已開啟" : "已關閉", r.classList.toggle("on", on)
+            r.textContent = on ? t("set.on") : t("set.off"), r.classList.toggle("on", on)
         }
         var p = $("set-push");
         if(p) {
             var pon = !!s.push;
-            p.textContent = pon ? "已開啟" : "開啟", p.classList.toggle("on", pon)
+            p.textContent = pon ? t("set.pushOn") : t("set.pushOff"), p.classList.toggle("on", pon)
         }
         var b = $("btn-remind");
-        b && (b.textContent = s.remind !== !1 ? "關閉" : "開啟")
+        b && (b.textContent = s.remind !== !1 ? t("set.turnOff") : t("set.turnOn"))
     }
     var settingReturnTo = "diary";
     $("setting-back").addEventListener("click", function() {
@@ -1287,7 +1946,7 @@
         var u = currentUser();
         if(u) {
             var cur = (u.name || "").trim(),
-                nm = prompt("輸入新的暱稱（最多 16 字）", cur);
+                nm = prompt(t("prompt.editName"), cur);
             if(nm !== null) {
                 if(nm = nm.trim(), !nm) {
                     toast(t("toast.nameEmpty"));
@@ -1333,30 +1992,58 @@
     }
 
     function loadDiary() {
-        var local = seedDiary();
         try {
             var raw = localStorage.getItem(diaryKey());
-            if(raw) local = JSON.parse(raw)
+            if(raw) return JSON.parse(raw)
         } catch (e) {}
+        var seed = seedDiary();
         try {
-            localStorage.getItem(diaryKey()) === null && localStorage.setItem(diaryKey(), JSON.stringify(local))
+            localStorage.setItem(diaryKey(), JSON.stringify(seed))
         } catch (e) {}
-        if(typeof FB != "undefined" && FB && FB.loadDiary) {
-            var remoteUid = uid();
-            FB.loadDiary(remoteUid).then(function(remote) {
-                if(remote) {
-                    try {
-                        localStorage.setItem(diaryKey(), JSON.stringify(remote))
-                    } catch (e) {}
-                    diaryData = remote, renderDiaryData(), renderCalendar(), renderCollect()
-                }
-            })
-        }
-        return local
+        return seed
     }
 
+    function hydrateFromCloud() {
+        if(typeof FB == "undefined" || !FB || !isLoggedIn()) return;
+        var rev0 = diaryRev,
+            dk = diaryKey(),
+            ck = collectKey(),
+            sk = settingsKey(),
+            jobs = [];
+        FB.loadDiary && jobs.push(FB.loadDiary(uid()).then(function(remote) {
+            if(remote && remote.length && diaryRev === rev0) {
+                diaryData = remote;
+                try {
+                    localStorage.setItem(dk, JSON.stringify(remote))
+                } catch (e) {}
+                renderDiaryData(), renderCalendar(), renderCollect()
+            }
+        }));
+        FB.loadCollect && jobs.push(FB.loadCollect(uid()).then(function(remote) {
+            if(remote && Object.keys(remote).length) {
+                try {
+                    localStorage.setItem(ck, JSON.stringify(remote))
+                } catch (e) {}
+                renderCollect()
+            }
+        }));
+        FB.loadSettings && jobs.push(FB.loadSettings(uid()).then(function(remote) {
+            if(remote && Object.keys(remote).length) {
+                try {
+                    localStorage.setItem(sk, JSON.stringify(remote))
+                } catch (e) {}
+                applySettingsUI()
+            }
+        }));
+        jobs.length && Promise.all(jobs).then(function() {
+            loadGuardianRemote()
+        }).catch(function() {})
+    }
+
+    var diaryRev = 0;
+
     function saveDiary(arr) {
-        diaryData = arr;
+        diaryData = arr, diaryRev++;
         var remoteClean = [];
         try {
             for(var clean = [], si = 0; si < arr.length; si++) {
@@ -1405,7 +2092,7 @@
             if(drafts && drafts.length) {
                 for(var diary = loadDiary(), i = drafts.length - 1; i >= 0; i--) {
                     var d = drafts[i];
-                    !d || !d.hex || (diary.unshift(recordFromResult(d)), d.method === "daily" && unlockElementsFromHex(d.hex))
+                    !d || !d.hex || (diary.unshift(recordFromResult(d)), d.method === "daily" && recordElementsFromHex(d.hex))
                 }
                 saveDiary(diary), clearDraft()
             }
@@ -1486,6 +2173,17 @@
         }
     }
 
+    var MOOD_IMG = {
+            "\ud83d\ude0c": "img/mood-smile.png",
+            "\ud83d\ude0a": "img/mood-laugh.png",
+            "\ud83e\udd14": "img/mood-think.png",
+            "\ud83d\ude14": "img/mood-sad.png",
+            "\u2728": "img/icon-sparkle.png"
+        },
+        moodImg = function(m) {
+            return m && MOOD_IMG[m] ? ASSET_ROOT + MOOD_IMG[m] : ""
+        };
+
     function renderJournalCard(rec) {
         var st = diaryStore(),
             d = JS(),
@@ -1494,9 +2192,7 @@
             thumb = h && h.cardImg ? '<img src="' + h.cardImg + '" alt="">' : '<div class="ph"><img src="' + ASSET_ROOT + 'img/card.png" alt=""></div>',
             line = st.clip(st.oneLine(rec) || (d.fallback && d.fallback.line) || "", 46),
             mark = "";
-        if(rec.verify === "y") mark = '<span class="jr-mark y"><img src="' + ASSET_ROOT + 'img/icon-sparkle.png" alt=""></span>';
-        else if(rec.verify === "x") mark = '<span class="jr-mark x"><img src="' + ASSET_ROOT + 'img/icon-close.png" alt=""></span>';
-        else rec.mood && (mark = '<span class="jr-mark m"><img src="' + ASSET_ROOT + 'img/icon-moon.png" alt=""></span>');
+        if(rec.mood && moodImg(rec.mood)) mark = '<span class="jr-mark m"><img src="' + moodImg(rec.mood) + '" alt=""></span>';
         return '<div class="jr-card" data-ts="' + (rec.ts || 0) + '">' + mark + '<div class="jr-thumb">' + thumb + '</div><div class="jr-date">' + esc(dateTxt) + '</div><div class="jr-line">' + esc(line) + "</div></div>"
     }
 
@@ -1529,35 +2225,35 @@
         var grid = $("jr-grid"),
             empty = $("jr-empty");
         if(!grid || !empty) return;
-        applyJournalText(), renderJournalCats();
+        if(journalTab !== "divination") journalTab = "card";
         var st = diaryStore(),
-            list = st.group(diaryData)[journalTab] || [],
+            cats = st && typeof st.allCats === "function" ? st.allCats() : [],
             d = JS(),
             html = "",
             i,
+            g,
+            gs,
+            byCat,
+            one,
             showEmpty = function(src, txt) {
                 grid.innerHTML = "", grid.classList.add("hidden"), empty.className = "jr-empty", empty.innerHTML = '<img src="' + src + '" alt="">' + esc(txt || "")
             };
-        if(journalTab === "card") {
-            if(!list.length) {
-                showEmpty(ASSET_ROOT + "img/card.png", (d.empty && d.empty.card) || "");
-                return
-            }
-            for(i = 0; i < list.length; i++) html += renderJournalCard(list[i]);
-        } else {
-            if(typeof st.groupByCat === "function") {
-                var gs = st.groupByCat(list),
-                    byCat = {};
-                for(i = 0; i < gs.length; i++) byCat[gs[i].key] = gs[i].records;
-                list = journalCat === "all" ? list : byCat[journalCat] || []
-            }
-            if(!list.length) {
-                var one = journalCat === "all" ? (d.empty && d.empty.divination) || "" : (d.catEmptyOne || "").replace(/\{cat\}/g, journalCatLabel(journalCat));
-                showEmpty(ASSET_ROOT + "img/jar.png", one);
-                return
-            }
-            for(i = 0; i < list.length; i++) html += renderJournalCard(list[i]);
+        if(journalCat !== "all" && cats.indexOf(journalCat) < 0) journalCat = "all";
+        applyJournalText(), renderJournalCats();
+        g = st.group(diaryData) || {};
+        var list = journalTab === "divination" ? g.divination || [] : g.card || [];
+        if(journalTab === "divination" && journalCat !== "all" && typeof st.groupByCat === "function") {
+            gs = st.groupByCat(list), byCat = {};
+            for(i = 0; i < gs.length; i++) byCat[gs[i].key] = gs[i].records;
+            list = byCat[journalCat] || []
         }
+        if(!list.length) {
+            if(journalTab === "card") one = (d.empty && d.empty.card) || "";
+            else one = journalCat === "all" ? (d.empty && d.empty.divination) || "" : (d.catEmptyOne || "").replace(/\{cat\}/g, journalCatLabel(journalCat));
+            showEmpty(ASSET_ROOT + (journalTab === "card" ? "img/card.png" : "img/jar.png"), one);
+            return
+        }
+        for(i = 0; i < list.length; i++) html += renderJournalCard(list[i]);
         grid.className = "jr-grid", grid.innerHTML = html, empty.className = "jr-empty hidden", empty.innerHTML = ""
     }
 
@@ -1658,60 +2354,7 @@
                 }
         })
     })();
-    var COLLECT_BOOKS = [{
-            title: "🎯 系統任務",
-            grid: "three",
-            items: [{
-                e: "🔮",
-                label: "完成第一次卜卦",
-                locked: !1
-            }, {
-                e: "⭐",
-                label: "完成第 10 次卜卦",
-                locked: !0
-            }, {
-                e: "📝",
-                label: "完成 3 次筆記回饋",
-                locked: !1
-            }]
-        }, {
-            title: "🧭 元素收集",
-            grid: "four",
-            items: [{
-                e: "☀️",
-                label: "天",
-                locked: !1
-            }, {
-                e: "⛰️",
-                label: "地",
-                locked: !0
-            }, {
-                e: "💧",
-                label: "水",
-                locked: !1
-            }, {
-                e: "🔥",
-                label: "火",
-                locked: !0
-            }, {
-                e: "⚡",
-                label: "雷",
-                locked: !1
-            }, {
-                e: "🌬️",
-                label: "風",
-                locked: !0
-            }, {
-                e: "🏔️",
-                label: "山",
-                locked: !1
-            }, {
-                e: "🌊",
-                label: "澤",
-                locked: !0
-            }]
-        }],
-        COLLECT_KEY = "xingua_collect_elements";
+    var COLLECT_KEY = "xingua_collect_elements";
 
     function collectKey() {
         return COLLECT_KEY + "_" + uid()
@@ -1732,19 +2375,7 @@
         typeof FB != "undefined" && FB && FB.saveCollect && FB.saveCollect(uid(), arr)
     }
 
-    function loadCollectRemote() {
-        typeof FB != "undefined" && FB && FB.loadCollect && FB.loadCollect(uid()).then(function(remote) {
-            if(remote) {
-                var arr = Array.isArray(remote) ? remote : (remote && Array.isArray(remote.c) ? remote.c : []);
-                try {
-                    localStorage.setItem(collectKey(), JSON.stringify(arr))
-                } catch (e) {}
-                renderCollect()
-            }
-        })
-    }
-
-    function unlockElementsFromHex(hex) {
+    function recordElementsFromHex(hex) {
         if(!hex) return [];
         for(var names = [hex.upperName, hex.lowerName], cur = getCollectedElements(), fresh = [], i = 0; i < names.length; i++) {
             var n = names[i];
@@ -1761,7 +2392,7 @@
             var guest = JSON.parse(localStorage.getItem(GUEST_KEY) || "[]");
             if(!guest.length) return;
             for(var cur = getCollectedElements(), i = 0; i < guest.length; i++) cur.indexOf(guest[i]) === -1 && cur.push(guest[i]);
-            saveCollectedElements(cur), localStorage.removeItem(GUEST_KEY), state.result && state.result.hex && unlockElementsFromHex(state.result.hex)
+            saveCollectedElements(cur), localStorage.removeItem(GUEST_KEY), state.result && state.result.hex && recordElementsFromHex(state.result.hex)
         } catch (e) {}
     }
 
@@ -2049,12 +2680,12 @@
     function bindDetailBack(fromDiary) {
         var b = $("detail-back");
         b && b.addEventListener("click", function() {
-            go(fromDiary ? "diary" : "p1")
+            fromDiary && renderDiaryData(), go(fromDiary ? "diary" : "p1")
         })
     }(function() {
         var b = $("detail-back");
         b && b.addEventListener("click", function() {
-            go("diary")
+            renderDiaryData(), go("diary")
         })
     })(), (function() {
         var d = $("detail-dots");
@@ -2075,13 +2706,13 @@
     function setNoteSaveUI(dirty, saved) {
         var hint = $("note-save-hint"),
             btn = $("note-save-btn");
-        hint && (hint.textContent = dirty ? "尚未儲存" : saved ? "已儲存" : "", hint.classList.toggle("dirty", !!dirty)), btn && btn.classList.toggle("saved", !!saved && !dirty)
+        hint && (hint.textContent = dirty ? t("note.unsaved") : saved ? t("note.saved") : "", hint.classList.toggle("dirty", !!dirty)), btn && btn.classList.toggle("saved", !!saved && !dirty)
     }
     document.querySelectorAll("#detail-moods .mood-btn").forEach(function(btn) {
         btn.addEventListener("click", function() {
             detailMood = btn.getAttribute("data-mood"), document.querySelectorAll("#detail-moods .mood-btn").forEach(function(b) {
                 b.classList.remove("on")
-            }), btn.classList.add("on"), toast(fillTpl(t("toast.moodRecorded"), { mood: detailMood })), saveDetailField("mood", detailMood)
+            }), btn.classList.add("on"), toast(fillTpl(t("toast.moodRecorded"), { mood: detailMood })), saveDetailField("mood", detailMood), renderDiaryData()
         })
     });
     var verify = null;
@@ -2108,7 +2739,7 @@
 
     function setNoteBtnMode(saved) {
         var btn = $("note-save-btn");
-        btn && (noteSaved = !!saved, btn.innerHTML = saved ? "✏️ 編輯" : "💾 儲存", btn.classList.toggle("saved", !!saved))
+        btn && (noteSaved = !!saved, btn.innerHTML = saved ? "✏️ " + t("note.edit") : "💾 " + t("menu.detailSave"), btn.classList.toggle("saved", !!saved))
     }
     $("detail-note").addEventListener("input", function() {
         detailRec && (detailNoteDraft = {
@@ -2191,7 +2822,7 @@
 
 `, txt += t("emailShare.footer1") + `
 ` + t("emailShare.footer2") + `
-`, txt += "。 " + (lang() === "en" ? "From " : "來自 ") + t("emailShare.brandName"), txt
+`, txt += (lang() === "en" ? ". " : "。 ") + t("emailShare.from") + t("emailShare.brandName"), txt
     }
 
     function shareUrl() {
@@ -2290,7 +2921,7 @@
 
 ` + body, $("email-preview").style.display = "block";
         try {
-            var mailto = "mailto:" + encodeURIComponent(email) + "?subject=" + encodeURIComponent("DEC. 12 · 我的卜卦結果") + "&body=" + encodeURIComponent(body),
+            var mailto = "mailto:" + encodeURIComponent(email) + "?subject=" + encodeURIComponent(t("emailShare.subject")) + "&body=" + encodeURIComponent(body),
                 w = window.open(mailto, "_blank");
             toast(w ? t("toast.mailOpened") : t("toast.mailSent"))
         } catch (e) {
@@ -2299,7 +2930,7 @@
     });
 
     function onBoot() {
-        purgeLegacyPasswords(), clearLegacySession(), updateNav(), updateMenuAuth(), applySettingsUI(), go("p1"), isLoggedIn() && loadGuardianRemote(), typeof FB != "undefined" && FB && FB.loadUsers && FB.loadUsers().then(function(remote) {
+        purgeLegacyPasswords(), clearLegacySession(), updateNav(), updateMenuAuth(), applySettingsUI(), go("p1"), isLoggedIn() && hydrateFromCloud(), typeof FB != "undefined" && FB && FB.loadUsers && FB.loadUsers().then(function(remote) {
             if(remote) try {
                 localStorage.setItem(FB_USERS_KEY, JSON.stringify(remote))
             } catch (e) {}
@@ -2334,681 +2965,6 @@
             el.textContent = txt
         }
     }
-    var I18N = {
-        zh: {
-            nav: {
-                login: "登入/註冊"
-            },
-            lang: {
-                zh: "中文",
-                en: "EN"
-            },
-            menu: {
-                home: "首頁",
-                diary: "我的隨記",
-                about: "關於 DEC. 12",
-                milk: "奶茶金",
-                setting: "設定",
-                lang: "語言設置",
-                langSub: "切換中文／English 介面",
-                logout: "⎋ 登出",
-                account: "帳戶",
-                accountGuest: "未登入",
-                editName: "修改暱稱",
-                privacy: "隱私權政策",
-                authEmail: "帳戶（Email）",
-                authName: "用戶名（註冊用）",
-                authPass: "密碼",
-                authPass2: "確認密碼",
-                forgot: "忘記帳戶或密碼？",
-                forgotFind: "尋找密碼",
-                forgotClose: "關閉",
-                loading: "載入你的隨記中…",
-                shareNote1: " ",
-                shareNote2: "若未收到請檢查垃圾郵件",
-                langToggle: "系統語言切換",
-                diaryHint: "點任一個格子可查看該卦內容；滑動查看更多月份",
-                detailWrite: "寫下觀察與感受",
-                detailNoteSave: "尚未儲存",
-                detailSave: "儲存",
-                detailMood: "表情符號",
-                detailVerify: "感受",
-                verifyY: "◯ 有幫助",
-                verifyX: "沒有幫助",
-                detailNoteHint: "寫下心得，之後回到這裡，看看指引是否有所幫助",
-                collectSub: "完成任務或收集元素，解鎖彩色圖案",
-                guardianSub: "每個帳戶只有一次翻開守護卡機會",
-                guardianFront1: "請靜心翻開旅程起點的第一張卡片作為迎新祝福",
-                guardianFlip: "翻開守護卡",
-                guardianLocked: "守護卡已固定，無法再次翻開",
-                guardianBetaTitle: "封測參與者限定",
-                guardianBetaSub: "正式開放後，你可再抽一次守護卡",
-                guardianBetaBtn: "領取再抽資格",
-                guardianBetaReserved: "已預約 · 正式開放時自動生效",
-                guardianBetaClaimedTitle: "封測感謝禮",
-                guardianBetaClaimedSub: "你已保留正式開放後再抽一次的資格"
-            },
-            dash: {
-                helloPre: "你好，",
-                helloPost: "，歡迎回來",
-                helloGuest: "你好，旅人",
-                collect: "收藏相簿",
-                guardian: "本命守護牌",
-                statCount: "卜卦次數",
-                statPending: "待回來對照",
-                sec: "每一筆卜卦"
-            },
-            setting: {
-                title: "設定",
-                subtitle: "管理你的通知、隱私與帳號",
-                remind: "寄信提醒",
-                push: "推播通知",
-                dark: "深色模式",
-                darkVal: "跟隨系統",
-                lang: "語言設置",
-                account: "帳號",
-                accountGuest: "未登入",
-                accountLogged: "（已登入）",
-                privacy: "隱私權政策"
-            },
-            set: {
-                on: "已開啟",
-                off: "已關閉",
-                pushOff: "開啟"
-            },
-            p1: {
-                micro: "微光卡",
-                microSub: "為當下的自己帶來靈感與溫柔指引",
-                draw: "點擊翻開",
-                save: "儲存至日記",
-                redraw: "重新抽卡",
-                share: "下載圖片",
-                divider: "需要更具體的方向？",
-                advance: "進階卜卦",
-                advanceSub: "透過類別，讓指引更聚焦",
-                enter: "進入星星瓶",
-                footerPre: "若DEC.12真的有鼓舞到您，歡迎",
-                footerLink: "Ko-fi一杯奶茶",
-                footerPost: "表示支持",
-                visits: "今日瀏覽 {{n}} 人"
-            },
-            p2a: {
-                back: "← 返回",
-                title: "星星瓶",
-                subtitle: "閉上眼，帶著問題選擇類別，讓思緒在星光中聚焦。",
-                cat: "問題類別(必填)",
-                cat1: "感情",
-                cat2: "事業",
-                cat3: "健康",
-                cat4: "財運",
-                cat5: "人際",
-                len: "顯化期(必填)",
-                len1: "一週內",
-                len2: "一個月內",
-                len3: "三個月內",
-                len4: "六個月",
-                start: "開始卜卦"
-            },
-            result: {
-                category: "類別",
-                duration: "有效長度",
-                noChanging: "沒有變爻",
-                changingPrefix: "動爻：第",
-                changingSuffix: " 爻",
-                aboutPrefix: "關於",
-                advice: "參考建議",
-                zhiGuaPrefix: "之卦「",
-                zhiGuaSuffix: "」：",
-                benGuaPrefix: "本卦："
-            },
-            p2c: {
-                save: "儲存到日記",
-                redo: "重新起卦",
-                share: "儲存圖片"
-            },
-            about: {
-                title: "關於 DEC. 12",
-                subtitle: "在圓的軌跡裡，與宇宙共振",
-                p1: "1949 年，卡爾·榮格為《易經》的西方譯本寫下序言。真正撼動他的，從來不是未卜先知的預言，而是一抹被他稱為「共時性」的心靈幽光。",
-                p2: "他曾提及一位病人，正喃喃述說著夢裡出現的金龜子；話音未落，一隻金龜子竟真憑空飛來，輕輕棲停在窗台的玻璃上。這並非萬物間的因果牽連，卻在同一個瞬間，於虛實兩端照亮了同一個意涵。",
-                p3: "《易經》的奧秘亦是如此。它從非預測未來的占卜羅盤，而是一面清澈的鏡子，映照出你心底早已瞭然、卻始終未曾啟齒的答案。",
-                p4: "DEC.12 建議將這份古老的智慧，揉入極簡的日常習練——記錄日記。將你拋向歲月的每一個叩問細心寫下。日後驀然回首，你定會驚覺，那些卦象與生活的軌跡竟是如此神合。那並非命運被提早預演，而是因為在誠心發問的那刻，你終於學會了對自己坦白。",
-                version: "DEC. 12 · 測試版 v1"
-            },
-            draw: {
-                front: "每日靈感",
-                hint: "每日靈感卡，點擊翻開。",
-                drawBtn: "點擊翻開",
-                drawHint: "每日靈感卡，點擊翻開。",
-                swipeHint: " ",
-                learnMore: "深入了解這一卦 →",
-                today: "今日"
-            },
-            p2b: {
-                casting: "起卦中"
-            },
-            milk: {
-                title: "奶茶基金",
-                subtitle: "每一杯奶茶，都是開發者繼續寫字和維護的燃料",
-                cups: "累積杯數",
-                total: "累積金額",
-                ratio: "淨利潤捐出",
-                r1: "固定費用",
-                r2: "創作獎勵",
-                r3: "已捐金額",
-                support: "Ko-fi一杯奶茶",
-                note: "每月月初更新金額",
-                charity: "DEC.12捐款流向 No Kid Hungry & 家扶基金會"
-            },
-            p5: {
-                title: "登入",
-                sub: "記錄你的卜卦與應驗，歡迎回來對照，看看指引是否成真",
-                login: "登入",
-                register: "註冊",
-                submit: "登入",
-                later: "稍後再說"
-            },
-            saved: {
-                title: "已儲存該筆紀錄",
-                sub: "這筆卜卦已寫入你的隨記",
-                go: "前往查看",
-                stay: "回到首頁",
-                langToggle: "系統語言切換",
-                settingItem: "設定",
-                diaryHint: "點任一格子可查看該卦內容；滑動查看更多月份",
-                detailWrite: "寫下觀察與感受",
-                detailNoteSave: "尚未儲存",
-                detailSave: "儲存",
-                detailMood: "表情符號",
-                detailVerify: "感受",
-                verifyY: "○ 有幫助",
-                verifyX: "沒有幫助",
-                detailNoteHint: "寫下心得，之後回到這裡對照，看看指引是否有所幫助",
-                detailNotePrivacy: "心得只會存在你的裝置上",
-                account: "帳號",
-                accountGuest: "未登入",
-                editName: "修改暱稱",
-                privacy: "隱私權政策",
-                credits: "圖片來源",
-                authEmail: "帳號（Email）",
-                authName: "用戶名（註冊用）",
-                authPass: "密碼",
-                authPass2: "確認密碼",
-                forgot: "忘記帳號或密碼？",
-                forgotFind: "尋找密碼",
-                forgotLabel: "輸入註冊時的信箱尋找密碼",
-                forgotClose: "關閉",
-                loading: "載入你的隨記中…",
-                shareNote1: " ",
-                shareNote2: "若未收到請檢查垃圾郵件",
-                collectSub: "完成任務或收集元素，解鎖彩色圖案",
-                guardianSub: "送給你的迎新祝福，每個帳戶只有一次翻開機會",
-                guardianFront1: "請靜心翻開旅程起點的第一張卡牌",
-                guardianFront2: "作為送給用戶的迎新祝福",
-                guardianFlip: "翻開守護卡",
-                guardianLocked: "守護卡已固定，無法再次翻開"
-            },
-            cardPreview: {
-                title: "下載圖卡",
-                hint: "長壓圖片即可儲存到手機",
-                download: "下載圖片"
-            },
-            guard: {
-                title: "尚未儲存",
-                sub: "這筆卜卦結果尚未儲存，要儲存到隨記嗎？",
-                save: "儲存至日記",
-                discard: "放棄儲存"
-            },
-            share: {
-                title: "下載圖片",
-                sub: "使用Email僅寄送這份結果，不會註冊帳戶",
-                or: "或寄到 Email",
-                send: "寄送",
-                cardBtn: "下載圖卡"
-            },
-            save: {
-                done: "已儲存"
-            },
-            toast: {
-                lang: "已切換語言",
-                remindUpdated: "寄信提醒設定已更新",
-                pushUpdated: "推播通知設定已更新",
-                needLogin: "請先登入",
-                logout: "已登出",
-                milkSoon: "感謝支持，將為你開啟捐款頁面",
-                drawRevealed: "今日靈感已揭曉",
-                needCat: "請先選擇問題類別",
-                needLen: "請先選擇預測顯化期長度",
-                draftSaved: "已幫你暫存這筆結果",
-                foundPw: "已透過信箱找到密碼",
-                nameEmpty: "暱稱不能空白",
-                nameLong: "暱稱最多 16 字",
-                nameUsed: "這個暱稱已被使用，請換一個",
-                noRecord: "這天沒有卜卦紀錄",
-                locked: "尚未解鎖：完成任務或收集元素後解鎖",
-                collected: "已收集 ✨",
-                guardianFixed: "🛡️ 守護卡已固定",
-                guardianBetaClaimed: "已領取！正式開放後可再抽一次守護卡",
-                guardianBetaOff: "此功能尚未開放",
-                verifyY2: "已記錄：應驗了",
-                verifyX2: "已記錄：未應驗",
-                editMode: "已切換為編輯模式",
-                noteSaved: "已儲存這則觀察與感受",
-                divineFirst: "請先完成卜卦",
-                copied: "已複製分享內容，請貼到聊天室",
-                needEmail: "請輸入 email",
-                badEmail: "email 格式似乎有誤",
-                mailSent: "已寄出，請到信箱收信",
-                mailOpened: "已開啟郵件客戶端",
-                registerWelcome: "註冊成功，歡迎 {name}",
-                loginWelcome: "登入成功，歡迎回來 {name}",
-                nameUpdated: "暱稱已更新為「{name}」",
-                moodRecorded: "已記錄心情 {mood}",
-                elementTaskDone: "✨ 元素任務完成：{list}",
-                shareOpened: "已開啟分享",
-                memberDefault: "會員",
-                collectionUnlocked: "（已解鎖收藏相簿）"
-            },
-            authErr: {
-                emailRequired: "請輸入帳號（Email）",
-                emailInvalid: "Email 格式有誤（例：you@example.com，不可含空白或特殊字元）",
-                emailInvalidShort: "Email 格式有誤",
-                passRequired: "請輸入密碼",
-                needNetwork: "需要連線才能註冊／登入，請確認網路後再試",
-                weakPassword: "密碼強度不足：至少 8 碼，且需包含字母與數字",
-                passMismatch: "密碼與確認密碼不符合",
-                emailInUse: "這個帳號已註冊，請直接登入",
-                nameRequired: "請輸入暱稱",
-                nameTaken: "這個暱稱已被使用，請換一個",
-                registerNeedNetwork: "需要連線才能註冊，請確認網路後再試",
-                registerFailed: "註冊失敗，請稍後再試",
-                loginNeedNetwork: "需要連線才能登入，請確認網路後再試",
-                loginFailed: "帳號或密碼不正確"
-            },
-            forgotErr: {
-                emailRequired: "請輸入註冊時的信箱",
-                emailInvalid: "Email 格式有誤（例：you@example.com）",
-                notRegistered: "此信箱未註冊，請確認是否曾以該信箱註冊（僅能以信箱查詢，無法用用戶名）",
-                notRegisteredShort: "此信箱未註冊",
-                sentToPrefix: "重設密碼信件已寄出至 ",
-                sentToSuffix: "，請到信箱點擊連結設定新密碼。",
-                sentToast: "重設密碼信件已寄出",
-                needNetwork: "需要連線才能重設密碼，請確認網路後再試。",
-                needNetworkToast: "需要連線才能重設密碼",
-                sendFailedPrefix: "寄送失敗："
-            },
-            ph: {
-                detailNote: "這段時間的觀察、感受，或是與指引對照的心得…",
-                authName: "想被稱呼的名字",
-                authPass: "至少 8 碼，含字母與數字",
-                authPass2: "再輸入一次密碼",
-                shareEmail: "輸入 email…"
-            },
-            authErr2: {
-                passHintOk: "✓ 密碼符合規範（至少 8 碼，含英文與數字）",
-                passHintNeed: "密碼需至少 8 碼，且需含英文與數字"
-            },
-            emailShare: {
-                brandName: "DEC. 12 星星罐",
-                title: "DEC. 12 · 你的卜卦結果",
-                divider: "========================",
-                catPrefix: "類別：",
-                lenPrefix: "顯化期長度：",
-                mainGuaPrefix: "本卦：",
-                changedGuaPrefix: "變卦：",
-                changedLinePrefix: "動爻：第 ",
-                changedLineSuffix: " 爻",
-                corePrefix: "核心：",
-                plainLabel: "白話卦辭：",
-                contextPrefix: "情境解讀：關於",
-                contextMid: "：",
-                footer1: "一事不宜多問",
-                footer2: "這是指引，不是預言",
-                signature: "本信件由「DEC. 12」寄出，僅用於備份這份結果。",
-                unsubscribe: "若不想再收到提醒，可隨時回覆「退訂」停止寄送。",
-                previewTo: "寄送給 ",
-                previewColon: "："
-            }
-        },
-        en: {
-            nav: {
-                login: "Log in / Sign up"
-            },
-            lang: {
-                zh: "Chinese",
-                en: "EN"
-            },
-            menu: {
-                home: "Home",
-                diary: "My Journal",
-                about: "About DEC. 12",
-                milk: "Milk Tea Fund",
-                setting: "Settings",
-                lang: "Language",
-                langSub: "Switch between Chinese and English",
-                logout: "⎋ Log out",
-                account: "Account",
-                accountGuest: "Not logged in",
-                editName: "Edit nickname",
-                privacy: "Privacy Policy",
-                authEmail: "Account (Email)",
-                authName: "Username (for sign-up)",
-                authPass: "Password",
-                authPass2: "Confirm password",
-                forgot: "Forgot your account or password?",
-                forgotFind: "Find password",
-                forgotLabel: "Enter the email you signed up with to find your password",
-                forgotClose: "Close",
-                loading: "Loading your journal…",
-                shareNote1: " ",
-                shareNote2: "If you don't receive it, check your spam folder",
-                langToggle: "Language",
-                diaryHint: "Tap any date to view its reading; scroll for more months",
-                detailWrite: "Write your thoughts and observations",
-                detailNoteSave: "Unsaved",
-                detailSave: "Save",
-                detailMood: "Mood",
-                detailVerify: "Feeling",
-                verifyY: "◯ It helps",
-                verifyX: "Doesn't help",
-                detailNoteHint: "Write what happened and how you felt, then come back later to compare",
-                collectSub: "Complete missions or collect elements to unlock artwork",
-                guardianSub: "Each account can reveal its Guardian Card only once",
-                guardianFront1: "Take a quiet moment, then reveal the first card of your journey as a welcome blessing",
-                guardianFlip: "Reveal Guardian Card",
-                guardianLocked: "Your Guardian Card is set and cannot be revealed again",
-                guardianBetaTitle: "Beta Tester Exclusive",
-                guardianBetaSub: "After the official launch, you can draw one more Guardian Card",
-                guardianBetaBtn: "Claim extra draw",
-                guardianBetaReserved: "Reserved · activates at launch",
-                guardianBetaClaimedTitle: "Beta Thank-You Gift",
-                guardianBetaClaimedSub: "Your extra Guardian Card draw after launch is reserved"
-            },
-            dash: {
-                helloPre: "Hello, ",
-                helloPost: ", welcome back",
-                helloGuest: "Hello, traveler",
-                collect: "Collection",
-                guardian: "Guardian Card",
-                statCount: "Readings",
-                statPending: "Waiting to review",
-                sec: "Your readings"
-            },
-            setting: {
-                title: "Settings",
-                subtitle: "Manage notifications, privacy, and your account",
-                remind: "Email reminders",
-                push: "Push notifications",
-                dark: "Dark mode",
-                darkVal: "Follow system",
-                lang: "Language",
-                account: "Account",
-                accountGuest: "Not logged in",
-                accountLogged: " (logged in)",
-                privacy: "Privacy Policy"
-            },
-            set: {
-                on: "On",
-                off: "Off",
-                pushOff: "Enable"
-            },
-            p1: {
-                micro: "Glimmer Card",
-                microSub: "A little inspiration and gentle guidance for this moment",
-                draw: "Tap to reveal",
-                save: "Save to Journal",
-                redraw: "Draw again",
-                share: "Download Image",
-                divider: "Need more specific guidance?",
-                advance: "Advanced Reading",
-                advanceSub: "Choose a category for more focused guidance",
-                enter: "Enter Star Jar",
-                footerPre: "If DEC.12 has encouraged you, you're welcome to ",
-                footerLink: "buy me a milk tea on Ko-fi",
-                footerPost: " to support the project",
-                visits: "{{n}} visitors today"
-            },
-            p2a: {
-                back: "← Back",
-                title: "Star Jar",
-                subtitle: "Close your eyes, hold your question in mind, and choose a category.",
-                cat: "Question category (required)",
-                cat1: "Love",
-                cat2: "Career",
-                cat3: "Health",
-                cat4: "Finances",
-                cat5: "Relationships",
-                len: "Time window (required)",
-                len1: "Within 1 week",
-                len2: "Within 1 month",
-                len3: "Within 3 months",
-                len4: "6 months",
-                start: "Start Reading"
-            },
-            result: {
-                category: "Category",
-                duration: "Time Window",
-                noChanging: "No changing lines",
-                changingPrefix: "Changing lines:",
-                changingSuffix: "",
-                aboutPrefix: "About",
-                advice: "Guidance",
-                zhiGuaPrefix: "Resulting Hexagram “",
-                zhiGuaSuffix: "”: ",
-                benGuaPrefix: "Original Hexagram: "
-            },
-            p2c: {
-                save: "Save to Journal",
-                redo: "Start over",
-                share: "Download Image"
-            },
-            about: {
-                title: "About DEC. 12",
-                subtitle: "Finding resonance in life's patterns",
-                p1: "Carl Jung wrote the foreword to one of the most influential Western editions of the I Ching. What interested him was not fortune-telling, but a phenomenon he called synchronicity—moments when an inner experience and an outer event seem meaningfully connected, even without a clear causal link.",
-                p2: "One story he shared involved a patient describing a dream about a scarab-like beetle. During the conversation, a similar beetle appeared at the window. For Jung, the significance was not that one event caused the other, but that the coincidence carried meaning for the person experiencing it.",
-                p3: "The I Ching can be approached in a similar way.",
-                p4: "Rather than treating it as a tool for predicting the future, DEC.12 uses it as a prompt for reflection—a way to pause, look at a situation from another angle, and put thoughts or feelings into words.",
-                p5: "DEC.12 pairs this practice with journaling. Each time you ask a question, you can save the reading along with your own thoughts. When you return to it later, you may notice connections between the reading, the choices you made, and what eventually happened.",
-                p6: "Not because the future was already written, but because asking a meaningful question can help you notice what was already taking shape.",
-                version: "DEC. 12 · Beta v1"
-            },
-            draw: {
-                front: "Daily Inspiration",
-                hint: "Your daily inspiration card. Tap to reveal.",
-                drawBtn: "Tap to reveal",
-                drawHint: "Your daily inspiration card. Tap to reveal.",
-                swipeHint: " ",
-                learnMore: "Learn more about this hexagram →",
-                today: "Today"
-            },
-            p2b: {
-                casting: "Casting…"
-            },
-            milk: {
-                title: "Milk Tea Fund",
-                subtitle: "Every milk tea helps fuel the writing and upkeep behind DEC.12",
-                cups: "Total cups",
-                total: "Total amount",
-                ratio: "Net profit donated",
-                r1: "Fixed costs",
-                r2: "Creative rewards",
-                r3: "Amount donated",
-                support: "Buy me a milk tea on Ko-fi",
-                note: "Updated at the beginning of each month",
-                charity: "DEC.12 donations support No Kid Hungry and the Taiwan Fund for Children and Families"
-            },
-            p5: {
-                title: "Log in",
-                sub: "Save your readings and outcomes so you can come back later and see how the guidance unfolded",
-                login: "Log in",
-                register: "Sign up",
-                submit: "Log in",
-                later: "Maybe later"
-            },
-            saved: {
-                title: "Record saved",
-                sub: "This reading has been added to your journal",
-                go: "View record",
-                stay: "Back to Home",
-                langToggle: "Language",
-                settingItem: "Settings",
-                diaryHint: "Tap any date to view its reading; scroll for more months",
-                detailWrite: "Write your thoughts and observations",
-                detailNoteSave: "Unsaved",
-                detailSave: "Save",
-                detailMood: "Mood",
-                detailVerify: "Outcome",
-                verifyY: "○ Came true",
-                verifyX: "Didn't come true",
-                detailNoteHint: "Write what happened and how you felt, then come back later to compare",
-                detailNotePrivacy: "Saved only on this device",
-                account: "Account",
-                accountGuest: "Not logged in",
-                editName: "Edit nickname",
-                privacy: "Privacy Policy",
-                credits: "Image Credits",
-                authEmail: "Account (Email)",
-                authName: "Username (for sign-up)",
-                authPass: "Password",
-                authPass2: "Confirm password",
-                forgot: "Forgot your account or password?",
-                forgotFind: "Find password",
-                forgotLabel: "Enter the email you signed up with to find your password",
-                forgotClose: "Close",
-                loading: "Loading your journal…",
-                shareNote1: " ",
-                shareNote2: "If you don't receive it, check your spam folder",
-                collectSub: "Complete missions or collect elements to unlock artwork",
-                guardianSub: "A welcome blessing you can reveal only once",
-                guardianFront1: "Take a quiet moment and reveal the first card of your journey",
-                guardianFront2: "A welcome blessing for you",
-                guardianFlip: "Reveal Guardian Card",
-                guardianLocked: "Your Guardian Card is set and cannot be revealed again"
-            },
-            cardPreview: {
-                title: "Download Card",
-                hint: "Press and hold the image to save it to your phone",
-                download: "Download Image"
-            },
-            guard: {
-                title: "Not Saved",
-                sub: "This reading has not been saved. Save it to your journal?",
-                save: "Save to Journal",
-                discard: "Discard"
-            },
-            share: {
-                title: "Share",
-                sub: "Email is used only to send this result and will not create an account",
-                or: "Or send to Email",
-                send: "Send",
-                cardBtn: "Download card"
-            },
-            save: {
-                done: "Saved"
-            },
-            toast: {
-                lang: "Language switched",
-                remindUpdated: "Email reminder settings updated",
-                pushUpdated: "Push notification settings updated",
-                needLogin: "Please log in first",
-                logout: "Logged out",
-                milkSoon: "Thanks for your support. Opening the donation page",
-                drawRevealed: "Today's inspiration is ready",
-                needCat: "Please choose a question category",
-                needLen: "Please choose a time window",
-                draftSaved: "This result has been saved as a draft",
-                foundPw: "Password found by email",
-                nameEmpty: "Nickname cannot be blank",
-                nameLong: "Nickname can be up to 16 characters",
-                nameUsed: "This nickname is already in use. Try another",
-                noRecord: "No reading recorded for this day",
-                locked: "Locked: complete a mission or collect elements to unlock",
-                collected: "Collected ✨",
-                guardianFixed: "🛡️ Guardian Card set",
-                guardianBetaClaimed: "Claimed! You can draw one more Guardian Card after launch",
-                guardianBetaOff: "This feature is not available yet",
-                verifyY2: "Recorded: came true",
-                verifyX2: "Recorded: didn't come true",
-                editMode: "Edit mode enabled",
-                noteSaved: "Your note has been saved",
-                divineFirst: "Please complete a reading first",
-                copied: "Share text copied. Paste it into your chat",
-                needEmail: "Please enter an email",
-                badEmail: "That email address looks invalid",
-                mailSent: "Sent. Check your inbox",
-                mailOpened: "Email app opened",
-                registerWelcome: "Signed up! Welcome, {name}",
-                loginWelcome: "Welcome back, {name}",
-                nameUpdated: "Nickname updated to \u201c{name}\u201d",
-                moodRecorded: "Mood recorded: {mood}",
-                elementTaskDone: "\u2728 Element mission complete: {list}",
-                shareOpened: "Share sheet opened",
-                memberDefault: "Member",
-                collectionUnlocked: " (Collection artwork unlocked)"
-            },
-            authErr: {
-                emailRequired: "Please enter your email",
-                emailInvalid: "Invalid email format (e.g. you@example.com, no spaces or special characters)",
-                emailInvalidShort: "Invalid email format",
-                passRequired: "Please enter your password",
-                needNetwork: "A connection is needed to sign up or log in. Please check your network and try again",
-                weakPassword: "Password too weak: at least 8 characters, including letters and numbers",
-                passMismatch: "Passwords do not match",
-                emailInUse: "This account is already registered. Please log in instead",
-                nameRequired: "Please enter a nickname",
-                nameTaken: "This nickname is already taken. Please choose another",
-                registerNeedNetwork: "A connection is needed to sign up. Please check your network and try again",
-                registerFailed: "Sign-up failed. Please try again later",
-                loginNeedNetwork: "A connection is needed to log in. Please check your network and try again",
-                loginFailed: "Incorrect email or password"
-            },
-            forgotErr: {
-                emailRequired: "Please enter the email you registered with",
-                emailInvalid: "Invalid email format (e.g. you@example.com)",
-                notRegistered: "This email isn't registered. Please check you used this email to sign up (lookup works by email only, not by username)",
-                notRegisteredShort: "This email isn't registered",
-                sentToPrefix: "Password reset email sent to ",
-                sentToSuffix: ". Please click the link in the email to set a new password.",
-                sentToast: "Password reset email sent",
-                needNetwork: "A connection is needed to reset your password. Please check your network and try again.",
-                needNetworkToast: "Connection needed to reset password",
-                sendFailedPrefix: "Send failed: "
-            },
-            ph: {
-                detailNote: "Write your observations and feelings here, or notes to compare against the reading later\u2026",
-                authName: "What should we call you?",
-                authPass: "At least 8 characters, with letters and numbers",
-                authPass2: "Enter your password again",
-                shareEmail: "Enter email\u2026"
-            },
-            authErr2: {
-                passHintOk: "\u2713 Password meets the requirements (8+ characters, letters and numbers)",
-                passHintNeed: "Password needs at least 8 characters, with letters and numbers"
-            },
-            emailShare: {
-                brandName: "DEC. 12 Starry Jar",
-                title: "DEC. 12 \u00b7 Your Reading Result",
-                divider: "========================",
-                catPrefix: "Category: ",
-                lenPrefix: "Manifestation window: ",
-                mainGuaPrefix: "Original Hexagram: ",
-                changedGuaPrefix: "Changed Hexagram: ",
-                changedLinePrefix: "Changing line(s): ",
-                changedLineSuffix: "",
-                corePrefix: "Core: ",
-                plainLabel: "In Plain Words:",
-                contextPrefix: "Contextual Reading: Regarding ",
-                contextMid: ": ",
-                footer1: "One question at a time",
-                footer2: "This is guidance, not prophecy",
-                signature: "This email was sent by \u201cDEC. 12\u201d, solely to back up this reading.",
-                unsubscribe: "If you\u2019d rather not receive these, just reply \u201cunsubscribe\u201d anytime to stop.",
-                previewTo: "Sending to ",
-                previewColon: ": "
-            }
-        }
-    };
 
     function t(key) {
         function pick(o) {
@@ -3016,7 +2972,8 @@
                 return a && a[k]
             }, o)
         }
-        var v = pick(I18N[lang()]) || pick(I18N.zh);
+        var tbl = I18N || {},
+            v = pick(tbl[lang()]) || pick(tbl.zh);
         return v || key
     }
 
